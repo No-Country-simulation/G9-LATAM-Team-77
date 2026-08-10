@@ -1,4 +1,6 @@
 package com.financeia.financeia_backend.entity;
 
-public class Role {
+public enum Role {
+    USER,
+    ADMIN
 }
