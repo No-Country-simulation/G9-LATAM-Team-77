@@ -7,7 +7,7 @@ INSERT INTO paises (nombre, codigo) VALUES
 
 INSERT INTO monedas (nombre, codigo, simbolo) VALUES
 ('Colón costarricense', 'CRC', '₡'),
+('Peso mexicano', 'MXN', '$'),
 ('Dólar estadounidense', 'USD', '$'),
 ('Euro', 'EUR', '€'),
-('Peso mexicano', 'MXN', '$'),
 ('Peso colombiano', 'COP', '$');

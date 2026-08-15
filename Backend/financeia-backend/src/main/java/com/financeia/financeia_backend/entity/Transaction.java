@@ -1,10 +1,7 @@
 package com.financeia.financeia_backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,8 +27,9 @@ public class Transaction {
     @Column(nullable = false)
     private String category;
 
-    @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private TransactionType type;
 
     @Column(nullable = false)
     private LocalDate date;

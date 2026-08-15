@@ -1,5 +1,7 @@
 package com.financeia.financeia_backend.service;
 
+import com.financeia.financeia_backend.dto.auth.LoginRequest;
+import com.financeia.financeia_backend.dto.auth.LoginResponse;
 import com.financeia.financeia_backend.dto.auth.RegistroRequest;
 import com.financeia.financeia_backend.dto.auth.RegistroResponse;
 import com.financeia.financeia_backend.entity.Moneda;
@@ -21,7 +23,7 @@ public class AuthService {
     private final PaisRepository paisRepository;
     private final MonedaRepository monedaRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final JwtService jwtService;
     public RegistroResponse register(RegistroRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
@@ -49,6 +51,24 @@ public class AuthService {
                 savedUser.getId(),
                 savedUser.getName(),
                 savedUser.getEmail()
+        );
+    }
+    public LoginResponse login(LoginRequest request) {
+
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new RuntimeException("Credenciales inválidas");
+        }
+
+        String token = jwtService.generateToken(user.getEmail());
+
+        return new LoginResponse(
+                token,
+                user.getId(),
+                user.getName(),
+                user.getEmail()
         );
     }
 }
