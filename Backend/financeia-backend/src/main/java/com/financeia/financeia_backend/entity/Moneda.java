@@ -1,25 +1,26 @@
 package com.financeia.financeia_backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Table(name = "monedas")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Moneda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public Moneda() {
-    }
+    @Column(nullable = false)
+    private String nombre;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(nullable = false)
+    private String codigo;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(nullable = false)
+    private String simbolo;
 }
