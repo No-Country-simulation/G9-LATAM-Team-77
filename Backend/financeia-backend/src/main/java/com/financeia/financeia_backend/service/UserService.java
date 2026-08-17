@@ -30,6 +30,7 @@ public class UserService {
         return toResponse(currentUser);
     }
 
+    @Transactional
     public UserResponse updateProfile(
             User user,
             UserUpdateRequest request
