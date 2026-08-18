@@ -1,0 +1,124 @@
+---
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.replace(/^\/|\/$/g, '');
+---
+
+<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
+    <div class="flex items-center space-x-8">
+        <!-- Logo -->
+        <a href="/" class="flex items-center space-x-2.5">
+            <div class="flex space-x-1">
+                <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            </div>
+            <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white">FinanceAI</span>
+        </a>
+
+        <!-- Main Nav (Only visible when user is logged in and not on login page) -->
+        <nav id="mainNav" class="hidden space-x-6 text-sm font-medium">
+            <a href="/"
+                class={`pb-1 transition-colors ${currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                Dashboard
+            </a>
+        </nav>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center space-x-4">
+        <!-- Backend Health Indicator -->
+        <div id="backendIndicator" class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full">
+            <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span id="backendStatusText">Backend...</span>
+        </div>
+
+        <!-- Auth Button (Hidden on /login) -->
+        {currentPath !== 'login' && (
+            <a href="/login" id="authNavBtn"
+                class="text-xs font-semibold px-3.5 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors">
+                Iniciar Sesión
+            </a>
+        )}
+
+        <!-- Dark mode toggle -->
+        <button id="themeToggle"
+            aria-label="Cambiar tema"
+            class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+            <!-- Sun icon (dark mode) -->
+            <svg id="iconSun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+            </svg>
+            <!-- Moon icon (light mode) -->
+            <svg id="iconMoon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+            </svg>
+        </button>
+    </div>
+</header>
+
+<script is:inline>
+    // Theme toggle
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+
+    // Check auth status
+    const token = localStorage.getItem('financeai_token');
+    const authNavBtn = document.getElementById('authNavBtn');
+    const mainNav = document.getElementById('mainNav');
+
+    if (token) {
+        if (mainNav) {
+            mainNav.classList.remove('hidden');
+            mainNav.classList.add('md:flex');
+        }
+        if (authNavBtn) {
+            authNavBtn.textContent = 'Cerrar Sesión';
+            authNavBtn.className = 'text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors';
+            authNavBtn.href = '#';
+            authNavBtn.onclick = (e) => {
+                e.preventDefault();
+                localStorage.removeItem('financeai_token');
+                localStorage.removeItem('financeai_user');
+                window.location.href = '/login';
+            };
+        }
+    } else {
+        if (mainNav) {
+            mainNav.classList.add('hidden');
+            mainNav.classList.remove('md:flex');
+        }
+    }
+
+    // Health check polling
+    const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8080' : '';
+    fetch(`${BACKEND_URL}/api/v1/health`)
+        .then(res => res.json())
+        .then(data => {
+            const dot = document.getElementById('backendDot');
+            const text = document.getElementById('backendStatusText');
+            if (dot && text) {
+                if (data.status === 'UP') {
+                    dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                    text.textContent = 'Online';
+                }
+            }
+        })
+        .catch(() => {
+            const dot = document.getElementById('backendDot');
+            const text = document.getElementById('backendStatusText');
+            if (dot && text) {
+                dot.className = 'w-2 h-2 rounded-full bg-red-500';
+                text.textContent = 'Offline';
+            }
+        });
+</script>

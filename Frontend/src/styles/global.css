@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Tailwind v4: dark mode via class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Base font */
+:root {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Smooth theme transitions */
+*, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: ease;
+    transition-duration: 200ms;
+}
+
+/* Remove transition from interactive elements to avoid lag */
+button, input, select, a {
+    transition-property: background-color, border-color, color, opacity, box-shadow, transform;
+    transition-timing-function: ease;
+    transition-duration: 150ms;
+}
+
+/* Scrollbar dark mode */
+.dark ::-webkit-scrollbar { background: #111827; }
+.dark ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
