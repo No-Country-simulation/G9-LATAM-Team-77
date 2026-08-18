@@ -1,0 +1,11 @@
+# FinanceAI - Data Science Dependencies
+pandas==3.0.5
+scikit-learn==1.9.0
+joblib==1.5.3
+numpy==2.5.1
+scipy==1.18.0
+python-dateutil==2.9.0.post0
+threadpoolctl==3.6.0
+six==1.17.0
+tzdata==2026.3
+pyyaml==6.0.3

@@ -3,6 +3,7 @@ package com.financeia.financeia_backend.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.financeia.financeia_backend.dto.analisis.AnalisisRequest;
 import com.financeia.financeia_backend.service.AnalisisFinancieroService;
+import com.financeia.financeia_backend.service.ModeloIntegrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -10,6 +11,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,8 +31,11 @@ class AnalisisControllerTest {
         AnalisisFinancieroService service =
                 new AnalisisFinancieroService();
 
+        ModeloIntegrationService mockModelo = mock(ModeloIntegrationService.class);
+        when(mockModelo.analisisCompletoConIA(any())).thenReturn(null);
+
         mockMvc = MockMvcBuilders
-                .standaloneSetup(new AnalisisController(service))
+                .standaloneSetup(new AnalisisController(service, mockModelo))
                 .build();
 
         objectMapper = new ObjectMapper();
@@ -37,9 +46,9 @@ class AnalisisControllerTest {
 
         AnalisisRequest request = new AnalisisRequest(
                 new BigDecimal("25000"),
-                new BigDecimal("12000"),
-                new BigDecimal("5000"),
                 BigDecimal.ZERO,
+                "Mensual",
+                java.util.List.of(new AnalisisRequest.TransaccionRequest("Gasto", new BigDecimal("5000"))),
                 "HNL"
         );
 
@@ -58,10 +67,10 @@ class AnalisisControllerTest {
 
         String solicitudInvalida = """
                 {
-                  "ingresoMensual": 0,
-                  "gastoMensual": 5000,
-                  "ahorroMensual": 1000,
-                  "deudaTotal": 0,
+                  "ingreso_mensual": -10,
+                  "nivel_endeudamiento": 5000,
+                  "frecuencia_ahorro": "Mensual",
+                  "transacciones": [],
                   "moneda": "HNL"
                 }
                 """;

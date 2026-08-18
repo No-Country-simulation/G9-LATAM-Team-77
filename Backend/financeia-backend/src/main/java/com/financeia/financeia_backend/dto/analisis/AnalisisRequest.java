@@ -1,32 +1,38 @@
 package com.financeia.financeia_backend.dto.analisis;
 
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-
 import java.math.BigDecimal;
+import java.util.List;
 
 public record AnalisisRequest(
 
+        @JsonProperty("ingreso_mensual")
         @NotNull(message = "El ingreso mensual es obligatorio")
-        @Positive(message = "El ingreso mensual debe ser mayor que cero")
+        @PositiveOrZero(message = "El ingreso mensual no puede ser negativo")
         BigDecimal ingresoMensual,
 
-        @NotNull(message = "El gasto mensual es obligatorio")
-        @PositiveOrZero(message = "El gasto mensual no puede ser negativo")
-        BigDecimal gastoMensual,
+        @JsonProperty("nivel_endeudamiento")
+        @NotNull(message = "El nivel de endeudamiento es obligatorio")
+        @PositiveOrZero(message = "El nivel de endeudamiento no puede ser negativo")
+        BigDecimal nivelEndeudamiento,
 
-        @NotNull(message = "El ahorro mensual es obligatorio")
-        @PositiveOrZero(message = "El ahorro mensual no puede ser negativo")
-        BigDecimal ahorroMensual,
+        @JsonProperty("frecuencia_ahorro")
+        String frecuenciaAhorro,
 
-        @NotNull(message = "La deuda total es obligatoria")
-        @PositiveOrZero(message = "La deuda total no puede ser negativa")
-        BigDecimal deudaTotal,
+        @JsonProperty("transacciones")
+        List<TransaccionRequest> transacciones,
 
-        @NotBlank(message = "La moneda es obligatoria")
+        @JsonProperty("moneda")
         String moneda
 
 ) {
+    public record TransaccionRequest(
+            @JsonProperty("descripcion")
+            String descripcion,
+
+            @JsonProperty("valor")
+            BigDecimal valor
+    ) {}
 }

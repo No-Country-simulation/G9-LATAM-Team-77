@@ -24,9 +24,9 @@ class AnalisisFinancieroServiceTest {
 
         AnalisisRequest request = new AnalisisRequest(
                 new BigDecimal("25000"),
-                new BigDecimal("12000"),
-                new BigDecimal("5000"),
                 BigDecimal.ZERO,
+                "Mensual",
+                java.util.List.of(new AnalisisRequest.TransaccionRequest("Gasto", new BigDecimal("5000"))),
                 "HNL"
         );
 
@@ -44,9 +44,9 @@ class AnalisisFinancieroServiceTest {
 
         AnalisisRequest request = new AnalisisRequest(
                 new BigDecimal("10000"),
-                new BigDecimal("9500"),
-                new BigDecimal("500"),
-                new BigDecimal("70000"),
+                new BigDecimal("7.00"),
+                "Mensual",
+                java.util.List.of(new AnalisisRequest.TransaccionRequest("Gasto", new BigDecimal("15000"))),
                 "HNL"
         );
 

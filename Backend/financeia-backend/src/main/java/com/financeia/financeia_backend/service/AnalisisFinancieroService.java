@@ -19,40 +19,32 @@ public class AnalisisFinancieroService {
         List<String> alerts = new ArrayList<>();
         List<String> recommendations = new ArrayList<>();
 
-        BigDecimal porcentajeGastos = request.gastoMensual()
-                .divide(request.ingresoMensual(), 4, RoundingMode.HALF_UP);
+        BigDecimal porcentajeGastos = request.ingresoMensual().compareTo(BigDecimal.ZERO) == 0 
+                ? BigDecimal.ZERO : request.ingresoMensual(); 
+        
+        // Dado que la petición ya no tiene gastoMensual directamente, sumamos las transacciones
+        BigDecimal gastoMensual = request.transacciones() != null ? 
+            request.transacciones().stream().map(t -> t.valor()).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
 
-        BigDecimal porcentajeAhorro = request.ahorroMensual()
-                .divide(request.ingresoMensual(), 4, RoundingMode.HALF_UP);
-
-        BigDecimal nivelDeuda = request.deudaTotal()
-                .divide(request.ingresoMensual(), 4, RoundingMode.HALF_UP);
+        BigDecimal porcentajeGastosReal = request.ingresoMensual().compareTo(BigDecimal.ZERO) > 0 ? 
+            gastoMensual.divide(request.ingresoMensual(), 4, RoundingMode.HALF_UP) : BigDecimal.ZERO;
 
         // Evaluar los gastos mensuales
-        if (porcentajeGastos.compareTo(new BigDecimal("0.90")) > 0) {
+        if (porcentajeGastosReal.compareTo(new BigDecimal("0.90")) > 0) {
             score -= 30;
             alerts.add("Los gastos superan el 90% de los ingresos.");
             recommendations.add("Reduce gastos no esenciales inmediatamente.");
-        } else if (porcentajeGastos.compareTo(new BigDecimal("0.70")) > 0) {
+        } else if (porcentajeGastosReal.compareTo(new BigDecimal("0.70")) > 0) {
             score -= 20;
             alerts.add("Los gastos representan más del 70% de los ingresos.");
             recommendations.add("Revisa tu presupuesto y reduce gastos variables.");
-        } else if (porcentajeGastos.compareTo(new BigDecimal("0.50")) > 0) {
+        } else if (porcentajeGastosReal.compareTo(new BigDecimal("0.50")) > 0) {
             score -= 10;
             recommendations.add("Intenta mantener tus gastos por debajo del 50% de tus ingresos.");
         }
 
-        // Evaluar el ahorro mensual
-        if (porcentajeAhorro.compareTo(new BigDecimal("0.10")) < 0) {
-            score -= 20;
-            alerts.add("El nivel de ahorro mensual es bajo.");
-            recommendations.add("Procura ahorrar al menos el 10% de tus ingresos.");
-        } else if (porcentajeAhorro.compareTo(new BigDecimal("0.20")) < 0) {
-            score -= 10;
-            recommendations.add("Intenta aumentar gradualmente tu ahorro hasta el 20%.");
-        }
-
         // Evaluar el nivel de endeudamiento
+        BigDecimal nivelDeuda = request.nivelEndeudamiento();
         if (nivelDeuda.compareTo(new BigDecimal("6.00")) > 0) {
             score -= 25;
             alerts.add("El nivel de endeudamiento es muy alto.");
@@ -66,13 +58,9 @@ public class AnalisisFinancieroService {
             recommendations.add("Mantén un plan constante para reducir tus deudas.");
         }
 
-        // Comprobar si los gastos y el ahorro superan los ingresos
-        BigDecimal totalUtilizado = request.gastoMensual()
-                .add(request.ahorroMensual());
-
-        if (totalUtilizado.compareTo(request.ingresoMensual()) > 0) {
+        if (gastoMensual.compareTo(request.ingresoMensual()) > 0) {
             score -= 20;
-            alerts.add("La suma de gastos y ahorro supera el ingreso mensual.");
+            alerts.add("Los gastos superan el ingreso mensual.");
             recommendations.add("Ajusta los valores para mantener un presupuesto sostenible.");
         }
 
