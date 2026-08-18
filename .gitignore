@@ -1,1 +1,3 @@
 financeai-data-science/.venv/
+__pycache__/
+*.pyc
