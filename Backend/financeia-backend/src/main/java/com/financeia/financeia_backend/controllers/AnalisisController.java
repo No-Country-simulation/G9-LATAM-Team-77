@@ -1,8 +1,8 @@
 package com.financeia.financeia_backend.controllers;
 
-import com.financeia.financeia_backend.dto.analisis.AnalisisRequest;
-import com.financeia.financeia_backend.dto.analisis.AnalisisResponse;
-import com.financeia.financeia_backend.service.AnalisisFinancieroService;
+import tools.jackson.databind.JsonNode;
+import com.financeia.financeia_backend.dto.analisis.AnalisisDataScienceRequest;
+import com.financeia.financeia_backend.service.DataScienceService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,20 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/analisis-financiero")
 public class AnalisisController {
 
-    private final AnalisisFinancieroService analisisFinancieroService;
+    private final DataScienceService dataScienceService;
 
-    public AnalisisController(
-            AnalisisFinancieroService analisisFinancieroService
-    ) {
-        this.analisisFinancieroService = analisisFinancieroService;
+    public AnalisisController(DataScienceService dataScienceService) {
+        this.dataScienceService = dataScienceService;
     }
 
     @PostMapping
-    public ResponseEntity<AnalisisResponse> analizar(
-            @Valid @RequestBody AnalisisRequest request
+    public ResponseEntity<JsonNode> analizar(
+            @Valid @RequestBody AnalisisDataScienceRequest request
     ) {
-        AnalisisResponse response =
-                analisisFinancieroService.analizar(request);
+
+        JsonNode response = dataScienceService.analizar(request);
 
         return ResponseEntity.ok(response);
     }
