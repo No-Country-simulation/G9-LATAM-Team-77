@@ -1,37 +1,73 @@
-#  FinanceAl - Asistente Inteligente de Salud Financiera
+<div align="center">
 
-![Status](https://img.shields.io/badge/Status-En%20Desarrollo-yellow)
-![Fase](https://img.shields.io/badge/Fase-Definición%20y%20Objetivos-blue)
+# 🚀 FinanceAI - Análisis Financiero Inteligente
 
-> **Nota:** Este repositorio se encuentra en sus fases iniciales de desarrollo. La documentación y la arquitectura se irán actualizando progresivamente a medida que el proyecto avance.
+[![Astro](https://img.shields.io/badge/Frontend-Astro_4.0-FF5D01?style=for-the-badge&logo=astro&logoColor=white)](https://astro.build/)
+[![Java Spring Boot](https://img.shields.io/badge/Backend-Spring_Boot_3-6DB33F?style=for-the-badge&logo=spring&logoColor=white)](https://spring.io/)
+[![Python DS](https://img.shields.io/badge/Data_Science-Python_3.10-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-##  El Desafío
-En la actualidad, el mercado de fintechs, bancos digitales y plataformas de educación financiera está en constante expansión. Muchas personas tienen acceso a los datos brutos de sus transacciones, pero **tienen gran dificultad para transformar esa información en conocimiento útil** para la toma de decisiones. 
+*Una plataforma financiera impulsada por IA que te ayuda a tomar el control de tu economía mediante predicciones y categorización inteligente.*
 
-##  Nuestro Objetivo
-**FinanceAl** nace como una solución inteligente orientada a usuarios de carteras digitales e instituciones financieras. Nuestro objetivo principal es **analizar el comportamiento financiero de un usuario a partir de sus transacciones para generar una visión completa y clara de su salud financiera.**
-
-Buscamos transformar datos financieros aislados en información procesable que permita a los usuarios:
-- Organizar automáticamente sus gastos e ingresos.
-- Entender exactamente hacia dónde se está dirigiendo su dinero.
-- Identificar hábitos financieros (tanto positivos como de riesgo).
-- Recibir recomendaciones simples y objetivas de mejora.
-
-##  Alcance del Proyecto (MVP Propuesto)
-Para lograr este objetivo, estamos construyendo un Producto Mínimo Viable (MVP) que integrará Inteligencia Artificial, desarrollo Backend y servicios Cloud. 
-
-Las metas de desarrollo incluyen:
-1. **Motor de Clasificación (Data Science):** Un modelo de Machine Learning capaz de clasificar automáticamente los gastos en categorías (Alimentación, Transporte, Salud, etc.) e identificar el perfil financiero del usuario (ej. *Saludable, En riesgo*).
-2. **API REST (Backend):** Una interfaz de comunicación estructurada que recibirá los datos financieros del usuario, los procesará a través de nuestros modelos predictivos y devolverá los análisis en formato JSON.
-3. **Infraestructura Cloud (OCI):** Despliegue de la solución utilizando los servicios de Oracle Cloud Infrastructure (como Object Storage o Compute) para garantizar escalabilidad.
-
-##  Próximos Pasos (Roadmap Inicial)
-- [ ] Construcción y recolección del conjunto de datos (Dataset).
-- [ ] Análisis Exploratorio de Datos (EDA) y limpieza.
-- [ ] Entrenamiento del primer modelo de clasificación de gastos.
-- [ ] Diseño de los endpoints de la API.
-- [ ] Integración en la nube.
+</div>
 
 ---
-*Este documento será modificado progresivamente según los avances técnicos del proyecto
-para una mejor implementacion del mismo.*
+
+## 🎯 Sobre el Proyecto (MVP)
+FinanceAI es una solución tecnológica desarrollada durante el Hackathon (Team-77) que permite a los usuarios registrar sus transacciones, obtener un perfil financiero y recibir recomendaciones personalizadas generadas por modelos de **Machine Learning**.
+
+### ✨ Características Principales
+- **Dashboard Interactivo:** Visualización clara de los patrones de gasto y métricas clave.
+- **Predicción de IA Sensible a Moneda:** El modelo en Python analiza y proyecta tu salud financiera adaptándose a la moneda que elijas.
+- **Arquitectura de Microservicios:** Módulos separados, robustos y fácilmente escalables (Frontend, Backend, y API de Datos).
+- **Despliegue OCI (Oracle Cloud Infrastructure):** Diseñado para ser contenido en Docker y ejecutado eficientemente en la nube.
+
+---
+
+## 🏗️ Arquitectura de la Solución
+
+El proyecto está dividido en tres módulos principales con responsabilidad única:
+
+```mermaid
+graph TD;
+    A[Frontend: Astro + Tailwind] <-->|REST API JSON camelCase| B(Backend: Spring Boot + JWT);
+    B <-->|Seguridad y Datos| C[(MySQL / H2 In-Memory)];
+    B <-->|Análisis Predictivo| D[Data Science: Python ML];
+```
+
+| Módulo | Directorio | Descripción |
+| :--- | :--- | :--- |
+| **Frontend** | `/Frontend` | Interfaz gráfica y UX. Autenticación, visualización y captura de datos (Astro). |
+| **Backend** | `/Backend` | Lógica de negocio, autenticación, protección de endpoints y base de datos (Java). |
+| **Data Science**| `/DataScient` | Entorno de ejecución de modelos `.joblib` y *scripts* para generar el *score* financiero. |
+
+---
+
+## 🚀 Guía de Inicio Rápido (Desarrollo Local)
+
+Para orquestar todo el ecosistema de manera inmediata, hemos provisto un *script* automatizado. 
+
+### 1. Requisitos Previos
+- Node.js (v18+) y `pnpm`
+- Java OpenJDK 17
+- Python 3.10+
+- Variables de entorno configuradas en el archivo `.env` en la raíz.
+
+### 2. Ejecutar la Orquestación
+Usa el inicializador unificado que preparará las bases de datos y lanzará los 3 servicios simultáneamente. Simplemente ejecuta en la terminal o da doble clic en:
+
+```bash
+./scripts/iniciar_proyecto.bat
+```
+
+> [!TIP]
+> **Rutas expuestas:**
+> - 🌐 **App Frontend:** `http://localhost:4321`
+> - ⚙️ **API Backend:** `http://localhost:8080/api/v1`
+> - 📊 **Documentación API:** `http://localhost:8080/swagger-ui.html`
+
+---
+
+## 📄 Licencia y Equipo
+Construido con dedicación por el **G9-LATAM-Team-77**.
+*Fernando (Frontend) · Justin (Backend) · Jonathan (DevOps/DS)*

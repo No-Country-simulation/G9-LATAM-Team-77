@@ -1,17 +1,19 @@
 package com.financeia.financeia_backend.dto.dashboard;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Map;
 
 public record DashboardResponse(
-        Long id,
-        LocalDate fecha,
-        BigDecimal ingresoMensual,
-        BigDecimal nivelEndeudamiento,
-        String frecuenciaAhorro,
-        BigDecimal totalGastos,
-        BigDecimal ahorroEstimado,
-        String scoreFinanciero,
-        String resumenCategorias
+        BigDecimal ingresosMesActual,
+        BigDecimal gastosMesActual,
+        BigDecimal balanceMesActual,
+
+        BigDecimal ingresosMesAnterior,
+        BigDecimal gastosMesAnterior,
+        BigDecimal balanceMesAnterior,
+
+        BigDecimal variacionGastos,
+
+        Map<String, BigDecimal> gastosPorCategoria
 ) {
 }

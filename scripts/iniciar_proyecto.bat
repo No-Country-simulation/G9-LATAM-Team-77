@@ -8,7 +8,7 @@ echo =======================================================
 echo.
 
 echo Cargando variables desde el archivo maestro .env...
-for /f "usebackq tokens=1,* delims==" %%a in ("C:\Java\hackathon_2\.env") do (
+for /f "usebackq tokens=1,* delims==" %%a in ("%~dp0.env") do (
     :: Ignoramos las lineas que empiezan con #
     echo %%a | findstr /b /c:"#" >nul || (
         set "%%a=%%~b"
@@ -16,13 +16,13 @@ for /f "usebackq tokens=1,* delims==" %%a in ("C:\Java\hackathon_2\.env") do (
 )
 
 echo [1/2] Levantando el Backend (Spring Boot)...
-start "Backend FinanceAI (Puerto 8080)" cmd /k "cd /d C:\Java\hackathon_2\Backend\financeia-backend && .\mvnw spring-boot:run"
+start "Backend FinanceAI (Puerto 8080)" cmd /k "cd /d %~dp0Backend\financeia-backend && .\mvnw spring-boot:run"
 
 :: Esperamos 5 segundos para darle ventaja al backend
 timeout /t 5 /nobreak >nul
 
 echo [2/2] Levantando el Frontend (Astro)...
-start "Frontend FinanceAI (Puerto 4321)" cmd /k "cd /d C:\Java\hackathon_2\Frontend && pnpm dev"
+start "Frontend FinanceAI (Puerto 4321)" cmd /k "cd /d %~dp0Frontend && pnpm dev"
 
 echo.
 echo =======================================================

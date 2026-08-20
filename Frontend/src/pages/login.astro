@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { API_URL } from '../lib/api';
 ---
 
 <Layout title="Iniciar Sesión | FinanceAI">
@@ -183,7 +184,7 @@ import Layout from '../layouts/Layout.astro';
 	});
 </script>
 
-<script is:inline>
+<script define:vars={{ API_URL }}>
 	// Si ya está autenticado, redirigir directo al dashboard
 	if (localStorage.getItem('financeai_token')) {
 		window.location.href = '/dashboard';
@@ -266,7 +267,6 @@ import Layout from '../layouts/Layout.astro';
 
 		const email = document.getElementById('email').value.trim();
 		const password = document.getElementById('password').value;
-		const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8080' : '';
 
 		submitBtn.disabled = true;
 		submitBtn.textContent = 'Procesando...';
@@ -278,7 +278,7 @@ import Layout from '../layouts/Layout.astro';
 				const paisId = parseInt(document.getElementById('paisId').value);
 				const monedaId = parseInt(document.getElementById('monedaId').value);
 
-				const res = await fetch(`${BACKEND_URL}/api/v1/auth/register`, {
+				const res = await fetch(`${API_URL}/api/v1/auth/register`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
@@ -295,7 +295,7 @@ import Layout from '../layouts/Layout.astro';
 				if (res.ok) {
 					showAlert('¡Cuenta creada con éxito! Iniciando sesión...', false);
 					setTimeout(async () => {
-						const loginRes = await fetch(`${BACKEND_URL}/api/v1/auth/login`, {
+						const loginRes = await fetch(`${API_URL}/api/v1/auth/login`, {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({ email, password })
@@ -313,7 +313,7 @@ import Layout from '../layouts/Layout.astro';
 					showAlert(data.message || data.mensaje || data.error || 'No fue posible registrar la cuenta.');
 				}
 			} else {
-				const res = await fetch(`${BACKEND_URL}/api/v1/auth/login`, {
+				const res = await fetch(`${API_URL}/api/v1/auth/login`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ email, password })
@@ -336,11 +336,13 @@ import Layout from '../layouts/Layout.astro';
 				} else {
 					const errorMsg = data.message || data.mensaje || data.error || 'Credenciales inválidas o correo no registrado.';
 					showAlert(errorMsg);
-					window.alert("⚠️ Acceso Denegado\n\n" + errorMsg);
+					window.alert("Acceso Denegado\n\n" + errorMsg);
 				}
 			}
 		} catch (err) {
-			showAlert(`Error de conexión con el backend (${err.message}).`);
+			const errorText = 'Error de conexión con el servidor. Por favor, verifica que el Backend esté activo o inténtalo más tarde.';
+			showAlert(errorText);
+			window.alert("Error de Conexión\n\n" + errorText);
 		} finally {
 			submitBtn.disabled = false;
 			submitBtn.textContent = isRegisterMode ? 'Registrarse' : 'Iniciar sesión';

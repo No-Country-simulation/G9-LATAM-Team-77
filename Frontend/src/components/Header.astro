@@ -1,4 +1,6 @@
 ---
+import { API_URL } from '../lib/api';
+
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
 ---
@@ -20,6 +22,10 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             <a href="/"
                 class={`pb-1 transition-colors ${currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
                 Dashboard
+            </a>
+            <a href="/historial"
+                class={`pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                Historial
             </a>
         </nav>
     </div>
@@ -58,7 +64,7 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
     </div>
 </header>
 
-<script is:inline>
+<script define:vars={{ API_URL }}>
     // Theme toggle
     document.getElementById('themeToggle').addEventListener('click', () => {
         const html = document.documentElement;
@@ -100,8 +106,7 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
     }
 
     // Health check polling
-    const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8080' : '';
-    fetch(`${BACKEND_URL}/api/v1/health`)
+    fetch(`${API_URL}/api/v1/health`)
         .then(res => res.json())
         .then(data => {
             const dot = document.getElementById('backendDot');

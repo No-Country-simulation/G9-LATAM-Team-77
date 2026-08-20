@@ -1,3 +1,4 @@
+import { API_URL } from '../../lib/api';
 import type { APIRoute } from 'astro';
 import { sendWelcomeEmail } from '../../lib/email';
 
@@ -14,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Call backend API to register
-    const res = await fetch("http://localhost:8080/api/v1/auth/register", {
+    const res = await fetch(`${API_URL}/api/v1/auth/register`, {
       method: "POST",
       body: JSON.stringify({ email, password, name }),
       headers: { "Content-Type": "application/json" }

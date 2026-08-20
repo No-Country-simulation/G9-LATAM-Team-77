@@ -17,8 +17,8 @@ export const sendWelcomeEmail = async (email: string) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log('Welcome email sent to', email);
+    const info = await transporter.sendMail(mailOptions);
+    return info;
   } catch (error) {
     console.error('Error sending welcome email:', error);
   }
@@ -33,8 +33,8 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log('Password reset email sent to', email);
+    const info = await transporter.sendMail(mailOptions);
+    return info;
   } catch (error) {
     console.error('Error sending password reset email:', error);
   }
