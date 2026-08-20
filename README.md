@@ -33,4 +33,5 @@ Las metas de desarrollo incluyen:
 - [ ] Integración en la nube.
 
 ---
-*Este documento será modificado progresivamente según los avances técnicos del proyecto.*
+*Este documento será modificado progresivamente según los avances técnicos del proyecto
+para una mejor implementacion del mismo.*
