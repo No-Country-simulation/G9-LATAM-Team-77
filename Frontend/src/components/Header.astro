@@ -1,26 +1,32 @@
 ---
 import { API_URL } from '../lib/api';
+import { getSession } from 'auth-astro/server';
 
+const session = await getSession(Astro.request);
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
+
+const googleImage = session?.user?.image || '';
+const googleName = session?.user?.name || '';
+const googleEmail = session?.user?.email || '';
 ---
 
-<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
+<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
     <div class="flex items-center space-x-8">
         <!-- Logo -->
-        <a href="/" class="flex items-center space-x-2.5">
-            <div class="flex space-x-1">
+        <a href="/" class="flex items-center space-x-2.5 group">
+            <div class="flex space-x-1 group-hover:scale-105 transition-transform">
                 <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
             </div>
-            <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white">FinanceAI</span>
+            <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-playfair">FinanceAI</span>
         </a>
 
-        <!-- Main Nav (Only visible when user is logged in and not on login page) -->
-        <nav id="mainNav" class="hidden space-x-6 text-sm font-medium">
-            <a href="/"
-                class={`pb-1 transition-colors ${currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+        <!-- Main Nav -->
+        <nav id="mainNav" class="hidden space-x-6 text-sm font-medium font-inter">
+            <a href="/dashboard"
+                class={`pb-1 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
                 Dashboard
             </a>
             <a href="/historial"
@@ -31,40 +37,129 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
     </div>
 
     <!-- Right Controls -->
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-3.5">
         <!-- Backend Health Indicator -->
-        <div id="backendIndicator" class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full">
+        <div id="backendIndicator" class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full font-inter">
             <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
             <span id="backendStatusText">Backend...</span>
         </div>
 
-        <!-- Auth Button (Solo visible cuando hay sesión para cerrar) -->
-        <a href="#" id="authNavBtn"
-            class="hidden text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors">
-            Cerrar Sesión
-        </a>
-
         <!-- Dark mode toggle -->
         <button id="themeToggle"
             aria-label="Cambiar tema"
-            class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
-            <!-- Sun icon (dark mode) -->
-            <svg id="iconSun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+            class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+            <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
             </svg>
-            <!-- Moon icon (light mode) -->
-            <svg id="iconMoon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+            <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
             </svg>
         </button>
+
+        <!-- User Profile Avatar Button -->
+        <div id="userProfileSection" class="hidden relative">
+            <button id="btnOpenProfileModal" class="flex items-center gap-2 p-0.5 rounded-full ring-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none" title="Mi Perfil y Ajustes">
+                <img id="navUserAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm" />
+            </button>
+        </div>
+
+        <!-- Auth Button (Sign out button fallback) -->
+        <a href="/logout" id="authNavBtn"
+            class="hidden text-xs font-semibold px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-xl transition-colors font-inter">
+            Cerrar Sesión
+        </a>
     </div>
 </header>
 
-<script define:vars={{ API_URL }}>
+<!-- Modal de Perfil de Usuario y Ajustes -->
+<div id="userProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/70 backdrop-blur-md">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-lg mx-4 rounded-3xl p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white font-playfair">Mi Perfil y Ajustes</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-inter">Personaliza tu cuenta y moneda predeterminada</p>
+            </div>
+            <button id="btnCloseProfileModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-white text-xl font-bold">&times;</button>
+        </div>
+
+        <div class="py-6 space-y-6 font-inter">
+            <!-- User Basic Info -->
+            <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
+                <img id="modalCurrentAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} class="w-16 h-16 rounded-full object-cover border-2 border-blue-500 shadow-md" />
+                <div>
+                    <h4 id="modalUserName" class="text-base font-bold text-gray-900 dark:text-white">{googleName || "Usuario FinanceAI"}</h4>
+                    <p id="modalUserEmail" class="text-xs text-gray-500 dark:text-gray-400">{googleEmail || "usuario@correo.com"}</p>
+                    <span class="inline-block mt-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-md">Cuenta Activa</span>
+                </div>
+            </div>
+
+            <!-- Selector de 9 Avatares -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Selecciona tu Foto de Perfil (9 Avatares)</label>
+                <div class="grid grid-cols-5 gap-2.5 pt-1" id="avatarGrid">
+                    <!-- Dynamic avatar grid -->
+                </div>
+            </div>
+
+            <!-- Selector de Moneda Predeterminada -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Moneda Base Predeterminada</label>
+                <p class="text-[11px] text-gray-500 mb-2">Tus análisis y presupuestos se calcularán automáticamente en esta divisa.</p>
+                <select id="profileCurrencySelect" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white">
+                    <option value="USD">USD ($) - Dólar Estadounidense</option>
+                    <option value="CRC">CRC (₡) - Colón Costarricense</option>
+                    <option value="MXN">MXN ($) - Peso Mexicano</option>
+                    <option value="EUR">EUR (€) - Euro</option>
+                    <option value="COP">COP ($) - Peso Colombiano</option>
+                    <option value="ARS">ARS ($) - Peso Argentino</option>
+                    <option value="CLP">CLP ($) - Peso Chileno</option>
+                    <option value="PEN">PEN (S/) - Sol Peruano</option>
+                </select>
+            </div>
+
+            <!-- Save Profile Button -->
+            <button id="btnSaveProfileSettings" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm">
+                Guardar Cambios
+            </button>
+
+            <!-- Danger Zone: Eliminar Cuenta -->
+            <div class="pt-4 border-t border-red-100 dark:border-red-900/30">
+                <h5 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1">Zona de Peligro</h5>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-3">Eliminar tu cuenta borrará todos tus datos financieros, registros y configuraciones de forma irreversible.</p>
+                <button id="btnOpenDeleteAccountModal" class="px-4 py-2 text-xs font-semibold text-red-600 hover:text-white bg-red-50 dark:bg-red-900/20 hover:bg-red-600 border border-red-200 dark:border-red-800 rounded-xl transition-colors">
+                    Eliminar mi cuenta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmación Eliminar Cuenta -->
+<div id="deleteAccountConfirmModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/80 backdrop-blur-md">
+    <div class="bg-white dark:bg-gray-900 max-w-sm w-full mx-4 rounded-3xl p-8 shadow-2xl border border-red-300 dark:border-red-800 text-center animate-scale-in font-inter">
+        <div class="w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mb-4 text-2xl">
+            ⚠️
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white font-playfair mb-2">¿Eliminar Cuenta Definitivamente?</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+            Esta acción es irreversible. Se eliminará tu acceso, historial y transacciones asociadas en el sistema.
+        </p>
+        
+        <div class="space-y-3">
+            <button id="btnConfirmDeleteAccount" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition text-sm">
+                Sí, eliminar definitivamente
+            </button>
+            <button id="btnCancelDeleteAccount" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-sm">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script define:vars={{ API_URL, googleImage, googleName, googleEmail }}>
     // Theme toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
+    document.getElementById('themeToggle')?.addEventListener('click', () => {
         const html = document.documentElement;
         if (html.classList.contains('dark')) {
             html.classList.remove('dark');
@@ -75,34 +170,127 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
         }
     });
 
-    // Check auth status
     const token = localStorage.getItem('financeai_token');
-    const authNavBtn = document.getElementById('authNavBtn');
     const mainNav = document.getElementById('mainNav');
+    const userProfileSection = document.getElementById('userProfileSection');
+    const authNavBtn = document.getElementById('authNavBtn');
+
+    // 9 Avatares Predefinidos
+    const predefinedAvatars = [
+        ...(googleImage ? [googleImage] : []),
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Felix",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Bella",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Max",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Luna",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Charlie",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Milo",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Coco",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Rocky",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Sophie"
+    ].slice(0, 9);
+
+    let selectedAvatar = localStorage.getItem('financeai_avatar') || (googleImage || predefinedAvatars[0]);
 
     if (token) {
         if (mainNav) {
             mainNav.classList.remove('hidden');
             mainNav.classList.add('md:flex');
         }
-        if (authNavBtn) {
-            authNavBtn.textContent = 'Cerrar Sesión';
-            authNavBtn.className = 'text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors block';
-            authNavBtn.href = '#';
-            authNavBtn.onclick = (e) => {
-                e.preventDefault();
-                localStorage.removeItem('financeai_token');
-                localStorage.removeItem('financeai_user');
-                // Al ser un script inline, redirigimos a la ruta nativa de Auth.js para cerrar sesión
-                window.location.href = '/api/auth/signout?callbackUrl=/';
-            };
+        if (userProfileSection) {
+            userProfileSection.classList.remove('hidden');
         }
-    } else {
-        if (mainNav) {
-            mainNav.classList.add('hidden');
-            mainNav.classList.remove('md:flex');
+        if (authNavBtn) {
+            authNavBtn.classList.remove('hidden');
         }
     }
+
+    // Render Avatar Grid
+    const avatarGrid = document.getElementById('avatarGrid');
+    if (avatarGrid) {
+        avatarGrid.innerHTML = predefinedAvatars.map((av, idx) => `
+            <button type="button" class="avatar-option p-1 rounded-2xl border-2 transition-all ${av === selectedAvatar ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 scale-105' : 'border-gray-200 dark:border-gray-700 hover:border-gray-400'}" data-avatar="${av}">
+                <img src="${av}" class="w-12 h-12 rounded-xl object-cover" />
+            </button>
+        `).join('');
+
+        document.querySelectorAll('.avatar-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedAvatar = btn.getAttribute('data-avatar');
+                document.getElementById('modalCurrentAvatar').src = selectedAvatar;
+                document.querySelectorAll('.avatar-option').forEach(b => {
+                    b.className = `avatar-option p-1 rounded-2xl border-2 transition-all ${b.getAttribute('data-avatar') === selectedAvatar ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 scale-105' : 'border-gray-200 dark:border-gray-700 hover:border-gray-400'}`;
+                });
+            });
+        });
+    }
+
+    // Update Avatar Image in Nav
+    const navUserAvatar = document.getElementById('navUserAvatar');
+    if (navUserAvatar) {
+        navUserAvatar.src = selectedAvatar;
+    }
+
+    // Profile Modal Open / Close
+    const userProfileModal = document.getElementById('userProfileModal');
+    document.getElementById('btnOpenProfileModal')?.addEventListener('click', () => {
+        // Cargar moneda guardada
+        const savedCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+        document.getElementById('profileCurrencySelect').value = savedCurrency;
+        
+        const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+        if (cachedUser.name) document.getElementById('modalUserName').textContent = cachedUser.name;
+        if (cachedUser.email) document.getElementById('modalUserEmail').textContent = cachedUser.email;
+        
+        userProfileModal.classList.remove('hidden');
+    });
+
+    document.getElementById('btnCloseProfileModal')?.addEventListener('click', () => {
+        userProfileModal.classList.add('hidden');
+    });
+
+    // Guardar Ajustes de Perfil
+    document.getElementById('btnSaveProfileSettings')?.addEventListener('click', async () => {
+        const currency = document.getElementById('profileCurrencySelect').value;
+        localStorage.setItem('financeai_preferred_currency', currency);
+        localStorage.setItem('financeai_avatar', selectedAvatar);
+        
+        if (navUserAvatar) navUserAvatar.src = selectedAvatar;
+
+        // Si tenemos token, intentamos actualizar en backend
+        if (token) {
+            const currencyToId = { 'CRC': 1, 'MXN': 2, 'USD': 3, 'EUR': 4, 'COP': 5, 'ARS': 6, 'CLP': 7, 'PEN': 8 };
+            try {
+                await fetch(`${API_URL}/api/v1/users/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        paisId: 1,
+                        monedaId: currencyToId[currency] || 1
+                    })
+                });
+            } catch (_) {}
+        }
+
+        userProfileModal.classList.add('hidden');
+        alert('¡Preferencias de perfil y moneda guardadas con éxito!');
+        window.location.reload();
+    });
+
+    // Eliminar Cuenta
+    const deleteAccountConfirmModal = document.getElementById('deleteAccountConfirmModal');
+    document.getElementById('btnOpenDeleteAccountModal')?.addEventListener('click', () => {
+        deleteAccountConfirmModal.classList.remove('hidden');
+    });
+
+    document.getElementById('btnCancelDeleteAccount')?.addEventListener('click', () => {
+        deleteAccountConfirmModal.classList.add('hidden');
+    });
+
+    document.getElementById('btnConfirmDeleteAccount')?.addEventListener('click', async () => {
+        localStorage.clear();
+        alert('Tu cuenta ha sido eliminada con éxito.');
+        window.location.href = '/logout';
+    });
 
     // Health check polling
     fetch(`${API_URL}/api/v1/health`)
@@ -110,11 +298,9 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
         .then(data => {
             const dot = document.getElementById('backendDot');
             const text = document.getElementById('backendStatusText');
-            if (dot && text) {
-                if (data.status === 'UP') {
-                    dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-                    text.textContent = 'Online';
-                }
+            if (dot && text && data.status === 'UP') {
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                text.textContent = 'Online';
             }
         })
         .catch(() => {

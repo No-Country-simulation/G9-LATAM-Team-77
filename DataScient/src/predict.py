@@ -11,8 +11,16 @@ Soporta tres tipos de solicitud:
 import sys
 import json
 import os
-import joblib
-import pandas as pd
+
+try:
+    import joblib
+except ImportError:
+    joblib = None
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
 # ─────────────────────────────────────────────────────────────────────────────
 # MAPA: subcategoría/descripción → categoría principal
@@ -500,21 +508,15 @@ def predict(input_json: str) -> str:
                 data.get("nivel_endeudamiento") or data.get("nivelEndeudamiento") or data.get("endeudamiento"),
                 0.0
             )
-            if nivel_endeudamiento == 0.0 and deuda_total > 0 and ingreso_mensual > 0:
-                nivel_endeudamiento = min(100.0, (deuda_total / ingreso_mensual) * 100.0)
-
             frecuencia_ahorro = _safe_str(
                 data.get("frecuencia_ahorro") or data.get("frecuenciaAhorro"),
-                "Media"
+                ""
             )
-            if not frecuencia_ahorro:
-                frecuencia_ahorro = "Media"
-
+            # Procesar transacciones
             transacciones_raw = data.get("transacciones") or data.get("transactions") or []
             if not isinstance(transacciones_raw, list):
                 transacciones_raw = []
 
-            # Cargar modelos (no críticos si fallan)
             tx_pipeline = None
             tx_model_path = os.path.join(base_dir, "models", "transaction_model.pkl")
             if os.path.exists(tx_model_path):
@@ -523,18 +525,8 @@ def predict(input_json: str) -> str:
                 except Exception:
                     pass
 
-            prof_clf = None
-            prof_features = []
-            prof_model_path = os.path.join(base_dir, "models", "profile_model.pkl")
-            if os.path.exists(prof_model_path):
-                try:
-                    prof_clf, prof_features = joblib.load(prof_model_path)
-                except Exception:
-                    pass
-
-            # Clasificar cada transacción
             transacciones_categorizadas = []
-            resumen_gastos: dict[str, float] = {}
+            resumen_gastos = {}
 
             for t in transacciones_raw:
                 if not isinstance(t, dict):
@@ -556,89 +548,200 @@ def predict(input_json: str) -> str:
                 total_gastos = gasto_mensual_directo
                 resumen_gastos["Otros"] = gasto_mensual_directo
 
-            # Predecir perfil financiero
-            perfil_financiero = "En observación"
-            probabilidad = 0.75
-
-            if prof_clf is not None and prof_features:
-                try:
-                    gastos_mensuales = total_gastos if total_gastos > 0 else gasto_mensual_directo
-                    ratio_gastos = gastos_mensuales / ingreso_mensual if ingreso_mensual > 0 else 1.0
-                    capacidad_ahorro = max(0.0, ingreso_mensual - gastos_mensuales)
-                    tasa_ahorro = capacidad_ahorro / ingreso_mensual if ingreso_mensual > 0 else 0.0
-
-                    # Gastos esenciales vs discrecionales
-                    cats_esenciales = {"Alimentación", "Vivienda", "Salud y bienestar", "Servicios", "Educación", "Transporte"}
-                    gasto_esencial = sum(v for k, v in resumen_gastos.items() if k in cats_esenciales)
-                    gasto_discrecional = max(0.0, total_gastos - gasto_esencial)
-                    pct_esencial = (gasto_esencial / total_gastos) if total_gastos > 0 else 0.5
-                    pct_discrecional = (gasto_discrecional / total_gastos) if total_gastos > 0 else 0.5
-
-                    max_cat_gasto = max(resumen_gastos.values()) if resumen_gastos else 0.0
-                    concentracion_cat = (max_cat_gasto / total_gastos) if total_gastos > 0 else 0.0
-
-                    feat_vals = {
-                        "ingreso_mensual_usd": ingreso_mensual,
-                        "gastos_mensuales_usd": gastos_mensuales,
-                        "gasto_total_usd": gastos_mensuales,
-                        "cuota_deuda_mensual_usd": (ingreso_mensual * nivel_endeudamiento / 100.0) if deuda_total == 0 else deuda_total,
-                        "nivel_endeudamiento": nivel_endeudamiento,
-                        "ahorro_total_acumulado_usd": (capacidad_ahorro * 12.0) if ahorro_mensual == 0 else (ahorro_mensual * 12.0),
-                        "ratio_ahorro_ingreso_anual": tasa_ahorro,
-                        "capacidad_ahorro_mensual_estimada_usd": capacidad_ahorro,
-                        "tasa_capacidad_ahorro": tasa_ahorro,
-                        "ratio_gastos_ingresos": ratio_gastos,
-                        "ratio_compromisos_ingresos": ratio_gastos + (nivel_endeudamiento / 100.0),
-                        "porcentaje_gasto_esencial": pct_esencial,
-                        "porcentaje_gasto_discrecional": pct_discrecional,
-                        "concentracion_categoria_principal": concentracion_cat,
-                        "cantidad_categorias_utilizadas": len(resumen_gastos),
-                    }
-                    df_row = pd.DataFrame([{f: feat_vals.get(f, 0.0) for f in prof_features}])
-                    perfil_financiero = prof_clf.predict(df_row)[0]
-                    if hasattr(prof_clf, "predict_proba"):
-                        proba_arr = prof_clf.predict_proba(df_row)[0]
-                        probabilidad = float(max(proba_arr))
-                except Exception:
-                    pass
-            else:
-                # Lógica de reglas si no hay modelo
-                ratio_compromisos = (total_gastos / ingreso_mensual if ingreso_mensual > 0 else 1.0) + (nivel_endeudamiento / 100.0)
-                if ratio_compromisos > 1.0 or nivel_endeudamiento > 50:
-                    perfil_financiero = "En riesgo"
-                    probabilidad = 0.80
-                elif ratio_compromisos > 0.80 or nivel_endeudamiento > 35:
-                    perfil_financiero = "En observación"
-                    probabilidad = 0.72
+            # Auto-cálculo de Deuda si no se ingresó o es 0
+            if nivel_endeudamiento == 0.0:
+                if deuda_total > 0 and ingreso_mensual > 0:
+                    nivel_endeudamiento = min(100.0, (deuda_total / ingreso_mensual) * 100.0)
                 else:
-                    perfil_financiero = "Saludable"
-                    probabilidad = 0.85
+                    gastos_fijos = sum(v for k, v in resumen_gastos.items() if k in ["Vivienda", "Servicios"])
+                    if ingreso_mensual > 0:
+                        nivel_endeudamiento = min(100.0, (gastos_fijos / ingreso_mensual) * 100.0)
+                    else:
+                        nivel_endeudamiento = 0.0
+            nivel_endeudamiento = round(nivel_endeudamiento, 1)
 
-            # Generar recomendaciones específicas
-            recomendaciones = _generar_recomendaciones(
-                transacciones_categorizadas=transacciones_categorizadas,
-                ingreso_mensual=ingreso_mensual,
-                nivel_endeudamiento=nivel_endeudamiento,
-                frecuencia_ahorro=frecuencia_ahorro,
-                perfil_financiero=perfil_financiero,
-            )
-
+            # Auto-cálculo de Frecuencia de Ahorro
             ahorro_estimado = max(0.0, ingreso_mensual - total_gastos)
+            ratio_ahorro_ingreso = (ahorro_estimado / ingreso_mensual) if ingreso_mensual > 0 else 0.0
+            
+            if not frecuencia_ahorro or frecuencia_ahorro in ["Media", "AUTO"]:
+                if ratio_ahorro_ingreso >= 0.25:
+                    frecuencia_ahorro = "Alta"
+                elif ratio_ahorro_ingreso >= 0.08:
+                    frecuencia_ahorro = "Media"
+                else:
+                    frecuencia_ahorro = "Baja"
+
+            # ─────────────────────────────────────────────────────────────────
+            # MOTOR DE EXPLICABILIDAD DS-08 Y SCORING OFICIAL PR-01
+            # ─────────────────────────────────────────────────────────────────
+            # Normalización de periodicidad si se especifica
+            periodicidad = _safe_str(data.get("periodicidad") or data.get("periodo"), "mensual").lower()
+            factor_mensual = 1.0
+            if "semanal" in periodicidad:
+                factor_mensual = 4.33
+            elif "quincenal" in periodicidad:
+                factor_mensual = 2.0
+
+            ingreso_mensual_normalizado = ingreso_mensual * factor_mensual
+            total_gastos_normalizado = total_gastos * factor_mensual
+
+            # Puntos Componente 1: Gasto/Ingreso (Máx 34 pts)
+            ratio_gastos = (total_gastos_normalizado / ingreso_mensual_normalizado) if ingreso_mensual_normalizado > 0 else 2.0
+            if ratio_gastos <= 0.60:
+                pts_gasto = 34.0
+            elif ratio_gastos <= 0.90:
+                pts_gasto = 17.0
+            else:
+                pts_gasto = 0.0
+
+            # Puntos Componente 2: Ahorro Real (Máx 33 pts)
+            excedente = max(0.0, ingreso_mensual - total_gastos)
+            ratio_ahorro_ingreso = (excedente / ingreso_mensual) if ingreso_mensual > 0 else 0.0
+            tasa_ahorro_pct = round(ratio_ahorro_ingreso * 100.0, 1)
+
+            if ingreso_mensual > 0 and excedente > 0:
+                if ratio_ahorro_ingreso >= 0.20:
+                    pts_ahorro = 33.0
+                elif ratio_ahorro_ingreso >= 0.05:
+                    pts_ahorro = 16.0
+                else:
+                    pts_ahorro = 0.0
+            else:
+                pts_ahorro = 0.0
+
+            # Puntos Componente 3: Nivel de Endeudamiento (Máx 33 pts)
+            tasa_deuda_pct = round(nivel_endeudamiento, 1)
+            if nivel_endeudamiento <= 15.0:
+                pts_deuda = 33.0
+            elif nivel_endeudamiento <= 35.0:
+                pts_deuda = 16.0
+            else:
+                pts_deuda = 0.0
+
+            score_total = max(0.0, min(100.0, pts_gasto + pts_ahorro + pts_deuda))
+
+            # 1.1 Clasificación de Nivel (DS-08)
+            if score_total >= 70:
+                nivel = "Saludable"
+                emoji = "✅"
+                probabilidad = 0.92
+            elif score_total >= 40:
+                nivel = "Riesgo"
+                emoji = "⚠️"
+                probabilidad = 0.75
+            else:
+                nivel = "Crítico"
+                emoji = "🚨"
+                probabilidad = 0.40
+
+            # 1.2 Identificación de Causa Principal (Menor % relativo)
+            pilares = {
+                "gasto_ingreso": {"pts": pts_gasto, "max": 34.0, "nombre": "tu relación Gasto/Ingreso"},
+                "ahorro": {"pts": pts_ahorro, "max": 33.0, "nombre": "tu hábito de ahorro del excedente"},
+                "endeudamiento": {"pts": pts_deuda, "max": 33.0, "nombre": "tu nivel de endeudamiento"}
+            }
+            for p in pilares.values():
+                p["pct"] = (p["pts"] / p["max"]) * 100.0 if p["max"] else 0.0
+
+            causa_clave, causa_datos = min(pilares.items(), key=lambda kv: kv[1]["pct"])
+
+            # 1.3 Generación de Mensaje en 3 Capas
+            diagnosticos = {
+                "Saludable": f"{emoji} Tu salud financiera está en nivel *Saludable* ({score_total:.0f}/100). Tus finanzas muestran equilibrio entre lo que ganas, gastas y ahorras.",
+                "Riesgo": f"{emoji} Tu salud financiera está en nivel *Riesgo* ({score_total:.0f}/100). Hay señales de desequilibrio que requieren atención para evitar un deterioro mayor.",
+                "Crítico": f"{emoji} Tu salud financiera está en nivel *Crítico* ({score_total:.0f}/100). Tus finanzas requieren medidas correctivas inmediatas."
+            }
+            diagnostico_texto = diagnosticos[nivel]
+
+            plantillas_causa = {
+                "gasto_ingreso": f"El principal factor es {causa_datos['nombre']}: estás gastando el {ratio_gastos * 100:.0f}% de tu ingreso, lo que deja poco margen para imprevistos.",
+                "ahorro": f"El principal factor es {causa_datos['nombre']}: sólo estás reteniendo el {tasa_ahorro_pct:.0f}% de tu ingreso como ahorro.",
+                "endeudamiento": f"El principal factor es {causa_datos['nombre']}: el {tasa_deuda_pct:.0f}% de tu ingreso se destina a compromisos y deudas fijas."
+            }
+            causa_texto = plantillas_causa[causa_clave]
+
+            plantillas_accion = {
+                ("gasto_ingreso", "Saludable"): "Acción sugerida: mantén tu ritmo actual y considera aumentar en 5 puntos porcentuales tu tasa de ahorro.",
+                ("gasto_ingreso", "Riesgo"): "Acción sugerida: identifica 1 categoría de 'deseo' (no esencial) y redúcela un 10% este período; revisa tus gastos recurrentes primero.",
+                ("gasto_ingreso", "Crítico"): "Acción sugerida: haz un recorte inmediato del 15-20% en gastos no esenciales durante 30 días y registra cada transacción.",
+                ("ahorro", "Saludable"): "Acción sugerida: automatiza una transferencia a tu cuenta de ahorro el mismo día que recibes tu ingreso.",
+                ("ahorro", "Riesgo"): "Acción sugerida: define una regla de 'ahorro primero': aparta al menos el 10% de cada ingreso antes de gastar.",
+                ("ahorro", "Crítico"): "Acción sugerida: crea un fondo de emergencia mínimo apartando el 5% de cada ingreso de forma intocable.",
+                ("endeudamiento", "Saludable"): "Acción sugerida: evalúa adelantar pagos a tu deuda con mayor tasa de interés para liberar flujo futuro.",
+                ("endeudamiento", "Riesgo"): "Acción sugerida: prioriza el pago de la deuda con la tasa más alta (método avalancha) y evita adquirir deuda nueva.",
+                ("endeudamiento", "Crítico"): "Acción sugerida: negocia plazos con tus acreedores y congela compras a cuotas hasta estabilizar tu flujo."
+            }
+            accion_texto = plantillas_accion.get((causa_clave, nivel), "Acción sugerida: mantén el registro diario de tus transacciones.")
+
+            # 1.4 Reglas de Alertas 50/30/20 (Tolerancia 5 pp)
+            cats_necesidades = {"Vivienda", "Alimentación", "Transporte", "Servicios", "Salud y bienestar", "Educación"}
+            cats_deseos = {"Entretenimiento", "Compras", "Cuidado personal", "Regalos", "Viajes", "Otros"}
+
+            gasto_necesidades = sum(v for k, v in resumen_gastos.items() if k in cats_necesidades)
+            gasto_deseos = sum(v for k, v in resumen_gastos.items() if k in cats_deseos)
+
+            pct_necesidades = round((gasto_necesidades / ingreso_mensual * 100.0) if ingreso_mensual > 0 else 0.0, 1)
+            pct_deseos = round((gasto_deseos / ingreso_mensual * 100.0) if ingreso_mensual > 0 else 0.0, 1)
+            pct_ahorro = round((excedente / ingreso_mensual * 100.0) if ingreso_mensual > 0 else 0.0, 1)
+
+            alertas_50_30_20 = []
+            if pct_necesidades > 55.0:
+                alertas_50_30_20.append({
+                    "tipo": "necesidades_excedidas",
+                    "mensaje": f"Tus gastos en necesidades representan el {pct_necesidades}% de tu ingreso (benchmark: 50%)."
+                })
+            if pct_deseos > 35.0:
+                alertas_50_30_20.append({
+                    "tipo": "deseos_excedidos",
+                    "mensaje": f"Tus gastos discrecionales representan el {pct_deseos}% de tu ingreso (benchmark: 30%)."
+                })
+            if pct_ahorro < 15.0:
+                alertas_50_30_20.append({
+                    "tipo": "ahorro_insuficiente",
+                    "mensaje": f"Tu capacidad de ahorro actual ({pct_ahorro}%) está por debajo del benchmark recomendado (20%)."
+                })
+
+            recomendaciones_finales = [
+                diagnostico_texto,
+                causa_texto,
+                accion_texto
+            ]
+            for al in alertas_50_30_20:
+                recomendaciones_finales.append(f"⚠️ {al['mensaje']}")
 
             return json.dumps({
                 "status": "success",
-                "perfil_financiero": perfil_financiero,
+                "score_financiero": round(score_total, 0),
+                "score": round(score_total, 0),
+                "perfil_financiero": nivel,
                 "probabilidad": round(probabilidad, 4),
                 "ingreso_mensual": ingreso_mensual,
                 "total_gastos": round(total_gastos, 2),
-                "ahorro_estimado": round(ahorro_estimado, 2),
-                "nivel_endeudamiento": nivel_endeudamiento,
+                "ahorro_estimado": round(excedente, 2),
+                "nivel_endeudamiento": tasa_deuda_pct,
                 "frecuencia_ahorro": frecuencia_ahorro,
+                "periodicidad": periodicidad,
                 "moneda": moneda,
+                "explicabilidad_ds08": {
+                    "diagnostico": diagnostico_texto,
+                    "causa_principal": causa_texto,
+                    "accion_recomendada": accion_texto,
+                    "pilar_debil": causa_clave,
+                    "desglose_pilares": pilares
+                },
+                "macro_grupos": {
+                    "necesidades_basicas": round(gasto_necesidades, 2),
+                    "pct_necesidades": pct_necesidades,
+                    "estilo_vida": round(gasto_deseos, 2),
+                    "pct_estilo_vida": pct_deseos,
+                    "ahorro_deuda": round(excedente, 2),
+                    "pct_ahorro": pct_ahorro
+                },
                 "resumen_gastos": {k: round(v, 2) for k, v in resumen_gastos.items()},
                 "transacciones_categorizadas": transacciones_categorizadas,
                 "categorias_detectadas": list(resumen_gastos.keys()),
-                "recomendaciones": recomendaciones,
+                "recomendaciones": recomendaciones_finales,
             }, ensure_ascii=False)
 
     except Exception as e:

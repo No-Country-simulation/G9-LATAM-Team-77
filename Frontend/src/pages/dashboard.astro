@@ -7,171 +7,201 @@ const session = await getSession(Astro.request);
 ---
 
 <Layout title="Dashboard de Análisis | FinanceAI">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Chart.js CDN -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <!-- Encabezado -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard de Análisis</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Prueba interactiva del modelo de Inteligencia Artificial.</p>
+    <div class="w-full max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-playfair">
+                    Dashboard de Análisis
+                </h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-inter">
+                    Evaluación inteligente con IA, motor de explicabilidad DS-08 y reglas financieras 50/30/20.
+                </p>
+            </div>
+            <div id="currencyBadge" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-300 font-inter">
+                <span>Moneda: <strong id="activeCurrencyDisplay">USD</strong></span>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <!-- Main Layout: 2 Columns Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Columna Izquierda: Entrada de Datos & Configuración de Período (5 Columnas) -->
+            <div class="lg:col-span-5 bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm border border-gray-200 dark:border-gray-800 space-y-5">
+                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white font-playfair">Datos Financieros</h2>
+                    <span id="periodBadge" class="text-[11px] font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-md font-inter">Mensual</span>
+                </div>
 
-            <!-- ══════════════════════════════
-                 PANEL IZQUIERDO — Formulario
-            ══════════════════════════════ -->
-            <div class="lg:col-span-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300">
-                <h2 class="font-bold text-lg text-gray-900 dark:text-white mb-6">Datos del Cliente</h2>
-
-                <form id="analisisForm" class="space-y-6">
-
-                    <!-- Fila 1: Ingreso, Endeudamiento, Ahorro -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                        <!-- Ingreso mensual -->
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">
-                                Ingreso Mensual
-                            </label>
-                            <div class="flex">
-                                <select id="moneda"
-                                    class="bg-gray-50 dark:bg-gray-800 border border-r-0 border-gray-200 dark:border-gray-700 rounded-l-lg px-2.5 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer">
-                                    <option value="USD">USD</option>
-                                    <option value="MXN">MXN</option>
-                                    <option value="EUR">EUR</option>
-                                    <option value="CRC">CRC</option>
-                                    <option value="COP">COP</option>
-                                </select>
-                                <input type="number" id="ingreso" value="4500" required min="1"
-                                    class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-r-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-                            </div>
-                        </div>
-
-                        <!-- Nivel de endeudamiento -->
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">
-                                Endeudamiento (%)
-                            </label>
-                            <input type="number" id="deuda" value="25" required min="0" max="100"
-                                class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-                        </div>
-
-                        <!-- Frecuencia de ahorro -->
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">
-                                Frecuencia Ahorro
-                            </label>
-                            <select id="ahorro"
-                                class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer">
-                                <option value="Alta">Alta</option>
-                                <option value="Media" selected>Media</option>
-                                <option value="Baja">Baja</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Fila 2: Transacciones dinamicas -->
+                <!-- Selector de Periodicidad y Ventana de Fechas -->
+                <div class="grid grid-cols-2 gap-3 font-inter">
                     <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                                Ultimas Transacciones
-                            </label>
-                            <span class="text-[11px] text-gray-400" id="txCount">1 categoria añadida</span>
-                        </div>
-
-                        <div id="transaccionesContainer" class="space-y-2 mb-3"></div>
-
-                        <button type="button" id="btnAgregarTransaccion"
-                            class="w-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg py-2.5 text-xs font-semibold transition-colors duration-200 flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Agregar transaccion
-                        </button>
+                        <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
+                            Periodicidad
+                        </label>
+                        <select id="selectPeriodicity" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="mensual" selected>Mensual (Mes Completo)</option>
+                            <option value="quincenal">Quincenal (15 Días)</option>
+                            <option value="semanal">Semanal (7 Días)</option>
+                        </select>
                     </div>
 
-                    <!-- Submit -->
-                    <button type="submit" id="submitBtn"
-                        class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 mt-auto flex items-center justify-center gap-2 text-sm shadow-sm">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
+                            Tramo del Período
+                        </label>
+                        <select id="selectSubPeriod" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <!-- Populated dynamically based on periodicity -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Rango de Fechas Permitido -->
+                <div class="p-2.5 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-xl text-[11px] text-blue-700 dark:text-blue-300 flex items-center justify-between font-inter">
+                    <span>Límite de fechas:</span>
+                    <strong id="dateRangeNotice" class="font-mono text-xs">2026-08-01 al 2026-08-31</strong>
+                </div>
+
+                <!-- Ingreso del Período -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5 font-inter">
+                        Ingreso del Período (<span class="currencySymbol">$</span>)
+                    </label>
+                    <input type="number" id="ingreso" value="4500" required min="1"
+                        class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition font-inter" />
+                </div>
+
+                <!-- Lista de Transacciones -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide font-inter">
+                            Transacciones (<span id="txCount">2 agregadas</span>)
+                        </label>
+                    </div>
+
+                    <div id="txList" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                        <!-- Dynamic transaction rows -->
+                    </div>
+
+                    <!-- Botón Agregar Transacción -->
+                    <button type="button" id="btnAddTx"
+                        class="w-full mt-3 py-2.5 border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-blue-500 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition flex items-center justify-center gap-1.5 font-inter">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
-                        Ejecutar Analisis con IA
+                        Agregar Transacción
                     </button>
-                </form>
+                </div>
+
+                <!-- Botón Ejecutar Análisis -->
+                <button type="button" id="btnAnalizar"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm font-inter">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Ejecutar Análisis con IA
+                </button>
             </div>
 
-            <!-- ══════════════════════════════
-                 PANEL DERECHO — Resultados
-            ══════════════════════════════ -->
-            <div class="flex flex-col gap-5">
-
-                <!-- Salud Financiera Card -->
-                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm flex flex-col items-center transition-colors duration-300">
-                    <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Salud Financiera</h3>
-                    <div class="relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-gray-200 dark:border-gray-700 mb-4 transition-all duration-300" id="circleScore">
-                        <div class="text-center">
-                            <span class="text-3xl font-black text-gray-900 dark:text-white" id="scoreValue">--</span>
-                            <span class="text-[10px] text-gray-400 font-semibold block -mt-1">/ 100</span>
-                        </div>
-                    </div>
-                    <div id="profileBadge"
-                        class="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide">
-                        Sin analizar
-                    </div>
-                </div>
-
-                <!-- Recomendaciones del Modelo de IA (CARD DESTACADA) -->
-                <div id="iaRecomendacionesCard"
-                    class="bg-white dark:bg-gray-900 border border-blue-200/80 dark:border-blue-900/60 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            <!-- Columna Derecha: Salud Financiera, Gráfica de Líneas y Explicabilidad DS-08 (7 Columnas) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Score de Salud Financiera & Métricas Clave -->
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm border border-gray-200 dark:border-gray-800 items-center">
+                    
+                    <!-- Gauge Score (5 Cols) -->
+                    <div class="sm:col-span-5 flex flex-col items-center justify-center text-center border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-800 pb-4 sm:pb-0 sm:pr-4">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2 font-inter">SALUD FINANCIERA</span>
+                        <div class="relative w-32 h-32 flex items-center justify-center">
+                            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="50" class="stroke-gray-100 dark:stroke-gray-800" stroke-width="10" fill="none" />
+                                <circle id="scoreRing" cx="60" cy="60" r="50" stroke="currentColor" stroke-width="10" fill="none"
+                                    stroke-dasharray="314.159" stroke-dashoffset="314.159" stroke-linecap="round"
+                                    class="text-gray-400 transition-all duration-1000 ease-out" />
                             </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="scoreText" class="text-3xl font-black text-gray-900 dark:text-white font-inter">--</span>
+                                <span class="text-[10px] text-gray-400 font-inter">/ 100</span>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-sm text-gray-900 dark:text-white">Recomendaciones de la IA</h3>
+                        <div class="mt-2">
+                            <span id="scoreBadge" class="inline-block px-3 py-0.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 font-inter">
+                                Sin analizar
+                            </span>
+                        </div>
                     </div>
 
-                    <div id="iaRecomendacionesContent" class="space-y-2.5"></div>
-                </div>
-
-                <!-- Analisis Detallado Card -->
-                <div id="resultadoFormateado"
-                    class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
-                    <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Resumen Financiero</h3>
-
-                    <!-- Mini cards -->
-                    <div class="grid grid-cols-2 gap-3 mb-4" id="resumenCards"></div>
-
-                    <!-- Categorias detectadas -->
-                    <div id="categoriasBox" class="hidden pt-2 border-t border-gray-100 dark:border-gray-800">
-                        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Categorías Analizadas</h4>
-                        <div id="categoriasTags" class="flex flex-wrap gap-2"></div>
-                    </div>
-                </div>
-
-                <!-- Grafica de barras -->
-                <div id="graficaBox"
-                    class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
-                    <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Distribución de Gastos</h3>
-                    <div class="relative" style="height: 180px;">
-                        <canvas id="barChart"></canvas>
+                    <!-- Resumen Métricas Clave (7 Cols) -->
+                    <div class="sm:col-span-7 grid grid-cols-2 gap-3 font-inter">
+                        <div class="p-3 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                            <span class="text-[10px] font-semibold text-gray-400 uppercase">Total Gastos</span>
+                            <div id="statGastos" class="text-lg font-bold text-gray-900 dark:text-white mt-0.5">$0</div>
+                        </div>
+                        <div class="p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-100 dark:border-emerald-900/40">
+                            <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Ahorro Est.</span>
+                            <div id="statAhorro" class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">$0</div>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-900/40">
+                            <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Endeudamiento</span>
+                            <div id="statDeuda" class="text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">0%</div>
+                        </div>
+                        <div class="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/40">
+                            <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase">Frec. Ahorro</span>
+                            <div id="statFrecuencia" class="text-lg font-bold text-blue-600 dark:text-blue-400 mt-0.5">Automática</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- JSON colapsable -->
-                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 rounded-xl shadow-sm transition-colors duration-300">
-                    <button id="toggleJson"
-                        class="w-full flex items-center justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
-                        <span class="uppercase tracking-wide">Ver JSON de Respuesta (API)</span>
-                        <svg id="toggleArrow" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-                    <div id="jsonWrapper" class="hidden mt-3">
-                        <pre id="jsonOutput"
-                            class="w-full bg-gray-950 dark:bg-black text-green-400 p-4 rounded-lg font-mono text-xs overflow-auto max-h-64 leading-relaxed">Esperando ejecución...</pre>
+                <!-- Gráfica de Líneas: Evolución de Gastos vs Ingresos en el Período -->
+                <div class="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 font-inter">
+                            Evolución de Gastos en el Período (Gráfica de Líneas)
+                        </h3>
+                        <span id="chartPeriodLabel" class="text-xs font-semibold text-blue-600 dark:text-blue-400 font-inter">Agosto 2026</span>
+                    </div>
+                    <div class="h-56 relative">
+                        <canvas id="lineChartEvolution"></canvas>
+                    </div>
+                </div>
+
+                <!-- Explicabilidad DS-08 en 3 Capas -->
+                <div id="ds08Container" class="hidden bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm border border-gray-200 dark:border-gray-800 font-inter animate-fade-in space-y-4">
+                    <div class="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
+                        <div class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold">🧠</div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white font-playfair">Diagnóstico y Explicabilidad (DS-08)</h3>
+                    </div>
+
+                    <!-- 3 Capas Estructuradas -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <!-- Capa 1: Diagnóstico -->
+                        <div class="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                            <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block mb-1">1. Diagnóstico</span>
+                            <p id="capa1Text" class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Evaluando...</p>
+                        </div>
+
+                        <!-- Capa 2: Causa Principal -->
+                        <div class="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                            <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">2. Causa Principal</span>
+                            <p id="capa2Text" class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Analizando factores...</p>
+                        </div>
+
+                        <!-- Capa 3: Acción Recomendada -->
+                        <div class="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1">3. Acción Recomendada</span>
+                            <p id="capa3Text" class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Generando plan...</p>
+                        </div>
+                    </div>
+
+                    <!-- Alertas 50/30/20 -->
+                    <div id="alertsBox" class="pt-2">
+                        <ul id="alertsList" class="space-y-2 text-xs text-gray-600 dark:text-gray-300">
+                            <!-- Dynamic alerts -->
+                        </ul>
                     </div>
                 </div>
 
@@ -179,40 +209,56 @@ const session = await getSession(Astro.request);
         </div>
     </div>
 
-    <!-- Modal para Completar Perfil (Google Auth) -->
-    <div id="completeProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
-        <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-2xl p-8 shadow-2xl border border-gray-200 dark:border-gray-800">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¡Completa tu Perfil!</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Hemos detectado que iniciaste sesión con Google. Selecciona tu país y moneda base para continuar.</p>
+    <!-- Modal para Completar Perfil de Google Auth con Todos los Países y Monedas -->
+    <div id="completeProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-md">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-gray-200 dark:border-gray-800 animate-scale-in">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-playfair">¡Completa tu Perfil!</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-6 font-inter leading-relaxed">
+                Detectamos tu cuenta de Google. Selecciona tu país y moneda base para personalizar tus análisis financieros.
+            </p>
             
-            <div class="space-y-4">
+            <div class="space-y-4 font-inter">
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">País</label>
-                    <select id="modalPaisId" class="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition">
+                    <select id="modalPaisId" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white">
                         <option value="1">Costa Rica</option>
                         <option value="2">México</option>
+                        <option value="3">Estados Unidos</option>
+                        <option value="4">España</option>
+                        <option value="5">Colombia</option>
+                        <option value="6">Argentina</option>
+                        <option value="7">Chile</option>
+                        <option value="8">Perú</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Moneda</label>
-                    <select id="modalMonedaId" class="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition">
-                        <option value="1">CRC (₡)</option>
-                        <option value="2">MXN ($)</option>
+                    <select id="modalMonedaId" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white">
+                        <option value="1">CRC (₡) - Costa Rica</option>
+                        <option value="2">MXN ($) - México</option>
+                        <option value="3">USD ($) - EE.UU.</option>
+                        <option value="4">EUR (€) - España/Europa</option>
+                        <option value="5">COP ($) - Colombia</option>
+                        <option value="6">ARS ($) - Argentina</option>
+                        <option value="7">CLP ($) - Chile</option>
+                        <option value="8">PEN (S/) - Perú</option>
                     </select>
                 </div>
-                <button id="btnSaveProfile" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors">Guardar y Continuar</button>
+                <button id="btnSaveProfile" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-sm text-sm">
+                    Guardar y Continuar
+                </button>
             </div>
         </div>
     </div>
 </Layout>
 
 <script define:vars={{ API_URL, session }}>
-    // Proteccion de ruta
+    // Protección de ruta
     if (!session && !localStorage.getItem('financeai_token')) {
-        window.location.href = '/';
+        window.location.href = '/login';
     }
 
-    // Truco: Sincronizar Google Auth con el Backend de Spring Boot para obtener JWT
+    // Google Sync Trick
     if (session && !localStorage.getItem('financeai_token')) {
         fetch(`${API_URL}/api/v1/auth/google-sync`, {
             method: 'POST',
@@ -230,30 +276,32 @@ const session = await getSession(Astro.request);
         }).catch(err => console.error("Error en sincronizacion con Google:", err));
     }
 
-    // Verificar si el usuario necesita completar su perfil (pais/moneda)
+    // Verificar perfil para pais/moneda
     const currentToken = localStorage.getItem('financeai_token');
     if (currentToken) {
         fetch(`${API_URL}/api/v1/users/profile`, {
             headers: { 'Authorization': `Bearer ${currentToken}` }
         }).then(res => res.json()).then(user => {
             if (!user.paisId || !user.monedaId) {
-                document.getElementById('completeProfileModal').classList.remove('hidden');
+                document.getElementById('completeProfileModal')?.classList.remove('hidden');
                 
-                document.getElementById('btnSaveProfile').onclick = async () => {
+                document.getElementById('btnSaveProfile')?.addEventListener('click', async () => {
                     const btn = document.getElementById('btnSaveProfile');
                     btn.disabled = true;
                     btn.textContent = 'Guardando...';
                     
+                    const pId = parseInt(document.getElementById('modalPaisId').value);
+                    const mId = parseInt(document.getElementById('modalMonedaId').value);
+                    const currencyCodes = { 1: 'CRC', 2: 'MXN', 3: 'USD', 4: 'EUR', 5: 'COP', 6: 'ARS', 7: 'CLP', 8: 'PEN' };
+                    localStorage.setItem('financeai_preferred_currency', currencyCodes[mId] || 'USD');
+
                     const updateRes = await fetch(`${API_URL}/api/v1/users/profile`, {
                         method: 'PUT',
                         headers: { 
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${currentToken}`
                         },
-                        body: JSON.stringify({
-                            paisId: parseInt(document.getElementById('modalPaisId').value),
-                            monedaId: parseInt(document.getElementById('modalMonedaId').value)
-                        })
+                        body: JSON.stringify({ paisId: pId, monedaId: mId })
                     });
                     
                     if (updateRes.ok) {
@@ -261,412 +309,337 @@ const session = await getSession(Astro.request);
                     } else {
                         btn.disabled = false;
                         btn.textContent = 'Error al guardar';
-                        alert("Error al guardar el perfil. Intenta de nuevo.");
                     }
-                };
+                });
             }
         }).catch(err => console.error("Error al obtener perfil", err));
     }
 
-// ─────────────────────────────────────────────
-// Categorias
-// ─────────────────────────────────────────────
-const CATEGORIAS = [
-    { value: "Supermercado",    label: "Supermercado" },
-    { value: "Combustible",     label: "Combustible" },
-    { value: "Streaming",       label: "Streaming" },
-    { value: "Restaurante",     label: "Restaurante" },
-    { value: "Transporte",      label: "Transporte" },
-    { value: "Salud",           label: "Salud" },
-    { value: "Educacion",       label: "Educación" },
-    { value: "Ropa",            label: "Ropa" },
-    { value: "Entretenimiento", label: "Entretenimiento" },
-    { value: "Servicios",       label: "Servicios" },
-    { value: "Viajes",          label: "Viajes" },
-    { value: "Otro",            label: "Otro" },
-];
+    // Moneda activa
+    const activeCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+    const activeCurrencyDisplay = document.getElementById('activeCurrencyDisplay');
+    if (activeCurrencyDisplay) activeCurrencyDisplay.textContent = activeCurrency;
+    document.querySelectorAll('.currencySymbol').forEach(el => el.textContent = activeCurrency);
 
-let transacciones = [];
-let contadorId = 0;
-let chartInstance = null;
-
-// ─── Helpers ───────────────────────────────
-function getUsedCategorias(excludeId) {
-    return transacciones
-        .filter(t => t.id !== excludeId)
-        .map(t => t.categoria)
-        .filter(Boolean);
-}
-
-function buildOptions(selectedValue, excludeId) {
-    const used = getUsedCategorias(excludeId);
-    return CATEGORIAS.map(c => {
-        const isUsed = used.includes(c.value) && c.value !== selectedValue;
-        return `<option value="${c.value}"
-            ${c.value === selectedValue ? 'selected' : ''}
-            ${isUsed ? 'disabled' : ''}
-            style="${isUsed ? 'color:#9ca3af' : ''}">${c.label}${isUsed ? ' (seleccionada)' : ''}</option>`;
-    }).join('');
-}
-
-function refreshAllDropdowns() {
-    transacciones.forEach(t => {
-        const sel = document.getElementById(`cat_${t.id}`);
-        if (!sel) return;
-        const current = sel.value;
-        sel.innerHTML = `<option value="">-- Selecciona categoría --</option>` + buildOptions(current, t.id);
-    });
-
-    const countEl = document.getElementById('txCount');
-    if (countEl) {
-        countEl.textContent = `${transacciones.length} transacción(es) agregada(s)`;
-    }
-}
-
-function createTransaccionRow(id, catValue, valValue) {
-    const row = document.createElement('div');
-    row.id = `row_${id}`;
-    row.className = 'flex items-center gap-2 tx-row-anim';
-    row.innerHTML = `
-        <select id="cat_${id}" data-id="${id}"
-            class="w-2/5 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer">
-            <option value="">-- Categoría --</option>
-            ${buildOptions(catValue, id)}
-        </select>
-        <input type="number" id="val_${id}" value="${valValue}"
-            class="w-1/4 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            placeholder="Valor" min="0" />
-        <input type="date" id="date_${id}" value="${new Date().toISOString().split('T')[0]}" required
-            class="w-1/4 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-        <button type="button" onclick="removeTransaccion(${id})"
-            class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition text-xl font-bold"
-            title="Eliminar transacción">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
-    `;
-
-    row.querySelector(`#cat_${id}`).addEventListener('change', (e) => {
-        const entry = transacciones.find(t => t.id === id);
-        if (entry) entry.categoria = e.target.value;
-        refreshAllDropdowns();
-    });
-
-    return row;
-}
-
-function addTransaccion(catValue = '', valValue = '') {
-    const id = ++contadorId;
-    transacciones.push({ id, categoria: catValue });
-    document.getElementById('transaccionesContainer').appendChild(
-        createTransaccionRow(id, catValue, valValue)
-    );
-    refreshAllDropdowns();
-}
-
-window.removeTransaccion = function(id) {
-    transacciones = transacciones.filter(t => t.id !== id);
-    const row = document.getElementById(`row_${id}`);
-    if (row) { row.style.opacity = '0'; setTimeout(() => row.remove(), 150); }
-    setTimeout(refreshAllDropdowns, 160);
-};
-
-// Filas iniciales por defecto
-addTransaccion('Transporte', 420);
-addTransaccion('Educacion', 500);
-
-document.getElementById('btnAgregarTransaccion').addEventListener('click', () => addTransaccion());
-
-// ─── Toggle JSON ───────────────────────────
-document.getElementById('toggleJson').addEventListener('click', () => {
-    const w = document.getElementById('jsonWrapper');
-    const a = document.getElementById('toggleArrow');
-    w.classList.toggle('hidden');
-    a.style.transform = w.classList.contains('hidden') ? '' : 'rotate(180deg)';
-});
-
-// ─── Chart.js ──────────────────────────────
-async function loadChartJs() {
-    if (window.Chart) return window.Chart;
-    return new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-        s.onload = () => resolve(window.Chart);
-        s.onerror = reject;
-        document.head.appendChild(s);
-    });
-}
-
-async function renderBarChart(labels, values, moneda) {
-    if (!labels.length) return;
-    document.getElementById('graficaBox').classList.remove('hidden');
-
-    await loadChartJs();
-    const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#9ca3af' : '#6b7280';
-    const gridColor = isDark ? '#1f2937' : '#f3f4f6';
-
-    const colors = [
-        'rgba(59, 130, 246, 0.8)',
-        'rgba(147, 51, 234, 0.8)',
-        'rgba(236, 72, 153, 0.8)',
-        'rgba(245, 158, 11, 0.8)',
-        'rgba(16, 185, 129, 0.8)',
-        'rgba(6, 182, 212, 0.8)'
+    // 12 Categorías Oficiales (PR-02)
+    const OFFICIAL_CATEGORIES = [
+        "Vivienda",
+        "Alimentación",
+        "Transporte",
+        "Servicios",
+        "Salud y bienestar",
+        "Educación",
+        "Entretenimiento",
+        "Compras",
+        "Cuidado personal",
+        "Regalos",
+        "Viajes",
+        "Otros"
     ];
 
-    const ctx = document.getElementById('barChart').getContext('2d');
-    if (chartInstance) chartInstance.destroy();
+    // ─── GESTIÓN DE PERIODICIDAD Y LÍMITES DE FECHA ───
+    let currentMinDate = "2026-08-01";
+    let currentMaxDate = "2026-08-31";
 
-    chartInstance = new window.Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [{
-                data: values,
-                backgroundColor: labels.map((_, i) => colors[i % colors.length]),
-                borderRadius: 6,
-                borderSkipped: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => ` ${moneda} ${ctx.parsed.y.toLocaleString()}`
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    grid: { color: gridColor },
-                    ticks: {
-                        callback: v => moneda + ' ' + v.toLocaleString(),
-                        color: textColor,
-                        font: { size: 10 }
-                    }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { color: textColor, font: { size: 10 } }
-                }
-            }
-        }
-    });
-}
+    const selectPeriodicity = document.getElementById('selectPeriodicity');
+    const selectSubPeriod = document.getElementById('selectSubPeriod');
+    const periodBadge = document.getElementById('periodBadge');
+    const dateRangeNotice = document.getElementById('dateRangeNotice');
+    const chartPeriodLabel = document.getElementById('chartPeriodLabel');
 
-// ─── Render resultado formateado ───────────
-function renderResultado(data, moneda, txns) {
-    // JSON raw
-    document.getElementById('jsonOutput').innerText = JSON.stringify(data, null, 2);
+    function updateSubPeriods() {
+        const periodicity = selectPeriodicity.value;
+        periodBadge.textContent = periodicity.charAt(0).toUpperCase() + periodicity.slice(1);
 
-    // Score & Perfil
-    const score = (data.score !== undefined && data.score !== null) 
-        ? data.score 
-        : ((data.score_financiero !== undefined && data.score_financiero !== null) 
-            ? data.score_financiero 
-            : ((data.probabilidad !== undefined && data.probabilidad !== null)
-                ? Math.round(data.probabilidad * 100)
-                : (data.level === 'Excelente' ? 88 : (data.level === 'Medio' ? 60 : 50))));
-
-    const perfil = data.level 
-        ? data.level 
-        : (data.perfil_financiero 
-            ? data.perfil_financiero 
-            : (score >= 75 ? 'Excelente' : (score >= 50 ? 'Moderado' : 'En riesgo')));
-    
-    document.getElementById('scoreValue').innerText = score;
-
-    const badge = document.getElementById('profileBadge');
-    const circle = document.getElementById('circleScore');
-    badge.innerText = perfil;
-
-    if (score >= 75 || perfil === 'Excelente' || perfil === 'Saludable') {
-        badge.className  = 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border border-emerald-300 dark:border-emerald-800';
-        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-emerald-500 mb-4 shadow-sm';
-    } else if (score >= 45 || perfil === 'Moderado' || perfil === 'Medio') {
-        badge.className  = 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border border-amber-300 dark:border-amber-800';
-        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-amber-500 mb-4 shadow-sm';
-    } else {
-        badge.className  = 'bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border border-red-300 dark:border-red-800';
-        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-red-500 mb-4 shadow-sm';
-    }
-
-    // ─── Render Recomendaciones y Alertas de IA ───
-    const recsCard = document.getElementById('iaRecomendacionesCard');
-    const recsContent = document.getElementById('iaRecomendacionesContent');
-
-    const rawRecs = data.recommendations || data.recomendaciones || data.recomendacion || [];
-    const recs = Array.isArray(rawRecs) ? rawRecs : [rawRecs];
-
-    const rawAlerts = data.alerts || data.alertas || [];
-    const alerts = Array.isArray(rawAlerts) ? rawAlerts : [rawAlerts];
-
-    let iaHtml = '';
-
-    if (alerts.length > 0) {
-        iaHtml += alerts.map(a => `
-            <div class="flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 rounded-xl p-3">
-                <span class="text-amber-500 text-sm font-bold shrink-0">!</span>
-                <div class="leading-relaxed font-medium">${a}</div>
-            </div>
-        `).join('');
-    }
-
-    if (recs.length > 0) {
-        iaHtml += recs.map(r => `
-            <div class="flex items-start gap-2.5 text-xs text-blue-950 dark:text-blue-200 bg-blue-50/80 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/60 rounded-xl p-3">
-                <span class="text-blue-600 dark:text-blue-400 text-sm font-bold shrink-0">*</span>
-                <div class="leading-relaxed font-medium">${r}</div>
-            </div>
-        `).join('');
-    }
-
-    if (iaHtml) {
-        recsContent.innerHTML = iaHtml;
-        recsCard.classList.remove('hidden');
-    } else {
-        recsCard.classList.add('hidden');
-    }
-
-    // ─── Resumen Financiero ───
-    document.getElementById('resultadoFormateado').classList.remove('hidden');
-
-    const totalGastos = (data.total_gastos !== undefined && data.total_gastos !== null) 
-        ? data.total_gastos 
-        : txns.reduce((sum, t) => sum + (t.valor || 0), 0);
-
-    const ingreso = parseFloat(document.getElementById('ingreso').value) || 0;
-
-    const ahorroEst = (data.ahorro_estimado !== undefined && data.ahorro_estimado !== null) 
-        ? data.ahorro_estimado 
-        : Math.max(0, ingreso - totalGastos);
-
-    const nivelEndeudamiento = (data.nivel_endeudamiento !== undefined && data.nivel_endeudamiento !== null) 
-        ? data.nivel_endeudamiento 
-        : (parseFloat(document.getElementById('deuda').value) || 0);
-
-    const frecuenciaAhorro = data.frecuencia_ahorro 
-        ? data.frecuencia_ahorro 
-        : document.getElementById('ahorro').value;
-
-    const items = [
-        { label: 'Total Gastos',   value: `${moneda} ${Number(totalGastos).toLocaleString()}`, color: 'red' },
-        { label: 'Ahorro Est.',     value: `${moneda} ${Number(ahorroEst).toLocaleString()}`,   color: 'green' },
-        { label: 'Endeudamiento', value: `${nivelEndeudamiento}%`,                             color: 'orange' },
-        { label: 'Frec. Ahorro',  value: frecuenciaAhorro,                                     color: 'blue' }
-    ];
-
-    const colorMap = {
-        red:    'bg-red-50    dark:bg-red-950/60    text-red-700    dark:text-red-400    border border-red-100 dark:border-red-900/40',
-        green:  'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40',
-        orange: 'bg-amber-50  dark:bg-amber-950/60  text-amber-700  dark:text-amber-400  border border-amber-100 dark:border-amber-900/40',
-        blue:   'bg-blue-50   dark:bg-blue-950/60   text-blue-700   dark:text-blue-400   border border-blue-100 dark:border-blue-900/40',
-    };
-
-    document.getElementById('resumenCards').innerHTML = items.map(c => `
-        <div class="rounded-xl p-3 ${colorMap[c.color]}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-70">${c.label}</p>
-            <p class="text-base font-extrabold mt-0.5">${c.value}</p>
-        </div>
-    `).join('');
-
-    // Categorias tags
-    const catBox  = document.getElementById('categoriasBox');
-    const catTags = document.getElementById('categoriasTags');
-    const cats = data.categorias_detectadas || txns.map(t => t.descripcion);
-    if (cats && cats.length) {
-        const tc = ['bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300',
-                    'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300',
-                    'bg-pink-100 dark:bg-pink-950 text-pink-700 dark:text-pink-300',
-                    'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300',
-                    'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300',
-                    'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300'];
-        catTags.innerHTML = cats.map((c, i) =>
-            `<span class="text-[11px] font-semibold px-2.5 py-1 rounded-full ${tc[i % tc.length]}">${c}</span>`
-        ).join('');
-        catBox.classList.remove('hidden');
-    } else {
-        catBox.classList.add('hidden');
-    }
-
-    // Grafica
-    renderBarChart(txns.map(t => t.descripcion), txns.map(t => t.valor), moneda);
-}
-
-// ─── Submit ────────────────────────────────
-document.getElementById('analisisForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const moneda = document.getElementById('moneda').value;
-    const txns = transacciones
-        .map(t => ({
-            descripcion: (document.getElementById(`cat_${t.id}`)?.value || '').trim(),
-            valor: parseFloat(document.getElementById(`val_${t.id}`)?.value) || 0,
-            fecha: document.getElementById(`date_${t.id}`)?.value || new Date().toISOString().split('T')[0]
-        }))
-        .filter(t => t.descripcion !== '');
-
-    const payload = {
-        ingresoMensual:     parseFloat(document.getElementById('ingreso').value) || 0,
-        nivelEndeudamiento: parseFloat(document.getElementById('deuda').value) || 0,
-        frecuenciaAhorro:   document.getElementById('ahorro').value.toUpperCase(),
-        moneda:              moneda,
-        transacciones:       txns
-    };
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerHTML = `
-        <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-        </svg>
-        Analizando con IA...`;
-
-    document.getElementById('jsonOutput').innerText = 'Analizando transacciones con IA...';
-
-    try {
-        const token = localStorage.getItem('financeai_token');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+        if (periodicity === 'mensual') {
+            selectSubPeriod.innerHTML = `
+                <option value="2026-08-01|2026-08-31" selected>Agosto 2026</option>
+                <option value="2026-07-01|2026-07-31">Julio 2026</option>
+                <option value="2026-06-01|2026-06-30">Junio 2026</option>
+            `;
+        } else if (periodicity === 'quincenal') {
+            selectSubPeriod.innerHTML = `
+                <option value="2026-08-01|2026-08-15">1ra Quincena Ago (1-15)</option>
+                <option value="2026-08-16|2026-08-31" selected>2da Quincena Ago (16-31)</option>
+                <option value="2026-07-01|2026-07-15">1ra Quincena Jul (1-15)</option>
+                <option value="2026-07-16|2026-07-31">2da Quincena Jul (16-31)</option>
+            `;
+        } else if (periodicity === 'semanal') {
+            selectSubPeriod.innerHTML = `
+                <option value="2026-08-17|2026-08-23" selected>Semana 3 Ago (17-23)</option>
+                <option value="2026-08-24|2026-08-30">Semana 4 Ago (24-30)</option>
+                <option value="2026-08-10|2026-08-16">Semana 2 Ago (10-16)</option>
+                <option value="2026-08-03|2026-08-09">Semana 1 Ago (03-09)</option>
+            `;
         }
 
-        const res = await fetch(`${API_URL}/api/v1/analisis-financiero`, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(payload)
+        applyDateBounds();
+    }
+
+    function applyDateBounds() {
+        const parts = selectSubPeriod.value.split('|');
+        currentMinDate = parts[0];
+        currentMaxDate = parts[1];
+
+        dateRangeNotice.textContent = `${currentMinDate} al ${currentMaxDate}`;
+        chartPeriodLabel.textContent = selectSubPeriod.options[selectSubPeriod.selectedIndex].text;
+
+        // Ajustar fechas de las transacciones para que no se salgan del rango
+        transacciones.forEach(tx => {
+            if (tx.fecha < currentMinDate) tx.fecha = currentMinDate;
+            if (tx.fecha > currentMaxDate) tx.fecha = currentMaxDate;
         });
 
-        if (res.ok) {
-            renderResultado(await res.json(), moneda, txns);
-        } else {
-            document.getElementById('jsonOutput').innerText = `Error HTTP ${res.status}: ${await res.text()}`;
-        }
-    } catch (err) {
-        document.getElementById('jsonOutput').innerText = `Error de conexión con el backend.\n\n${err.message}`;
-        alert('Error de conexión con el servidor. Por favor, verifica que el Backend esté activo o inténtalo más tarde.');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
-            Ejecutar Analisis con IA`;
+        renderTransacciones();
     }
-});
-</script>
 
-<style>
-@keyframes tx-fade-in {
-    from { opacity: 0; transform: translateY(-5px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.tx-row-anim { animation: tx-fade-in 0.2s ease; }
-select option[disabled] { color: #9ca3af; }
-</style>
+    selectPeriodicity?.addEventListener('change', updateSubPeriods);
+    selectSubPeriod?.addEventListener('change', applyDateBounds);
+
+    // Estado inicial de transacciones
+    let transacciones = [
+        { id: 1, descripcion: 'Transporte', monto: 420, fecha: '2026-08-18' },
+        { id: 2, descripcion: 'Educación', monto: 500, fecha: '2026-08-20' }
+    ];
+
+    function renderTransacciones() {
+        const list = document.getElementById('txList');
+        if (!list) return;
+
+        list.innerHTML = transacciones.map((tx, idx) => `
+            <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 p-2 rounded-2xl border border-gray-200 dark:border-gray-700 animate-fade-in" data-id="${tx.id}">
+                <select class="tx-category flex-1 px-2.5 py-2 text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                    ${OFFICIAL_CATEGORIES.map(cat => `
+                        <option value="${cat}" ${tx.descripcion === cat ? 'selected' : ''}>${cat}</option>
+                    `).join('')}
+                </select>
+                <input type="number" min="1" value="${tx.monto}" placeholder="Monto"
+                    class="tx-amount w-24 px-2.5 py-2 text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
+                <input type="date" min="${currentMinDate}" max="${currentMaxDate}" value="${tx.fecha || currentMinDate}"
+                    class="tx-date w-32 px-2 py-2 text-[11px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
+                <button type="button" class="btn-remove-tx p-1.5 text-gray-400 hover:text-red-500 transition rounded-lg" data-id="${tx.id}" title="Eliminar">
+                    &times;
+                </button>
+            </div>
+        `).join('');
+
+        document.getElementById('txCount').textContent = `${transacciones.length} agregada(s)`;
+
+        // Eventos
+        document.querySelectorAll('.btn-remove-tx').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                transacciones = transacciones.filter(t => t.id !== id);
+                renderTransacciones();
+                updateLineChartFromTxns();
+            });
+        });
+
+        document.querySelectorAll('.tx-category').forEach((sel, idx) => {
+            sel.addEventListener('change', () => {
+                transacciones[idx].descripcion = sel.value;
+            });
+        });
+
+        document.querySelectorAll('.tx-amount').forEach((inp, idx) => {
+            inp.addEventListener('input', () => {
+                transacciones[idx].monto = parseFloat(inp.value) || 0;
+                updateLineChartFromTxns();
+            });
+        });
+
+        document.querySelectorAll('.tx-date').forEach((inp, idx) => {
+            inp.addEventListener('change', () => {
+                transacciones[idx].fecha = inp.value;
+                updateLineChartFromTxns();
+            });
+        });
+    }
+
+    document.getElementById('btnAddTx')?.addEventListener('click', () => {
+        const nextId = transacciones.length > 0 ? Math.max(...transacciones.map(t => t.id)) + 1 : 1;
+        transacciones.push({ id: nextId, descripcion: 'Alimentación', monto: 150, fecha: currentMinDate });
+        renderTransacciones();
+        updateLineChartFromTxns();
+    });
+
+    // ─── GRÁFICA DE LÍNEAS INTERACTIVA (Chart.js) ───
+    let lineChartInstance = null;
+
+    function renderLineChart(labels, expensePoints, incomeLevel) {
+        const ctx = document.getElementById('lineChartEvolution')?.getContext('2d');
+        if (!ctx) return;
+
+        if (lineChartInstance) lineChartInstance.destroy();
+
+        lineChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: `Gastos (${activeCurrency})`,
+                        data: expensePoints,
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#EF4444',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    },
+                    {
+                        label: `Ingreso Base (${activeCurrency})`,
+                        data: labels.map(() => incomeLevel),
+                        borderColor: '#10B981',
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { family: 'Inter', size: 11 } }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { 
+                        grid: { color: 'rgba(156, 163, 175, 0.1)' },
+                        ticks: { callback: v => activeCurrency + ' ' + v }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateLineChartFromTxns() {
+        const dates = [...new Set(transacciones.map(t => t.fecha || currentMinDate))].sort();
+        const expenseByDate = dates.map(d => transacciones.filter(t => (t.fecha || currentMinDate) === d).reduce((a, b) => a + (b.monto || 0), 0));
+        const ingreso = parseFloat(document.getElementById('ingreso')?.value) || 4500;
+
+        renderLineChart(dates.length > 0 ? dates : [currentMinDate], expenseByDate.length > 0 ? expenseByDate : [0], ingreso);
+    }
+
+    // Inicializar subperiodos y fechas
+    updateSubPeriods();
+    updateLineChartFromTxns();
+
+    // ─── EJECUTAR ANÁLISIS CON IA ───
+    document.getElementById('btnAnalizar')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btnAnalizar');
+        btn.disabled = true;
+        btn.innerHTML = `<span class="animate-spin inline-block mr-2">⏳</span> Analizando con IA...`;
+
+        const ingreso = parseFloat(document.getElementById('ingreso').value) || 0;
+        const periodicity = selectPeriodicity.value;
+        const txns = transacciones.map(t => ({ descripcion: t.descripcion, valor: t.monto }));
+
+        const payload = {
+            ingresoMensual: ingreso,
+            nivelEndeudamiento: 0, // Auto-calculado
+            frecuenciaAhorro: "AUTO",
+            periodicidad: periodicity,
+            moneda: activeCurrency,
+            transacciones: txns
+        };
+
+        try {
+            const token = localStorage.getItem('financeai_token');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const res = await fetch(`${API_URL}/api/v1/analisis-financiero`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                updateDashboardResults(data);
+            } else {
+                alert(`Error HTTP ${res.status}: No fue posible completar el análisis.`);
+            }
+        } catch (e) {
+            alert('Error de conexión con el backend.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Ejecutar Análisis con IA`;
+        }
+    });
+
+    function updateDashboardResults(data) {
+        // Score Ring & Text
+        const score = data.score_financiero || data.score || 0;
+        document.getElementById('scoreText').textContent = score;
+        
+        const scoreRing = document.getElementById('scoreRing');
+        const offset = 314.159 - (314.159 * score) / 100;
+        scoreRing.style.strokeDashoffset = offset;
+
+        const badge = document.getElementById('scoreBadge');
+        if (score >= 70) {
+            scoreRing.setAttribute('class', 'text-emerald-500 transition-all duration-1000 ease-out');
+            badge.className = 'inline-block px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-inter';
+            badge.textContent = 'Saludable 🟢';
+        } else if (score >= 40) {
+            scoreRing.setAttribute('class', 'text-amber-500 transition-all duration-1000 ease-out');
+            badge.className = 'inline-block px-3 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 font-inter';
+            badge.textContent = 'En riesgo ⚠️';
+        } else {
+            scoreRing.setAttribute('class', 'text-red-500 transition-all duration-1000 ease-out');
+            badge.className = 'inline-block px-3 py-0.5 rounded-full text-xs font-bold bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 font-inter';
+            badge.textContent = 'Crítico 🚨';
+        }
+
+        // Stats
+        document.getElementById('statGastos').textContent = `${activeCurrency} ${Number(data.total_gastos || 0).toLocaleString()}`;
+        document.getElementById('statAhorro').textContent = `${activeCurrency} ${Number(data.ahorro_estimado || 0).toLocaleString()}`;
+        document.getElementById('statDeuda').textContent = `${data.nivel_endeudamiento || 0}%`;
+        document.getElementById('statFrecuencia').textContent = data.frecuencia_ahorro || 'Media';
+
+        // Explicabilidad DS-08 en 3 Capas
+        const ds08Container = document.getElementById('ds08Container');
+        if (data.explicabilidad_ds08) {
+            document.getElementById('capa1Text').textContent = data.explicabilidad_ds08.diagnostico || '';
+            document.getElementById('capa2Text').textContent = data.explicabilidad_ds08.causa_principal || '';
+            document.getElementById('capa3Text').textContent = data.explicabilidad_ds08.accion_recomendada || '';
+        }
+
+        // Alertas Adicionales
+        const alertsList = document.getElementById('alertsList');
+        if (data.recomendaciones && data.recomendaciones.length > 3) {
+            const extraAlerts = data.recomendaciones.slice(3);
+            alertsList.innerHTML = extraAlerts.map(al => `
+                <li class="p-2.5 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 rounded-xl border border-amber-200 dark:border-amber-900/40">
+                    ${al}
+                </li>
+            `).join('');
+        } else {
+            alertsList.innerHTML = '';
+        }
+
+        ds08Container.classList.remove('hidden');
+
+        // Actualizar Gráfica de Líneas
+        updateLineChartFromTxns();
+    }
+</script>
