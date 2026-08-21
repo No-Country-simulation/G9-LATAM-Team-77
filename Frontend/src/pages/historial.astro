@@ -1,38 +1,29 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-// Mocked Data
-const financialScore = 780;
-const debtLevel = 35; // percentage
-const totalGastos = 12500;
-const totalIngresos = 30000;
-
-const transactions = [
-  { id: 1, date: '2026-08-18', description: 'Pago de Hipoteca', category: 'Vivienda', amount: -5000, status: 'Completado' },
-  { id: 2, date: '2026-08-17', description: 'Salario Mensual', category: 'Ingreso', amount: 30000, status: 'Completado' },
-  { id: 3, date: '2026-08-15', description: 'Compra Supermercado', category: 'Alimentación', amount: -1200, status: 'Completado' },
-  { id: 4, date: '2026-08-12', description: 'Suscripción Netflix', category: 'Ocio', amount: -250, status: 'Completado' },
-  { id: 5, date: '2026-08-10', description: 'Seguro Auto', category: 'Transporte', amount: -800, status: 'Pendiente' },
-];
-
-const debtLevelColor = debtLevel < 30 ? 'bg-green-500' : debtLevel < 60 ? 'bg-yellow-500' : 'bg-red-500';
-const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 600 ? 'text-yellow-600' : 'text-red-600';
+import { API_URL } from '../lib/api';
 ---
 
-<Layout title="Historial Financiero | FinanceAl">
+<Layout title="Historial Financiero | FinanceAI">
     <div class="w-full max-w-7xl mx-auto p-4 md:p-8 flex flex-col gap-8">
         
         <!-- Header Section -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Historial Financiero</h1>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight dark:text-white">Historial Financiero</h1>
                 <p class="text-sm text-gray-500 mt-1">Revisa tus transacciones y métricas financieras.</p>
             </div>
             <div class="flex items-center space-x-3">
-                <button aria-label="Exportar historial a PDF" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- Select para filtrar por tiempo -->
+                <select id="periodFilter" class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-600 dark:text-gray-300">
+                    <option value="all">Todo el tiempo</option>
+                    <option value="month">Último Mes</option>
+                    <option value="week">Última Semana</option>
+                </select>
+
+                <button aria-label="Exportar historial a PDF" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Exportar PDF
                 </button>
-                <button aria-label="Añadir nueva transacción" class="px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <button onclick="window.location.href='/dashboard'" aria-label="Añadir nueva transacción" class="px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Nueva Transacción
                 </button>
             </div>
@@ -41,41 +32,41 @@ const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 60
         <!-- Summary Cards -->
         <section aria-label="Resumen Financiero" role="region" class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Score Financiero -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
-                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
-                <h2 class="text-sm font-semibold text-gray-500 mb-1" id="score-label">Score Financiero</h2>
+            <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1" id="score-label">Score Financiero</h2>
                 <div class="flex items-end space-x-2">
-                    <span aria-labelledby="score-label" class={`text-4xl font-black ${scoreColor}`}>{financialScore}</span>
+                    <span id="scoreValue" aria-labelledby="score-label" class="text-4xl font-black text-gray-400">--</span>
                     <span class="text-sm text-gray-400 mb-1">/ 850</span>
                 </div>
-                <p class="text-xs text-gray-400 mt-3">Tu puntuación es excelente. ¡Sigue así!</p>
+                <p id="scoreMsg" class="text-xs text-gray-400 mt-3">Calculando puntuación...</p>
             </div>
 
             <!-- Nivel de Endeudamiento -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow">
                 <div class="flex justify-between items-center mb-1">
-                    <h2 class="text-sm font-semibold text-gray-500" id="debt-label">Nivel de Endeudamiento</h2>
-                    <span class="text-sm font-bold text-gray-900">{debtLevel}%</span>
+                    <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400" id="debt-label">Nivel de Endeudamiento</h2>
+                    <span id="debtValue" class="text-sm font-bold text-gray-900 dark:text-white">--%</span>
                 </div>
-                <div class="w-full bg-gray-100 h-2 rounded-full mt-4 overflow-hidden" aria-hidden="true">
-                    <div class={`h-full rounded-full transition-all duration-1000 ${debtLevelColor}`} style={`width: ${debtLevel}%`}></div>
+                <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full mt-4 overflow-hidden" aria-hidden="true">
+                    <div id="debtBar" class="h-full rounded-full bg-gray-400 transition-all duration-1000" style="width: 0%"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-3">Relación deuda/ingreso saludable.</p>
+                <p class="text-xs text-gray-400 mt-3">Relación deuda/ingreso.</p>
             </div>
 
             <!-- Balance Mensual -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <h2 class="text-sm font-semibold text-gray-500 mb-1">Balance Mensual</h2>
+            <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow">
+                <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Balance Mensual</h2>
                 <div class="flex flex-col">
-                    <span class="text-2xl font-bold text-gray-900">${(totalIngresos - totalGastos).toLocaleString()}</span>
+                    <span id="balanceValue" class="text-2xl font-bold text-gray-900 dark:text-white">$--</span>
                     <div class="flex items-center space-x-4 mt-2">
                         <div class="flex items-center space-x-1">
                             <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                            <span class="text-xs text-gray-500">Ingresos: ${totalIngresos.toLocaleString()}</span>
+                            <span id="ingresosValue" class="text-xs text-gray-500 dark:text-gray-400">Ingresos: $--</span>
                         </div>
                         <div class="flex items-center space-x-1">
                             <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                            <span class="text-xs text-gray-500">Gastos: ${totalGastos.toLocaleString()}</span>
+                            <span id="gastosValue" class="text-xs text-gray-500 dark:text-gray-400">Gastos: $--</span>
                         </div>
                     </div>
                 </div>
@@ -83,12 +74,12 @@ const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 60
         </section>
 
         <!-- Transactions Table -->
-        <section aria-label="Historial de Transacciones" role="region" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 class="text-lg font-bold text-gray-900">Transacciones Recientes</h3>
+        <section aria-label="Historial de Transacciones" role="region" class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Transacciones Recientes</h3>
                 <div class="flex space-x-2 w-full sm:w-auto">
-                    <input type="text" placeholder="Buscar..." aria-label="Buscar transacciones" class="w-full sm:w-64 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                    <select aria-label="Filtrar por categoría" class="px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-600">
+                    <input type="text" id="searchTxn" placeholder="Buscar..." aria-label="Buscar transacciones" class="w-full sm:w-64 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all dark:text-white">
+                    <select id="categoryFilter" aria-label="Filtrar por categoría" class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-600 dark:text-gray-300">
                         <option value="">Todas</option>
                         <option value="Ingreso">Ingresos</option>
                         <option value="Gasto">Gastos</option>
@@ -99,7 +90,7 @@ const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 60
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse" aria-live="polite">
                     <thead>
-                        <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider">
+                        <tr class="bg-gray-50/50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">
                             <th scope="col" class="px-6 py-4 font-semibold rounded-tl-lg">Descripción</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Categoría</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Fecha</th>
@@ -107,42 +98,19 @@ const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 60
                             <th scope="col" class="px-6 py-4 font-semibold text-right rounded-tr-lg">Monto</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 text-sm">
-                        {transactions.map((tx) => (
-                            <tr class="hover:bg-gray-50/80 transition-colors group">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{tx.description}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                        {tx.category}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                    {new Date(tx.date).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.status === 'Completado' ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}>
-                                        <span class={`w-1.5 h-1.5 rounded-full mr-1.5 ${tx.status === 'Completado' ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
-                                        {tx.status}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right font-semibold">
-                                    <span class={tx.amount > 0 ? 'text-green-600' : 'text-gray-900'}>
-                                        {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
+                    <tbody id="txnTbody" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-gray-500">Cargando historial...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/30 flex justify-between items-center">
-                <span class="text-xs text-gray-500">Mostrando {transactions.length} resultados</span>
+            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/30 flex justify-between items-center">
+                <span id="showingCount" class="text-xs text-gray-500 dark:text-gray-400">Mostrando 0 resultados</span>
                 <div class="flex space-x-1">
-                    <button aria-label="Página anterior" disabled class="px-3 py-1 border border-gray-200 rounded text-sm text-gray-400 bg-white cursor-not-allowed">Anterior</button>
-                    <button aria-label="Página siguiente" class="px-3 py-1 border border-gray-200 rounded text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">Siguiente</button>
+                    <button aria-label="Página anterior" disabled class="px-3 py-1 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 cursor-not-allowed">Anterior</button>
+                    <button aria-label="Página siguiente" class="px-3 py-1 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Siguiente</button>
                 </div>
             </div>
         </section>
@@ -150,10 +118,128 @@ const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 60
     </div>
 </Layout>
 
-<script is:inline>
-    // ─── Proteger Historial: Redirigir a /login si no ha iniciado sesión ───
+<script define:vars={{ API_URL }}>
     const token = localStorage.getItem('financeai_token');
     if (!token) {
         window.location.href = '/';
     }
+
+    let allTransactions = [];
+    let allHistory = [];
+
+    async function loadData() {
+        try {
+            const [histRes, txRes] = await Promise.all([
+                fetch(`${API_URL}/api/v1/dashboard/history`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch(`${API_URL}/api/v1/transactions`, { headers: { 'Authorization': `Bearer ${token}` } })
+            ]);
+
+            if (histRes.ok) allHistory = await histRes.json();
+            if (txRes.ok) allTransactions = await txRes.json();
+
+            renderDashboard();
+        } catch (e) {
+            console.error(e);
+            document.getElementById('txnTbody').innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-500">Error al cargar datos.</td></tr>`;
+        }
+    }
+
+    function filterByPeriod(dateStr, period) {
+        if (period === 'all') return true;
+        const d = new Date(dateStr);
+        const now = new Date();
+        const diffTime = Math.abs(now - d);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        if (period === 'week') return diffDays <= 7;
+        if (period === 'month') return diffDays <= 30;
+        return true;
+    }
+
+    function renderDashboard() {
+        const period = document.getElementById('periodFilter').value;
+        const search = document.getElementById('searchTxn').value.toLowerCase();
+        const category = document.getElementById('categoryFilter').value;
+
+        // Filtrar transacciones
+        let txns = allTransactions.filter(tx => filterByPeriod(tx.fecha, period));
+        
+        // Calcular balance desde transacciones filtradas por tiempo
+        let totalIngresos = 0;
+        let totalGastos = 0;
+        txns.forEach(t => {
+            if (t.monto > 0) totalIngresos += t.monto;
+            else totalGastos += Math.abs(t.monto);
+        });
+
+        // Filtrar tabla
+        if (search) txns = txns.filter(t => t.descripcion.toLowerCase().includes(search));
+        if (category === 'Ingreso') txns = txns.filter(t => t.monto > 0);
+        if (category === 'Gasto') txns = txns.filter(t => t.monto <= 0);
+
+        // Actualizar UI - Balance
+        document.getElementById('balanceValue').textContent = `$${(totalIngresos - totalGastos).toLocaleString('es-MX')}`;
+        document.getElementById('ingresosValue').textContent = `Ingresos: $${totalIngresos.toLocaleString('es-MX')}`;
+        document.getElementById('gastosValue').textContent = `Gastos: $${totalGastos.toLocaleString('es-MX')}`;
+
+        // Actualizar UI - Score y Deuda (del historial mas reciente si existe)
+        const latestHistory = allHistory.length > 0 ? allHistory[allHistory.length - 1] : null;
+        if (latestHistory) {
+            const score = latestHistory.scoreFinanciero || 0;
+            const scoreEl = document.getElementById('scoreValue');
+            scoreEl.textContent = score;
+            scoreEl.className = `text-4xl font-black ${score > 750 ? 'text-green-600' : score > 600 ? 'text-yellow-600' : 'text-red-600'}`;
+            document.getElementById('scoreMsg').textContent = score > 750 ? 'Tu puntuación es excelente. ¡Sigue así!' : 'Tienes margen de mejora.';
+            
+            const debt = latestHistory.nivelEndeudamiento || 0;
+            document.getElementById('debtValue').textContent = `${debt}%`;
+            const debtBar = document.getElementById('debtBar');
+            debtBar.style.width = `${Math.min(debt, 100)}%`;
+            debtBar.className = `h-full rounded-full transition-all duration-1000 ${debt < 30 ? 'bg-green-500' : debt < 60 ? 'bg-yellow-500' : 'bg-red-500'}`;
+        } else {
+            document.getElementById('scoreValue').textContent = 'N/A';
+            document.getElementById('scoreMsg').textContent = 'Realiza un análisis en el Dashboard.';
+            document.getElementById('debtValue').textContent = '0%';
+        }
+
+        // Renderizar tabla
+        const tbody = document.getElementById('txnTbody');
+        if (txns.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">No hay transacciones para mostrar.</td></tr>`;
+        } else {
+            tbody.innerHTML = txns.map(tx => {
+                const isIngreso = tx.monto > 0;
+                return `
+                <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/80 transition-colors group">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 transition-colors">${tx.descripcion}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                            ${isIngreso ? 'Ingreso' : 'Gasto'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        ${new Date(tx.fecha).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                            <span class="w-1.5 h-1.5 rounded-full mr-1.5 bg-green-500"></span> Completado
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right font-semibold">
+                        <span class="${isIngreso ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}">
+                            ${isIngreso ? '+' : ''}${tx.monto.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
+                        </span>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+        document.getElementById('showingCount').textContent = `Mostrando ${txns.length} resultados`;
+    }
+
+    document.getElementById('periodFilter').addEventListener('change', renderDashboard);
+    document.getElementById('searchTxn').addEventListener('input', renderDashboard);
+    document.getElementById('categoryFilter').addEventListener('change', renderDashboard);
+
+    loadData();
 </script>

@@ -1,0 +1,58 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Cerrar Sesión | FinanceAI">
+	<div class="min-h-[calc(100vh-73px)] flex items-center justify-center relative overflow-hidden bg-white dark:bg-gray-950">
+		
+        <!-- Fondo borroso decorativo -->
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center opacity-40 dark:opacity-20 blur-sm pointer-events-none"></div>
+        <div class="absolute inset-0 bg-white/70 dark:bg-gray-950/80 backdrop-blur-xl"></div>
+
+		<div class="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl rounded-[2rem] shadow-2xl p-10 max-w-md w-full mx-4 border border-white/40 dark:border-gray-700/50 text-center overflow-hidden">
+			<!-- Glow Interno -->
+			<div class="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl pointer-events-none"></div>
+			<div class="absolute -bottom-20 -left-20 w-40 h-40 bg-red-500/30 rounded-full blur-3xl pointer-events-none"></div>
+			
+			<div class="relative z-10">
+				<div class="w-20 h-20 mx-auto bg-gray-100/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full flex items-center justify-center mb-6 shadow-inner ring-1 ring-black/5 dark:ring-white/10">
+					<svg class="w-10 h-10 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+				</div>
+				
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white mb-3">¿Cerrar Sesión?</h2>
+				
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-8 leading-relaxed font-medium">
+					¿Estás seguro de que deseas salir de tu cuenta? Tendrás que volver a iniciar sesión para acceder a tu inteligencia financiera.
+				</p>
+				
+				<div class="space-y-4">
+					<button id="btnConfirmSignout" class="w-full bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+						Sí, salir de mi cuenta
+					</button>
+					<button onclick="window.history.back()" class="w-full bg-white/50 hover:bg-white dark:bg-gray-800/50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold py-3.5 px-4 rounded-xl transition duration-200 border border-gray-200 dark:border-gray-700 shadow-sm">
+						Cancelar
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<script>
+    document.getElementById('btnConfirmSignout')?.addEventListener('click', async () => {
+        try {
+            const btn = document.getElementById('btnConfirmSignout');
+            if (btn) {
+                btn.textContent = 'Cerrando sesión...';
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+            }
+            const { signOut } = await import("auth-astro/client");
+            await signOut({ callbackUrl: '/' });
+        } catch (e) {
+            console.error(e);
+            window.location.href = '/';
+        }
+    });
+</script>

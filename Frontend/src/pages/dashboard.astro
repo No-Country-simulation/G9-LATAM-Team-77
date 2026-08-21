@@ -178,6 +178,32 @@ const session = await getSession(Astro.request);
             </div>
         </div>
     </div>
+
+    <!-- Modal para Completar Perfil (Google Auth) -->
+    <div id="completeProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-2xl p-8 shadow-2xl border border-gray-200 dark:border-gray-800">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¡Completa tu Perfil!</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Hemos detectado que iniciaste sesión con Google. Selecciona tu país y moneda base para continuar.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">País</label>
+                    <select id="modalPaisId" class="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition">
+                        <option value="1">Costa Rica</option>
+                        <option value="2">México</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Moneda</label>
+                    <select id="modalMonedaId" class="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition">
+                        <option value="1">CRC (₡)</option>
+                        <option value="2">MXN ($)</option>
+                    </select>
+                </div>
+                <button id="btnSaveProfile" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors">Guardar y Continuar</button>
+            </div>
+        </div>
+    </div>
 </Layout>
 
 <script define:vars={{ API_URL, session }}>
@@ -202,6 +228,44 @@ const session = await getSession(Astro.request);
                 window.location.reload(); 
             }
         }).catch(err => console.error("Error en sincronizacion con Google:", err));
+    }
+
+    // Verificar si el usuario necesita completar su perfil (pais/moneda)
+    const currentToken = localStorage.getItem('financeai_token');
+    if (currentToken) {
+        fetch(`${API_URL}/api/v1/users/profile`, {
+            headers: { 'Authorization': `Bearer ${currentToken}` }
+        }).then(res => res.json()).then(user => {
+            if (!user.paisId || !user.monedaId) {
+                document.getElementById('completeProfileModal').classList.remove('hidden');
+                
+                document.getElementById('btnSaveProfile').onclick = async () => {
+                    const btn = document.getElementById('btnSaveProfile');
+                    btn.disabled = true;
+                    btn.textContent = 'Guardando...';
+                    
+                    const updateRes = await fetch(`${API_URL}/api/v1/users/profile`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${currentToken}`
+                        },
+                        body: JSON.stringify({
+                            paisId: parseInt(document.getElementById('modalPaisId').value),
+                            monedaId: parseInt(document.getElementById('modalMonedaId').value)
+                        })
+                    });
+                    
+                    if (updateRes.ok) {
+                        window.location.reload();
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = 'Error al guardar';
+                        alert("Error al guardar el perfil. Intenta de nuevo.");
+                    }
+                };
+            }
+        }).catch(err => console.error("Error al obtener perfil", err));
     }
 
 // ─────────────────────────────────────────────
@@ -548,9 +612,9 @@ document.getElementById('analisisForm').addEventListener('submit', async (e) => 
         .filter(t => t.descripcion !== '');
 
     const payload = {
-        ingresoMensual:      parseFloat(document.getElementById('ingreso').value),
-        nivelEndeudamiento:  parseFloat(document.getElementById('deuda').value),
-        frecuenciaAhorro:    document.getElementById('ahorro').value.toUpperCase(),
+        ingresoMensual:     parseFloat(document.getElementById('ingreso').value) || 0,
+        nivelEndeudamiento: parseFloat(document.getElementById('deuda').value) || 0,
+        frecuenciaAhorro:   document.getElementById('ahorro').value.toUpperCase(),
         moneda:              moneda,
         transacciones:       txns
     };

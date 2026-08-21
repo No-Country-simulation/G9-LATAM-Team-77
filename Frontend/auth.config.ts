@@ -36,5 +36,8 @@ export default defineConfig({
       }
     })
   ],
-  secret: import.meta.env.AUTH_SECRET || "supersecret"
+  secret: import.meta.env.AUTH_SECRET || "supersecret",
+  pages: {
+    signOut: '/logout'
+  }
 });
