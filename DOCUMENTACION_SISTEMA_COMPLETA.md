@@ -24,9 +24,11 @@ graph TD
 
 ### 2.1 Frontend (`Frontend/`)
 - **Framework:** Astro 7.2 + TypeScript + Tailwind CSS.
-- **Tipografía Global:** `Playfair Display` para títulos y jerarquía visual elegante; `Inter` para datos numéricos y tablas.
+- **Tipografía Global:** `Josefin Sans` (geométrica, elegante y moderna) para títulos, encabezados y logotipos; `Inter` para métricas numéricas y tablas.
+- **Servicio de Correos:** Integración con **Nodemailer** y Gmail (`fernando.jose.reynosa@gmail.com`) con plantillas HTML de alta gama para envío de códigos de verificación de 6 dígitos al crear cuenta y restablecer contraseñas.
+- **Seguridad y Validación:** Bloqueo estricto de emojis en formularios de registro, y guardias de protección de rutas síncronos en `/dashboard` e `/historial` que impiden acceder cambiando la URL sin autenticación previa.
 - **Vistas Principales:**
-  - `/login`: Formulario interactivo de acceso y registro, verificación de correo con código de 6 dígitos, restablecimiento de contraseña en 3 pasos, y Google OAuth integrado.
+  - `/login`: Formulario interactivo de acceso y registro con bloqueo de emojis, envío automático de correos con Nodemailer para verificación de cuenta, y flujo guiado en 3 pasos para restablecer contraseña.
   - `/dashboard`: Layout en 2 columnas balanceadas (sin scroll excesivo), selector de periodicidad (Mensual, Quincenal, Semanal) con restricción automática de fechas mínimas y máximas por tramo, cálculo automático del nivel de endeudamiento y frecuencia de ahorro, clasificador de transacciones con 12 categorías oficiales (PR-02), gráfica de líneas dinámica con Chart.js para la evolución temporal de gastos e ingresos, medidor de Salud Financiera y motor de explicabilidad en 3 capas (DS-08).
   - `/historial`: Módulo analítico con filtros por Año, Mes, Día y Período Rápido, gráficas de evolución temporal y distribución en donut, exportación a Excel (.CSV con UTF-8 BOM) y exportación a PDF estilizada.
   - `/logout`: Pantalla de cierre de sesión con diseño glassmorphism, fondo desenfocado y destrucción sincronizada de tokens JWT y cookies de Google Auth.

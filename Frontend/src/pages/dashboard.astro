@@ -7,6 +7,17 @@ const session = await getSession(Astro.request);
 ---
 
 <Layout title="Dashboard de Análisis | FinanceAI">
+    <!-- Guardia Inmediato de Protección de Ruta -->
+    <script is:inline>
+        (function() {
+            const token = localStorage.getItem('financeai_token');
+            const hasAuthCookie = document.cookie.includes('authjs') || document.cookie.includes('next-auth');
+            if (!token && !hasAuthCookie) {
+                window.location.replace('/login');
+            }
+        })();
+    </script>
+
     <!-- Chart.js CDN -->
     <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
