@@ -54,7 +54,8 @@ public class SecurityConfig {
                                 "/api/v1/users/**",
                                 "/api/v1/transactions/**",
                                 "/api/v1/dashboard/**",
-                                "/api/v1/analisis-financiero/**"
+                                "/api/v1/analisis-financiero/**",
+                                "/api/v1/historial-analisis/**"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )

@@ -1,1 +1,1 @@
-import '@testing-library/jest-dom';
+// Configuración compartida para las pruebas de Vitest.
