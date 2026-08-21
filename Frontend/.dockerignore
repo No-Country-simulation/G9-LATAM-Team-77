@@ -1,0 +1,13 @@
+.git
+.idea
+node_modules
+dist
+.astro
+.venv
+__pycache__
+*.pyc
+.env
+.env.*
+!.env.example
+pnpm-debug.log*
+npm-debug.log*

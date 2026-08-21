@@ -2,3 +2,4 @@ financeai-data-science/.venv/
 __pycache__/
 *.pyc
 .idea/
+.env.docker
