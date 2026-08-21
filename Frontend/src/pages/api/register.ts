@@ -38,8 +38,8 @@ export const POST: APIRoute = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch {
+    return new Response(JSON.stringify({ error: 'No fue posible completar el registro' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

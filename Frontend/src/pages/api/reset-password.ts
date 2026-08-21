@@ -30,7 +30,14 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const data = await res.json();
-    const token = data.token || "mock-token-if-backend-does-not-return-one";
+    const token = data.token;
+
+    if (!token) {
+      return new Response(JSON.stringify({ error: "El Backend no devolvió un token válido" }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     // Send password reset email
     await sendPasswordResetEmail(email, token);
@@ -39,8 +46,8 @@ export const POST: APIRoute = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch {
+    return new Response(JSON.stringify({ error: 'No fue posible solicitar el restablecimiento' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

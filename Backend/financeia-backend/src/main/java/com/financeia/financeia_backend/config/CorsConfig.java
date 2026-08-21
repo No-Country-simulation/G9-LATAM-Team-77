@@ -7,7 +7,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -19,12 +18,23 @@ public class CorsConfig {
     ) {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                Arrays.stream(allowedOrigins.split(","))
-                        .map(String::trim)
-                        .filter(origin -> !origin.isBlank())
-                        .toList()
-        );
+        List<String> origins = List.of(allowedOrigins.split(","))
+                .stream()
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList();
+
+        if (origins.isEmpty()) {
+            origins = List.of("http://localhost:4321");
+        }
+
+        if (origins.contains("*")) {
+            throw new IllegalArgumentException(
+                    "CORS no permite el origen comodín cuando las credenciales están habilitadas"
+            );
+        }
+
+        configuration.setAllowedOrigins(origins);
 
         configuration.setAllowedMethods(List.of(
                 "GET",

@@ -3,347 +3,263 @@ import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
 ---
 
-<Layout title="Iniciar Sesión | FinanceAI">
-	<div class="min-h-[calc(100vh-73px)] flex flex-col lg:flex-row w-full bg-white dark:bg-gray-950">
-		<!-- Left Panel (Dark Branding & Metrics) -->
-		<div class="lg:w-1/2 bg-[#0b132b] text-white p-10 sm:p-16 lg:p-20 flex flex-col justify-between relative overflow-hidden">
-			<!-- Glow backdrop -->
-			<div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-			<div class="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+<Layout title="Iniciar sesión | FinanceAI">
+    <main class="min-h-[calc(100vh-73px)] bg-gray-50 px-4 py-10 dark:bg-gray-950 sm:px-6">
+        <div class="mx-auto grid max-w-5xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900 lg:grid-cols-2">
+            <section class="flex flex-col justify-between bg-[#0b132b] p-8 text-white sm:p-12">
+                <div class="flex gap-2" aria-hidden="true">
+                    <span class="h-3 w-3 rounded-full bg-blue-500"></span>
+                    <span class="h-3 w-3 rounded-full bg-red-500"></span>
+                    <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
+                </div>
+                <div class="py-16">
+                    <h1 class="text-4xl font-extrabold leading-tight sm:text-5xl">Inteligencia financiera a tu medida.</h1>
+                    <p class="mt-5 text-base leading-relaxed text-slate-300">
+                        Registra tus movimientos y complementa tus datos reales con análisis financiero asistido.
+                    </p>
+                </div>
+                <p class="text-xs text-slate-400">Acceso oficial del MVP: correo, contraseña y JWT.</p>
+            </section>
 
-			<!-- Top Dots -->
-			<div class="flex space-x-2.5 mb-12">
-				<div class="w-3 h-3 rounded-full bg-blue-500"></div>
-				<div class="w-3 h-3 rounded-full bg-red-500"></div>
-				<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-			</div>
+            <section class="p-7 sm:p-12">
+                <div class="mx-auto max-w-md">
+                    <h2 id="formTitle" class="text-3xl font-bold text-gray-900 dark:text-white">Bienvenido de nuevo</h2>
+                    <p id="formSubtitle" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Accede a tu panel financiero.</p>
 
-			<!-- Center Content -->
-			<div class="my-auto py-8">
-				<h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
-					Inteligencia<br/>financiera<br/>a tu medida.
-				</h1>
-				<p class="text-slate-400 text-lg sm:text-xl max-w-lg leading-relaxed font-normal">
-					Analiza tus finanzas, registra tus gastos y toma mejores decisiones respaldadas por datos en tiempo real.
-				</p>
-			</div>
-			
-			<!-- Bottom Metrics -->
-			<div class="grid grid-cols-3 gap-6 pt-12 border-t border-slate-800/80">
-				<div>
-					<div class="text-2xl sm:text-3xl font-bold tracking-tight text-white">$148K</div>
-					<div class="text-[11px] text-slate-500 font-semibold tracking-widest mt-1.5 uppercase">PORTAFOLIO</div>
-				</div>
-				<div>
-					<div class="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-400">+18.4%</div>
-					<div class="text-[11px] text-slate-500 font-semibold tracking-widest mt-1.5 uppercase">RENDIMIENTO</div>
-				</div>
-				<div>
-					<div class="text-2xl sm:text-3xl font-bold tracking-tight text-white">74/100</div>
-					<div class="text-[11px] text-slate-500 font-semibold tracking-widest mt-1.5 uppercase">SALUD FIN.</div>
-				</div>
-			</div>
-		</div>
+                    <div id="alertBox" role="alert" aria-live="polite" class="mt-5 hidden rounded-xl p-3.5 text-sm"></div>
 
-		<!-- Right Panel (Form - Only Email & Password) -->
-		<div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-16 bg-white dark:bg-gray-950">
-			<div class="max-w-md w-full mx-auto space-y-6">
-				<!-- Header -->
-				<div class="text-left">
-					<h2 id="formTitle" class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Bienvenido de nuevo</h2>
-					<p id="formSubtitle" class="text-sm text-gray-500 dark:text-gray-400 mt-1.5">Accede a tu panel financiero</p>
-				</div>
+                    <form id="authForm" class="mt-6 space-y-4" aria-label="Formulario de autenticación">
+                        <div id="registerFields" class="hidden space-y-4">
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    Nombre
+                                    <input id="nombre" type="text" autocomplete="given-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                </label>
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    Apellido
+                                    <input id="apellido" type="text" autocomplete="family-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                </label>
+                            </div>
 
-				<!-- Notification Alert -->
-				<div id="alertBox" class="hidden p-3.5 rounded-xl text-sm font-medium"></div>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    País
+                                    <select id="paisId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <option value="">Cargando países…</option>
+                                    </select>
+                                </label>
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    Moneda
+                                    <select id="monedaId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <option value="">Cargando monedas…</option>
+                                    </select>
+                                </label>
+                            </div>
 
-				<!-- Main Form -->
-				<form id="authForm" class="space-y-4" aria-label="Formulario de autenticación">
-					<!-- Extra Register Fields (Hidden in Login Mode) -->
-					<div id="registerFields" class="hidden space-y-4">
-						<div class="grid grid-cols-2 gap-3">
-							<div>
-								<label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
-								<input type="text" id="nombre" placeholder="Tu nombre"
-									class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition" />
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Apellido</label>
-								<input type="text" id="apellido" placeholder="Tu apellido"
-									class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition" />
-							</div>
-						</div>
+                            <div id="catalogStatus" aria-live="polite" class="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:bg-blue-950/40 dark:text-blue-200">
+                                Cargando países y monedas…
+                            </div>
+                            <button id="retryCatalogs" type="button" class="hidden text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                                Reintentar carga de catálogos
+                            </button>
+                        </div>
 
-						<div class="grid grid-cols-2 gap-3">
-							<div>
-								<label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">País (ID)</label>
-								<select id="paisId" class="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition">
-									<option value="1">1 - Costa Rica</option>
-									<option value="2">2 - México</option>
-									<option value="3">3 - Estados Unidos</option>
-									<option value="4">4 - España</option>
-									<option value="5">5 - Colombia</option>
-								</select>
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Moneda (ID)</label>
-								<select id="monedaId" class="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition">
-									<option value="1">1 - CRC (₡)</option>
-									<option value="2">2 - MXN ($)</option>
-									<option value="3">3 - USD ($)</option>
-									<option value="4">4 - EUR (€)</option>
-									<option value="5">5 - COP ($)</option>
-								</select>
-							</div>
-						</div>
-					</div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                            Correo electrónico
+                            <input id="email" type="email" required autocomplete="email" placeholder="tu@correo.com" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                        </label>
 
-					<!-- Email -->
-					<div>
-						<label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Correo electrónico</label>
-						<input type="email" id="email" required aria-required="true" aria-label="Correo electrónico" placeholder="tu@correo.com"
-							class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition" />
-					</div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                            Contraseña
+                            <input id="password" type="password" required autocomplete="current-password" minlength="6" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                        </label>
 
-					<!-- Password with Visibility Toggle -->
-					<div>
-						<label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Contraseña</label>
-						<div class="relative">
-							<input type="password" id="password" required aria-required="true" aria-label="Contraseña" placeholder="••••••••"
-								class="w-full pl-3.5 pr-11 py-2.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition" />
-							<button type="button" id="togglePasswordBtn"
-								class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition focus:outline-none"
-								title="Mostrar u ocultar contraseña" aria-label="Mostrar u ocultar contraseña">
-								<!-- Eye Icon (Show password) -->
-								<svg id="eyeIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-									<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-								</svg>
-								<!-- Eye Off Icon (Hide password) -->
-								<svg id="eyeOffIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-								</svg>
-							</button>
-						</div>
-					</div>
+                        <button id="submitBtn" type="submit" class="w-full rounded-xl bg-gray-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600 dark:hover:bg-blue-700">
+                            Iniciar sesión
+                        </button>
+                    </form>
 
-					<!-- Forgot password link -->
-					<div id="forgotPasswordContainer" class="flex justify-end pt-1">
-						<a href="#" class="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 hover:underline">
-							¿Olvidaste tu contraseña?
-						</a>
-					</div>
-
-					<!-- Single Submit Button -->
-					<button type="submit" id="submitBtn"
-						class="w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-center block text-sm shadow-sm">
-						Iniciar sesión
-					</button>
-				</form>
-
-				<div class="relative mt-6 mb-4">
-					<div class="absolute inset-0 flex items-center">
-						<div class="w-full border-t border-gray-300 dark:border-gray-700"></div>
-					</div>
-					<div class="relative flex justify-center text-sm">
-						<span class="px-2 bg-white dark:bg-gray-950 text-gray-500">O continuar con</span>
-					</div>
-				</div>
-
-				<button type="button" id="googleBtn" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold py-3 px-4 rounded-xl transition duration-200 text-sm shadow-sm">
-					<svg class="w-5 h-5" viewBox="0 0 24 24">
-						<path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-						<path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-						<path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-						<path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-					</svg>
-					Google
-				</button>
-
-				<!-- Toggle between login and registration -->
-				<div class="text-center text-xs text-gray-500 dark:text-gray-400 pt-2">
-					<span id="toggleQuestion">¿Sin cuenta?</span>
-					<button type="button" id="toggleModeBtn" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1">
-						Regístrate gratis
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                    <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <span id="toggleQuestion">¿Aún no tienes cuenta?</span>
+                        <button id="toggleModeBtn" type="button" class="ml-1 font-semibold text-blue-600 hover:underline dark:text-blue-400">Regístrate</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
 </Layout>
 
-<script>
-	document.getElementById('googleBtn')?.addEventListener('click', async () => {
-		try {
-			const { signIn } = await import("auth-astro/client");
-			signIn('google');
-		} catch (e) {
-			console.error("auth-astro no está disponible, usando fallback", e);
-			window.location.href = '/api/auth/signin/google';
-		}
-	});
-</script>
-
 <script define:vars={{ API_URL }}>
-	// Si ya está autenticado, redirigir directo al dashboard
-	if (localStorage.getItem('financeai_token')) {
-		window.location.href = '/dashboard';
-	}
+    const TOKEN_KEY = 'financeai_token';
+    const USER_KEY = 'financeai_user';
 
-	let isRegisterMode = false;
-	const form = document.getElementById('authForm');
-	const submitBtn = document.getElementById('submitBtn');
-	const alertBox = document.getElementById('alertBox');
-	const formTitle = document.getElementById('formTitle');
-	const formSubtitle = document.getElementById('formSubtitle');
-	const registerFields = document.getElementById('registerFields');
-	const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
-	const toggleQuestion = document.getElementById('toggleQuestion');
-	const toggleModeBtn = document.getElementById('toggleModeBtn');
+    if (localStorage.getItem(TOKEN_KEY)) {
+        window.location.replace('/dashboard');
+    }
 
-	// Toggle para ver/ocultar contraseña
-	const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-	const passwordInput = document.getElementById('password');
-	const eyeIcon = document.getElementById('eyeIcon');
-	const eyeOffIcon = document.getElementById('eyeOffIcon');
+    const byId = (id) => document.getElementById(id);
+    const form = byId('authForm');
+    const submitButton = byId('submitBtn');
+    const alertBox = byId('alertBox');
+    const registerFields = byId('registerFields');
+    const countrySelect = byId('paisId');
+    const currencySelect = byId('monedaId');
+    const catalogStatus = byId('catalogStatus');
+    const retryCatalogs = byId('retryCatalogs');
+    let registerMode = false;
+    let catalogsReady = false;
 
-	if (togglePasswordBtn && passwordInput) {
-		togglePasswordBtn.addEventListener('click', () => {
-			const isPassword = passwordInput.getAttribute('type') === 'password';
-			if (isPassword) {
-				passwordInput.setAttribute('type', 'text');
-				eyeIcon.classList.add('hidden');
-				eyeOffIcon.classList.remove('hidden');
-			} else {
-				passwordInput.setAttribute('type', 'password');
-				eyeIcon.classList.remove('hidden');
-				eyeOffIcon.classList.add('hidden');
-			}
-		});
-	}
+    function showAlert(message, error = true) {
+        alertBox.textContent = message;
+        alertBox.className = `mt-5 rounded-xl border p-3.5 text-sm ${error
+            ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200'
+            : 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200'}`;
+    }
 
-	function showAlert(msg, isError = true) {
-		alertBox.className = `p-3.5 rounded-xl text-xs font-medium ${
-			isError
-				? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
-				: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-		}`;
-		alertBox.textContent = msg;
-		alertBox.classList.remove('hidden');
-	}
+    function setSession(data) {
+        localStorage.setItem(TOKEN_KEY, data.token);
+        localStorage.setItem(USER_KEY, JSON.stringify(data));
+    }
 
-	function hideAlert() {
-		alertBox.classList.add('hidden');
-	}
+    function populateSelect(select, items, placeholder, labelFor) {
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = placeholder;
+        select.replaceChildren(placeholderOption);
 
-	toggleModeBtn.addEventListener('click', () => {
-		isRegisterMode = !isRegisterMode;
-		hideAlert();
+        items.forEach((item) => {
+            const option = document.createElement('option');
+            option.value = String(item.id);
+            option.textContent = labelFor(item);
+            select.appendChild(option);
+        });
+        select.disabled = false;
+    }
 
-		if (isRegisterMode) {
-			formTitle.textContent = 'Crear cuenta nueva';
-			formSubtitle.textContent = 'Ingresa tus datos para registrarte';
-			submitBtn.textContent = 'Registrarse';
-			submitBtn.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-center block text-sm shadow-sm';
-			registerFields.classList.remove('hidden');
-			forgotPasswordContainer.classList.add('hidden');
-			toggleQuestion.textContent = '¿Ya tienes una cuenta?';
-			toggleModeBtn.textContent = 'Inicia sesión';
-		} else {
-			formTitle.textContent = 'Bienvenido de nuevo';
-			formSubtitle.textContent = 'Accede a tu panel financiero';
-			submitBtn.textContent = 'Iniciar sesión';
-			submitBtn.className = 'w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-center block text-sm shadow-sm';
-			registerFields.classList.add('hidden');
-			forgotPasswordContainer.classList.remove('hidden');
-			toggleQuestion.textContent = '¿Sin cuenta?';
-			toggleModeBtn.textContent = 'Regístrate gratis';
-		}
-	});
+    async function loadCatalogs() {
+        catalogsReady = false;
+        countrySelect.disabled = true;
+        currencySelect.disabled = true;
+        catalogStatus.textContent = 'Cargando países y monedas…';
+        catalogStatus.className = 'rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:bg-blue-950/40 dark:text-blue-200';
+        retryCatalogs.classList.add('hidden');
 
-	form.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		hideAlert();
+        try {
+            const [countriesResponse, currenciesResponse] = await Promise.all([
+                fetch(`${API_URL}/api/v1/catalogos/paises`, { headers: { Accept: 'application/json' } }),
+                fetch(`${API_URL}/api/v1/catalogos/monedas`, { headers: { Accept: 'application/json' } }),
+            ]);
 
-		const email = document.getElementById('email').value.trim();
-		const password = document.getElementById('password').value;
+            if (!countriesResponse.ok || !currenciesResponse.ok) {
+                throw new Error('catalog-response');
+            }
 
-		submitBtn.disabled = true;
-		submitBtn.textContent = 'Procesando...';
+            const [countries, currencies] = await Promise.all([
+                countriesResponse.json(),
+                currenciesResponse.json(),
+            ]);
 
-		try {
-			if (isRegisterMode) {
-				const nombre = document.getElementById('nombre').value.trim();
-				const apellido = document.getElementById('apellido').value.trim();
-				const paisId = parseInt(document.getElementById('paisId').value);
-				const monedaId = parseInt(document.getElementById('monedaId').value);
+            if (!Array.isArray(countries) || !Array.isArray(currencies)) {
+                throw new Error('catalog-format');
+            }
+            if (countries.length === 0 || currencies.length === 0) {
+                catalogStatus.textContent = 'No hay países o monedas disponibles para completar el registro.';
+                catalogStatus.className = 'rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-200';
+                retryCatalogs.classList.remove('hidden');
+                return;
+            }
 
-				const res = await fetch(`${API_URL}/api/v1/auth/register`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						nombre,
-						apellido,
-						email,
-						password,
-						paisId,
-						monedaId
-					})
-				});
+            populateSelect(countrySelect, countries, 'Selecciona un país', (item) => `${item.nombre} (${item.codigo})`);
+            populateSelect(currencySelect, currencies, 'Selecciona una moneda', (item) => `${item.nombre} (${item.codigo}) · ${item.simbolo}`);
+            catalogsReady = true;
+            catalogStatus.textContent = 'Catálogos cargados. Selecciona el país y la moneda de tu cuenta.';
+            catalogStatus.className = 'rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200';
+        } catch {
+            catalogStatus.textContent = 'No fue posible cargar los catálogos. Verifica la conexión e inténtalo de nuevo.';
+            catalogStatus.className = 'rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800 dark:bg-red-950/40 dark:text-red-200';
+            retryCatalogs.classList.remove('hidden');
+        }
+    }
 
-				const data = await res.json();
-				if (res.ok) {
-					showAlert('¡Cuenta creada con éxito! Iniciando sesión...', false);
-					setTimeout(async () => {
-						const loginRes = await fetch(`${API_URL}/api/v1/auth/login`, {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ email, password })
-						});
-						if (loginRes.ok) {
-							const loginData = await loginRes.json();
-							localStorage.setItem('financeai_token', loginData.token);
-							localStorage.setItem('financeai_user', JSON.stringify(loginData));
-							window.location.href = '/dashboard';
-						} else {
-							toggleModeBtn.click();
-						}
-					}, 800);
-				} else {
-					showAlert(data.message || data.mensaje || data.error || 'No fue posible registrar la cuenta.');
-				}
-			} else {
-				const res = await fetch(`${API_URL}/api/v1/auth/login`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ email, password })
-				});
+    async function readJson(response) {
+        try {
+            return await response.json();
+        } catch {
+            return {};
+        }
+    }
 
-				let data = {};
-				try {
-					data = await res.json();
-				} catch (e) {
-					console.error("Error al parsear JSON del backend", e);
-				}
+    async function login(email, password) {
+        const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+        const data = await readJson(response);
+        if (!response.ok || !data.token) {
+            throw new Error(data.message || 'Credenciales inválidas.');
+        }
+        setSession(data);
+    }
 
-				if (res.ok && data.token) {
-					localStorage.setItem('financeai_token', data.token);
-					localStorage.setItem('financeai_user', JSON.stringify(data));
-					showAlert('¡Bienvenido! Redirigiendo...', false);
-					setTimeout(() => {
-						window.location.href = '/dashboard';
-					}, 400);
-				} else {
-					const errorMsg = data.message || data.mensaje || data.error || 'Credenciales inválidas o correo no registrado.';
-					showAlert(errorMsg);
-					window.alert("⚠️ Acceso Denegado\n\n" + errorMsg);
-				}
-			}
-		} catch (err) {
-			showAlert(`Error de conexión con el backend (${err.message}).`);
-		} finally {
-			submitBtn.disabled = false;
-			submitBtn.textContent = isRegisterMode ? 'Registrarse' : 'Iniciar sesión';
-		}
-	});
+    byId('toggleModeBtn').addEventListener('click', () => {
+        registerMode = !registerMode;
+        registerFields.classList.toggle('hidden', !registerMode);
+        byId('formTitle').textContent = registerMode ? 'Crea tu cuenta' : 'Bienvenido de nuevo';
+        byId('formSubtitle').textContent = registerMode ? 'Elige tus datos financieros sin asumir identificadores.' : 'Accede a tu panel financiero.';
+        byId('toggleQuestion').textContent = registerMode ? '¿Ya tienes cuenta?' : '¿Aún no tienes cuenta?';
+        byId('toggleModeBtn').textContent = registerMode ? 'Inicia sesión' : 'Regístrate';
+        submitButton.textContent = registerMode ? 'Crear cuenta' : 'Iniciar sesión';
+        if (registerMode && !catalogsReady) loadCatalogs();
+    });
+
+    retryCatalogs.addEventListener('click', loadCatalogs);
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = byId('email').value.trim();
+        const password = byId('password').value;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Procesando…';
+
+        try {
+            if (registerMode) {
+                if (!catalogsReady || !countrySelect.value || !currencySelect.value) {
+                    throw new Error('Selecciona un país y una moneda válidos.');
+                }
+                const firstName = byId('nombre').value.trim();
+                const lastName = byId('apellido').value.trim();
+                if (!firstName || !lastName) {
+                    throw new Error('Ingresa tu nombre y apellido.');
+                }
+
+                const response = await fetch(`${API_URL}/api/v1/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify({
+                        nombre: `${firstName} ${lastName}`,
+                        email,
+                        password,
+                        paisId: Number(countrySelect.value),
+                        monedaId: Number(currencySelect.value),
+                    }),
+                });
+                const data = await readJson(response);
+                if (!response.ok) {
+                    throw new Error(data.message || 'No fue posible crear la cuenta.');
+                }
+                await login(email, password);
+                showAlert('Cuenta creada. Redirigiendo…', false);
+            } else {
+                await login(email, password);
+                showAlert('Sesión iniciada. Redirigiendo…', false);
+            }
+            window.setTimeout(() => window.location.replace('/dashboard'), 250);
+        } catch (error) {
+            showAlert(error instanceof Error ? error.message : 'No fue posible completar la solicitud.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = registerMode ? 'Crear cuenta' : 'Iniciar sesión';
+        }
+    });
 </script>

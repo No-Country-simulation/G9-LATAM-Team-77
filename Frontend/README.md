@@ -21,7 +21,7 @@ Interfaz interactiva construida con **Astro** y **Tailwind CSS v4** que consume 
 ### 1. Instalar dependencias
 
 ```bash
-cd financeai-frontend
+cd Frontend
 pnpm install
 ```
 
@@ -36,7 +36,7 @@ También es accesible desde la red local gracias al flag `--host` ya incluido en
 
 ### 3. Asegurarte de que el backend esté corriendo
 
-El frontend llama a `http://localhost:8080`. Sin el backend activo:
+El frontend usa `PUBLIC_API_URL` y, para desarrollo local, cae en `http://localhost:8080`. Sin el backend activo:
 - El indicador de estado mostrará **"Backend offline"**.
 - El botón **"Ejecutar Análisis con IA"** devolverá error de conexión.
 
@@ -48,8 +48,10 @@ El frontend llama a `http://localhost:8080`. Sin el backend activo:
 financeai-frontend/
 ├── src/
 │   ├── pages/
-│   │   ├── index.astro       # Dashboard principal — formulario + resultados IA
-│   │   └── gastos.astro      # Página de registro de gastos individuales
+│   │   ├── index.astro       # Redirección según estado de autenticación
+│   │   ├── login.astro       # Login y registro con catálogos dinámicos
+│   │   ├── dashboard.astro   # Resumen persistido + análisis IA
+│   │   └── historial.astro   # Historial autenticado de análisis
 │   ├── components/
 │   │   ├── Header.astro      # Barra de navegación con toggle dark/light
 │   │   └── Welcome.astro     # Componente de bienvenida
@@ -71,7 +73,7 @@ financeai-frontend/
 |------------|-----|
 | **Astro 7** | Framework SSG/SSR. Cada página es un `.astro` con frontmatter para lógica de servidor y HTML/JS en el cliente |
 | **Tailwind CSS v4** | Estilos utilitarios. Integrado via `@tailwindcss/vite` (sin archivo de config separado) |
-| **Chart.js 4** | Gráficas de barras para distribución de gastos (cargado desde CDN en `index.astro`) |
+| **Chart.js 4** | Gráficas de barras para distribución de gastos (cargado desde CDN en `dashboard.astro`) |
 | **pnpm** | Gestor de paquetes rápido |
 | **Vitest** | Tests (`pnpm test`) |
 
@@ -79,7 +81,7 @@ financeai-frontend/
 
 ## 🧩 Páginas y funcionalidad
 
-### `/` — Dashboard principal (`index.astro`)
+### `/dashboard` — Dashboard principal (`dashboard.astro`)
 
 El corazón del proyecto. Tiene dos paneles:
 
@@ -106,7 +108,7 @@ Formulario para registrar un gasto individual:
 
 ## 🔌 Integración con el Backend
 
-El frontend se conecta a **`http://localhost:8080`**. Hay dos llamadas:
+El frontend se conecta a `PUBLIC_API_URL` (fallback local `http://localhost:8080`). Entre las llamadas principales están:
 
 ### Health check (server-side en el frontmatter de Astro)
 ```
@@ -116,7 +118,7 @@ Muestra el estado de conexión en el header del dashboard al cargar la página.
 
 ### Análisis financiero con IA (client-side al hacer submit)
 ```
-POST http://localhost:8080/analisis-financiero
+POST http://localhost:8080/api/v1/analisis-financiero
 Content-Type: application/json
 ```
 
@@ -162,3 +164,6 @@ El layout base aplica dark mode via la clase `.dark` en `<html>`. El Header incl
 | Puerto 4321 ocupado | Otro proceso usa el puerto | Astro elige automáticamente el siguiente disponible |
 | Estilos de Tailwind no aparecen | Falta instalar dependencias | `pnpm install` |
 | `node: command not found` | Node.js no instalado | Instalar Node.js >= 22.12.0 desde [nodejs.org](https://nodejs.org) |
+# Autenticación del MVP
+
+El flujo oficial utiliza correo/contraseña contra el Backend y conserva el JWT en `financeai_token` para las solicitudes protegidas. Google OAuth permanece deshabilitado en la interfaz hasta que el Backend pueda verificar de forma segura el token de Google y emitir su propio JWT; no debe agregarse una sincronización de usuario basada únicamente en datos enviados por el navegador.

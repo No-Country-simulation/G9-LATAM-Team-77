@@ -9,8 +9,45 @@ import { API_URL } from '../lib/api';
         <!-- Encabezado -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard de Análisis</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Prueba interactiva del modelo de Inteligencia Artificial.</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tus transacciones persistidas y el análisis de Data Science, en un mismo lugar.</p>
         </div>
+
+        <section class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900" aria-labelledby="summaryTitle">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 id="summaryTitle" class="text-lg font-bold text-gray-900 dark:text-white">Resumen de transacciones</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Calculado por el Backend con los movimientos de tu cuenta.</p>
+                </div>
+                <button id="retrySummary" type="button" class="hidden text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">Reintentar</button>
+            </div>
+            <p id="summaryStatus" aria-live="polite" class="mt-4 text-sm text-gray-500 dark:text-gray-400">Cargando resumen…</p>
+            <div id="summaryContent" class="mt-4 hidden">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div class="rounded-xl bg-emerald-50 p-4 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Ingresos del mes</p>
+                        <p id="summaryIncome" class="mt-1 text-xl font-extrabold">—</p>
+                    </div>
+                    <div class="rounded-xl bg-red-50 p-4 text-red-800 dark:bg-red-950/40 dark:text-red-200">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Gastos del mes</p>
+                        <p id="summaryExpenses" class="mt-1 text-xl font-extrabold">—</p>
+                    </div>
+                    <div class="rounded-xl bg-blue-50 p-4 text-blue-800 dark:bg-blue-950/40 dark:text-blue-200">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Balance del mes</p>
+                        <p id="summaryBalance" class="mt-1 text-xl font-extrabold">—</p>
+                    </div>
+                </div>
+                <div class="mt-4 grid gap-4 lg:grid-cols-2">
+                    <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
+                        <p class="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Comparación</p>
+                        <p id="summaryVariation" class="mt-2 text-sm font-semibold text-gray-800 dark:text-gray-200"></p>
+                    </div>
+                    <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
+                        <p class="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Gastos por categoría</p>
+                        <div id="summaryCategories" class="mt-2 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
@@ -38,6 +75,7 @@ import { API_URL } from '../lib/api';
                                     <option value="EUR">EUR</option>
                                     <option value="CRC">CRC</option>
                                     <option value="COP">COP</option>
+                                    <option value="HNL">HNL</option>
                                 </select>
                                 <input type="number" id="ingreso" value="4500" required min="1"
                                     class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-r-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
@@ -179,8 +217,9 @@ import { API_URL } from '../lib/api';
 
 <script define:vars={{ API_URL }}>
 // ─── Proteger Dashboard: Redirigir a /login si no ha iniciado sesión ───
-if (!localStorage.getItem('financeai_token')) {
-    window.location.href = '/';
+const authToken = localStorage.getItem('financeai_token');
+if (!authToken) {
+    window.location.replace('/login');
 }
 
 // ─────────────────────────────────────────────
@@ -204,6 +243,82 @@ const CATEGORIAS = [
 let transacciones = [];
 let contadorId = 0;
 let chartInstance = null;
+
+const summaryFormatter = new Intl.NumberFormat('es-HN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
+function clearSessionAndRedirect() {
+    localStorage.removeItem('financeai_token');
+    localStorage.removeItem('financeai_user');
+    window.location.replace('/login');
+}
+
+async function loadDashboardSummary() {
+    const status = document.getElementById('summaryStatus');
+    const content = document.getElementById('summaryContent');
+    const retry = document.getElementById('retrySummary');
+    status.textContent = 'Cargando resumen…';
+    content.classList.add('hidden');
+    retry.classList.add('hidden');
+
+    try {
+        const response = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
+            headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
+        });
+        if (response.status === 401) {
+            clearSessionAndRedirect();
+            return;
+        }
+        if (!response.ok) {
+            throw new Error('summary-request');
+        }
+
+        const summary = await response.json();
+        document.getElementById('summaryIncome').textContent = summaryFormatter.format(Number(summary.ingresosMesActual) || 0);
+        document.getElementById('summaryExpenses').textContent = summaryFormatter.format(Number(summary.gastosMesActual) || 0);
+        document.getElementById('summaryBalance').textContent = summaryFormatter.format(Number(summary.balanceMesActual) || 0);
+
+        const variation = Number(summary.variacionGastos);
+        document.getElementById('summaryVariation').textContent = Number.isFinite(variation)
+            ? `Variación de gastos frente al mes anterior: ${variation.toFixed(2)}%`
+            : 'No hay comparación disponible con el mes anterior.';
+
+        const categories = summary.gastosPorCategoria && typeof summary.gastosPorCategoria === 'object'
+            ? Object.entries(summary.gastosPorCategoria)
+            : [];
+        const categoryContainer = document.getElementById('summaryCategories');
+        if (categories.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'text-sm text-gray-500 dark:text-gray-400';
+            empty.textContent = 'Aún no hay gastos registrados este mes.';
+            categoryContainer.replaceChildren(empty);
+        } else {
+            categoryContainer.replaceChildren(...categories.map(([category, amount]) => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between gap-4 text-sm';
+                const name = document.createElement('span');
+                name.textContent = category;
+                const value = document.createElement('strong');
+                value.textContent = summaryFormatter.format(Number(amount) || 0);
+                row.append(name, value);
+                return row;
+            }));
+        }
+
+        status.textContent = categories.length === 0 && Number(summary.ingresosMesActual) === 0
+            ? 'Tu cuenta aún no tiene movimientos del mes actual.'
+            : 'Resumen actualizado con tus transacciones.';
+        content.classList.remove('hidden');
+    } catch {
+        status.textContent = 'No fue posible cargar el resumen de transacciones.';
+        retry.classList.remove('hidden');
+    }
+}
+
+document.getElementById('retrySummary').addEventListener('click', loadDashboardSummary);
+loadDashboardSummary();
 
 // ─── Helpers ───────────────────────────────
 function getUsedCategorias(excludeId) {
@@ -372,6 +487,23 @@ async function renderBarChart(labels, values) {
     });
 }
 
+function createRecommendationNode(message, isAlert) {
+    const row = document.createElement('div');
+    row.className = isAlert
+        ? 'flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/50 dark:text-amber-200'
+        : 'flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/80 p-3 text-xs text-blue-950 dark:border-blue-800/60 dark:bg-blue-950/50 dark:text-blue-200';
+
+    const icon = document.createElement('span');
+    icon.className = isAlert ? 'shrink-0 text-sm text-amber-500' : 'shrink-0 text-sm text-blue-600 dark:text-blue-400';
+    icon.textContent = isAlert ? '⚠️' : '💡';
+
+    const text = document.createElement('div');
+    text.className = 'font-medium leading-relaxed';
+    text.textContent = String(message);
+    row.append(icon, text);
+    return row;
+}
+
 // ─── Render resultado formateado ───────────
 function renderResultado(data, moneda, txns) {
     // JSON raw
@@ -419,30 +551,15 @@ function renderResultado(data, moneda, txns) {
     const rawAlerts = data.alerts || data.alertas || [];
     const alerts = Array.isArray(rawAlerts) ? rawAlerts : [rawAlerts];
 
-    let iaHtml = '';
+    const recommendationNodes = [];
+    alerts.forEach((alert) => recommendationNodes.push(createRecommendationNode(alert, true)));
+    recs.forEach((recommendation) => recommendationNodes.push(createRecommendationNode(recommendation, false)));
 
-    if (alerts.length > 0) {
-        iaHtml += alerts.map(a => `
-            <div class="flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 rounded-xl p-3">
-                <span class="text-amber-500 text-sm shrink-0">⚠️</span>
-                <div class="leading-relaxed font-medium">${a}</div>
-            </div>
-        `).join('');
-    }
-
-    if (recs.length > 0) {
-        iaHtml += recs.map(r => `
-            <div class="flex items-start gap-2.5 text-xs text-blue-950 dark:text-blue-200 bg-blue-50/80 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/60 rounded-xl p-3">
-                <span class="text-blue-600 dark:text-blue-400 text-sm shrink-0">💡</span>
-                <div class="leading-relaxed font-medium">${r}</div>
-            </div>
-        `).join('');
-    }
-
-    if (iaHtml) {
-        recsContent.innerHTML = iaHtml;
+    if (recommendationNodes.length > 0) {
+        recsContent.replaceChildren(...recommendationNodes);
         recsCard.classList.remove('hidden');
     } else {
+        recsContent.replaceChildren();
         recsCard.classList.add('hidden');
     }
 
@@ -542,11 +659,10 @@ document.getElementById('analisisForm').addEventListener('submit', async (e) => 
     document.getElementById('jsonOutput').innerText = 'Analizando transacciones con IA...';
 
     try {
-        const token = localStorage.getItem('financeai_token');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
+        const headers = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+        };
 
         const res = await fetch(`${API_URL}/api/v1/analisis-financiero`, {
             method: 'POST',
@@ -554,13 +670,22 @@ document.getElementById('analisisForm').addEventListener('submit', async (e) => 
             body: JSON.stringify(payload)
         });
 
-        if (res.ok) {
+        if (res.status === 401) {
+            clearSessionAndRedirect();
+        } else if (res.ok) {
             renderResultado(await res.json(), moneda, txns);
         } else {
-            document.getElementById('jsonOutput').innerText = `Error HTTP ${res.status}: ${await res.text()}`;
+            let errorMessage = 'El análisis no pudo completarse.';
+            try {
+                const errorData = await res.json();
+                if (typeof errorData.message === 'string') errorMessage = errorData.message;
+            } catch {
+                // El Backend no devolvió JSON; se conserva un mensaje seguro.
+            }
+            document.getElementById('jsonOutput').innerText = errorMessage;
         }
-    } catch (err) {
-        document.getElementById('jsonOutput').innerText = `Error de conexión con el backend.\n\n${err.message}`;
+    } catch {
+        document.getElementById('jsonOutput').innerText = 'Error de conexión con el Backend.';
     } finally {
         btn.disabled = false;
         btn.innerHTML = `

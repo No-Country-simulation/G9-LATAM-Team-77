@@ -1,13 +1,9 @@
-import Google from '@auth/core/providers/google';
 import Credentials from '@auth/core/providers/credentials';
 import { defineConfig } from 'auth-astro';
+import { API_URL } from './src/lib/api';
 
 export default defineConfig({
   providers: [
-    Google({
-      clientId: import.meta.env.GOOGLE_CLIENT_ID,
-      clientSecret: import.meta.env.GOOGLE_CLIENT_SECRET,
-    }),
     Credentials({
       name: 'Credentials',
       credentials: {
@@ -16,7 +12,7 @@ export default defineConfig({
       },
       async authorize(credentials) {
         try {
-          const res = await fetch("http://localhost:8080/api/v1/auth/login", {
+          const res = await fetch(`${API_URL}/api/v1/auth/login`, {
             method: 'POST',
             body: JSON.stringify({ email: credentials?.email, password: credentials?.password }),
             headers: { "Content-Type": "application/json" }
@@ -36,5 +32,5 @@ export default defineConfig({
       }
     })
   ],
-  secret: import.meta.env.AUTH_SECRET || "supersecret"
+  secret: import.meta.env.AUTH_SECRET
 });

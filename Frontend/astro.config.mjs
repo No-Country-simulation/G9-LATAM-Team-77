@@ -11,7 +11,7 @@ export default defineConfig({
     mode: 'standalone'
   }),
   vite: {
-    envDir: '../',
+    envDir: '.',
     plugins: [tailwindcss()]
   },
   integrations: [auth()]

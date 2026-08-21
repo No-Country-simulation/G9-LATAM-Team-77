@@ -5,9 +5,11 @@ import com.financeia.financeia_backend.dto.transaction.TransactionResponse;
 import com.financeia.financeia_backend.entity.Transaction;
 import com.financeia.financeia_backend.entity.TransactionType;
 import com.financeia.financeia_backend.entity.User;
+import com.financeia.financeia_backend.exception.ApiException;
 import com.financeia.financeia_backend.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -28,9 +30,11 @@ public class TransactionService {
         transaction.setAmount(request.amount());
         transaction.setCategory(request.category());
 
-        transaction.setType( //Funciona solo si los valores del enum coinciden con lo que le llega al Json
-                TransactionType.valueOf(request.type().toUpperCase())
-        );
+        try {
+            transaction.setType(TransactionType.valueOf(request.type().toUpperCase()));
+        } catch (IllegalArgumentException exception) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "El tipo de transacción no es válido");
+        }
 
         transaction.setDate(request.date());
         transaction.setUser(user);

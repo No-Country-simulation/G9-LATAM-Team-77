@@ -5,11 +5,13 @@ import com.financeia.financeia_backend.dto.user.UserUpdateRequest;
 import com.financeia.financeia_backend.entity.Moneda;
 import com.financeia.financeia_backend.entity.Pais;
 import com.financeia.financeia_backend.entity.User;
+import com.financeia.financeia_backend.exception.ApiException;
 import com.financeia.financeia_backend.repository.MonedaRepository;
 import com.financeia.financeia_backend.repository.PaisRepository;
 import com.financeia.financeia_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -25,7 +27,7 @@ public class UserService {
 
         User currentUser = userRepository.findById(user.getId())
                 .orElseThrow(() ->
-                        new RuntimeException("Usuario no encontrado"));
+                        new ApiException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
         return toResponse(currentUser);
     }
@@ -38,11 +40,11 @@ public class UserService {
 
         Pais pais = paisRepository.findById(request.paisId())
                 .orElseThrow(() ->
-                        new RuntimeException("País no encontrado"));
+                        new ApiException(HttpStatus.BAD_REQUEST, "País no encontrado"));
 
         Moneda moneda = monedaRepository.findById(request.monedaId())
                 .orElseThrow(() ->
-                        new RuntimeException("Moneda no encontrada"));
+                        new ApiException(HttpStatus.BAD_REQUEST, "Moneda no encontrada"));
 
         user.setCountry(pais);
         user.setMoneda(moneda);

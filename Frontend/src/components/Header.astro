@@ -19,9 +19,13 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
 
         <!-- Main Nav (Only visible when user is logged in and not on login page) -->
         <nav id="mainNav" class="hidden space-x-6 text-sm font-medium">
-            <a href="/"
-                class={`pb-1 transition-colors ${currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+            <a href="/dashboard"
+                class={`pb-1 transition-colors ${currentPath === 'dashboard' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
                 Dashboard
+            </a>
+            <a href="/historial"
+                class={`pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                Historial
             </a>
         </nav>
     </div>
@@ -91,7 +95,7 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
                 e.preventDefault();
                 localStorage.removeItem('financeai_token');
                 localStorage.removeItem('financeai_user');
-                window.location.href = '/login';
+                window.location.replace('/login');
             };
         }
     } else {
