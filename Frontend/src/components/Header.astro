@@ -20,7 +20,7 @@ const googleEmail = session?.user?.email || '';
                 <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
             </div>
-            <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-playfair">FinanceAI</span>
+            <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
         </a>
 
         <!-- Main Nav -->
@@ -272,8 +272,8 @@ const googleEmail = session?.user?.email || '';
         }
 
         userProfileModal.classList.add('hidden');
-        alert('¡Preferencias de perfil y moneda guardadas con éxito!');
-        window.location.reload();
+        window.showToast('¡Guardado!', 'Preferencias de perfil y moneda actualizadas con éxito.', '👤');
+        setTimeout(() => { window.location.reload(); }, 900);
     });
 
     // Eliminar Cuenta
@@ -287,9 +287,32 @@ const googleEmail = session?.user?.email || '';
     });
 
     document.getElementById('btnConfirmDeleteAccount')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btnConfirmDeleteAccount');
+        btn.disabled = true;
+        btn.textContent = 'Eliminando cuenta...';
+
+        const token = localStorage.getItem('financeai_token');
+        if (token) {
+            try {
+                await fetch(`${API_URL}/api/v1/users/profile`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (e) {
+                console.error("Error eliminando cuenta:", e);
+            }
+        }
+
         localStorage.clear();
-        alert('Tu cuenta ha sido eliminada con éxito.');
-        window.location.href = '/logout';
+        sessionStorage.clear();
+        window.showToast('Cuenta Eliminada', 'Tu cuenta y todos sus registros han sido eliminados de la base de datos.', '🗑️');
+
+        try {
+            const { signOut } = await import("auth-astro/client");
+            await signOut({ callbackUrl: '/login' });
+        } catch (_) {
+            setTimeout(() => { window.location.href = '/logout'; }, 800);
+        }
     });
 
     // Health check polling

@@ -12,4 +12,5 @@ public interface HistorialAnalisisRepository extends JpaRepository<HistorialAnal
     List<HistorialAnalisis> findByUsuarioId(Long usuarioId);
     Optional<HistorialAnalisis> findFirstByUsuarioIdOrderByFechaDesc(Long usuarioId);
     List<HistorialAnalisis> findAllByUsuarioIdOrderByFechaDesc(Long usuarioId);
+    void deleteByUsuarioId(Long usuarioId);
 }

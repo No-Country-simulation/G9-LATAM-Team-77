@@ -396,6 +396,12 @@ if (session) {
 		}`;
 		alertBox.textContent = msg;
 		alertBox.classList.remove('hidden');
+
+		if (isError) {
+			window.showToast?.('Atención', msg, '⚠️');
+		} else {
+			window.showToast?.('¡Éxito!', msg, '✅');
+		}
 	}
 
 	function hideAlert() {
@@ -627,9 +633,11 @@ if (session) {
 		showRecoveryStep(3);
 	});
 
-	document.getElementById('btnSaveNewPassword')?.addEventListener('click', () => {
+	document.getElementById('btnSaveNewPassword')?.addEventListener('click', async () => {
+		const email = document.getElementById('recoveryEmail').value.trim();
 		const p1 = document.getElementById('newRecoveryPassword').value;
 		const p2 = document.getElementById('confirmRecoveryPassword').value;
+		
 		if (EMOJI_REGEX.test(p1) || EMOJI_REGEX.test(p2)) {
 			showToast("Error", "No se permiten emojis en la contraseña.", "⚠️");
 			return;
@@ -642,7 +650,34 @@ if (session) {
 			showToast("Error", "Las contraseñas no coinciden.", "⚠️");
 			return;
 		}
-		showToast("¡Éxito!", "Contraseña restablecida con éxito. Inicia sesión.", "✅");
-		recoveryModal.classList.add('hidden');
+
+		const btn = document.getElementById('btnSaveNewPassword');
+		btn.disabled = true;
+		btn.textContent = 'Actualizando contraseña en BD...';
+
+		try {
+			const res = await fetch(`${API_URL}/api/v1/auth/reset-password`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: email, newPassword: p1 })
+			});
+
+			let data = {};
+			try { data = await res.json(); } catch (_) {}
+
+			if (res.ok) {
+				showToast("¡Éxito Total!", "Contraseña actualizada en la base de datos. Inicia sesión.", "✅");
+				recoveryModal.classList.add('hidden');
+				document.getElementById('email').value = email;
+				document.getElementById('password').value = p1;
+			} else {
+				showToast("Error", data.message || "No se pudo actualizar la contraseña.", "❌");
+			}
+		} catch (err) {
+			showToast("Error de Conexión", "No se pudo contactar con el backend.", "❌");
+		} finally {
+			btn.disabled = false;
+			btn.textContent = 'Guardar Nueva Contraseña';
+		}
 	});
 </script>

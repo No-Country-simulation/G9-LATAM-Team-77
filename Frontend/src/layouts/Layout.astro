@@ -79,6 +79,61 @@ const { title } = Astro.props;
 		</script>
 	</head>
 	<body class="bg-gray-50 dark:bg-gray-950 min-h-screen font-sans text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300 antialiased selection:bg-blue-600 selection:text-white">
+		<!-- Toast Notification Global en Esquina Superior Derecha -->
+		<div id="globalToast" class="fixed top-5 right-5 z-[300] hidden max-w-sm w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-blue-200 dark:border-blue-900/50 shadow-2xl rounded-2xl p-4 transition-all duration-300 transform translate-y-[-20px] opacity-0 font-inter">
+			<div class="flex items-start gap-3">
+				<div id="globalToastIcon" class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl flex-shrink-0 border border-blue-100 dark:border-blue-900/40">
+					✨
+				</div>
+				<div class="flex-1 pr-2">
+					<h4 id="globalToastTitle" class="text-sm font-bold text-gray-900 dark:text-white font-josefin">Notificación</h4>
+					<p id="globalToastMessage" class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed"></p>
+				</div>
+				<button id="btnGlobalCloseToast" class="text-gray-400 hover:text-gray-600 dark:hover:text-white text-lg font-bold">&times;</button>
+			</div>
+		</div>
+
+		<script is:inline>
+			let toastTimeout = null;
+			window.showToast = function(title, message, icon = "✨") {
+				const toast = document.getElementById('globalToast');
+				const toastTitle = document.getElementById('globalToastTitle');
+				const toastMessage = document.getElementById('globalToastMessage');
+				const toastIcon = document.getElementById('globalToastIcon');
+
+				if (!toast) return;
+				if (toastTimeout) clearTimeout(toastTimeout);
+
+				toastTitle.textContent = title;
+				toastMessage.textContent = message;
+				toastIcon.textContent = icon;
+
+				toast.classList.remove('hidden');
+				setTimeout(() => {
+					toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+					toast.classList.add('translate-y-0', 'opacity-100');
+				}, 10);
+
+				toastTimeout = setTimeout(() => {
+					window.hideToast();
+				}, 5000);
+			};
+
+			window.hideToast = function() {
+				const toast = document.getElementById('globalToast');
+				if (!toast) return;
+				toast.classList.remove('translate-y-0', 'opacity-100');
+				toast.classList.add('translate-y-[-20px]', 'opacity-0');
+				setTimeout(() => {
+					toast.classList.add('hidden');
+				}, 300);
+			};
+
+			document.getElementById('btnGlobalCloseToast')?.addEventListener('click', () => {
+				window.hideToast();
+			});
+		</script>
+
 		<Header />
 		<main class="flex-grow flex">
 			<slot />

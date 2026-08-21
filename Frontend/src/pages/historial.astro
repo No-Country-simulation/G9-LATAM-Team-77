@@ -1,479 +1,558 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
+const hasServerSession = !!session;
 ---
 
 <Layout title="Historial Financiero | FinanceAI">
-    <!-- Guardia Inmediato de Protección de Ruta -->
-    <script is:inline>
-        (function() {
-            const token = localStorage.getItem('financeai_token');
-            const hasAuthCookie = document.cookie.includes('authjs') || document.cookie.includes('next-auth');
-            if (!token && !hasAuthCookie) {
-                window.location.replace('/login');
-            }
-        })();
+    <!-- Guardia de Protección de Ruta Seguro -->
+    <script define:vars={{ hasServerSession }}>
+        if (!hasServerSession && !localStorage.getItem('financeai_token')) {
+            window.location.replace('/login');
+        }
     </script>
 
     <!-- Chart.js CDN -->
     <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="w-full max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-6">
+    <div class="w-full max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-6 font-inter">
         
         <!-- Header Section -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-playfair">Historial Financiero</h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-inter">Registro histórico, gráficos interactivos y exportación de movimientos.</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-josefin">Historial Financiero</h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Evolución temporal con picos y tendencias, distribución por categorías y reportes exportables.</p>
             </div>
             
             <!-- Actions -->
-            <div class="flex flex-wrap items-center gap-2.5 font-inter">
-                <!-- Exportar PDF -->
-                <button id="btnExportPDF" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Exportar PDF
+            <div class="flex items-center gap-3">
+                <button id="btnExportExcel" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Exportar a Excel
                 </button>
-
-                <!-- Exportar Excel -->
-                <button id="btnExportExcel" class="px-4 py-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 transition shadow-sm flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Exportar Excel (.CSV)
+                <button id="btnExportPdf" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-gray-100 hover:bg-black dark:hover:bg-white text-white dark:text-gray-900 rounded-xl text-xs font-semibold shadow-sm transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    Imprimir Reporte (PDF)
                 </button>
             </div>
         </header>
 
-        <!-- Filtros Avanzados (Año, Mes, Día, Período, Categoría) -->
-        <section class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm font-inter">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-                <!-- Filtro Rápido -->
+        <!-- KPI Summary Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Período Rápido</label>
-                    <select id="quickPeriodFilter" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Ingresos</span>
+                    <h3 id="statTotalIngresos" class="text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Gastos</span>
+                    <h3 id="statTotalGastos" class="text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Balance Neto</span>
+                    <h3 id="statBalanceNeto" class="text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Transacciones</span>
+                    <h3 id="statTotalTransacciones" class="text-2xl font-bold text-gray-900 dark:text-white">0</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRÁFICA MULTI-LÍNEA CON PICOS, SUBIDAS Y BAJADAS TEMPORALES (Screenshot Requirement) -->
+        <section class="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white font-josefin flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                        Evolución Comparativa y Tendencia de Flujos
+                    </h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Visualización de fluctuaciones, subidas, bajadas y picos de consumo en el tiempo.</p>
+                </div>
+
+                <!-- Selector de Granularidad de Tiempo -->
+                <div class="flex items-center gap-1.5 p-1 bg-gray-100 dark:bg-gray-800 rounded-2xl text-xs font-semibold">
+                    <button id="btnGranularityDay" class="px-3 py-1.5 rounded-xl bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm transition">Por Día</button>
+                    <button id="btnGranularityWeek" class="px-3 py-1.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Por Semana</button>
+                    <button id="btnGranularityMonth" class="px-3 py-1.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Por Mes</button>
+                </div>
+            </div>
+
+            <!-- Canvas de la Gráfica de Picos y Bajadas -->
+            <div class="h-72 w-full relative">
+                <canvas id="multiLinePeaksChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Filtros Rápidos y Detallados -->
+        <section class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Filtrar Histórico</h3>
+                <button id="btnResetFilters" class="text-xs text-blue-600 hover:underline">Restablecer filtros</button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Período Rápido</label>
+                    <select id="filterPeriod" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white">
                         <option value="all">Todo el Historial</option>
-                        <option value="today">Hoy</option>
-                        <option value="week">Última Semana</option>
-                        <option value="month">Último Mes</option>
-                        <option value="year">Último Año</option>
+                        <option value="this_month">Este Mes</option>
+                        <option value="last_month">Mes Anterior</option>
+                        <option value="this_year">Este Año</option>
                     </select>
                 </div>
-
-                <!-- Año -->
                 <div>
-                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Año</label>
-                    <select id="yearFilter" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="all">Todos los Años</option>
-                        <option value="2026" selected>2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                    </select>
-                </div>
-
-                <!-- Mes -->
-                <div>
-                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Mes</label>
-                    <select id="monthFilter" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="all">Todos los Meses</option>
-                        <option value="1">Enero</option>
-                        <option value="2">Febrero</option>
-                        <option value="3">Marzo</option>
-                        <option value="4">Abril</option>
-                        <option value="5">Mayo</option>
-                        <option value="6">Junio</option>
-                        <option value="7">Julio</option>
-                        <option value="8">Agosto</option>
-                        <option value="9">Septiembre</option>
-                        <option value="10">Octubre</option>
-                        <option value="11">Noviembre</option>
-                        <option value="12">Diciembre</option>
-                    </select>
-                </div>
-
-                <!-- Día Específico -->
-                <div>
-                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Día Específico</label>
-                    <input type="date" id="dateFilter" class="w-full px-3 py-1.5 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                </div>
-
-                <!-- Tipo de Transacción -->
-                <div>
-                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Tipo</label>
-                    <select id="typeFilter" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Tipo de Flujo</label>
+                    <select id="filterType" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white">
                         <option value="all">Ingresos y Gastos</option>
-                        <option value="income">Solo Ingresos</option>
-                        <option value="expense">Solo Gastos</option>
+                        <option value="INCOME">Solo Ingresos</option>
+                        <option value="EXPENSE">Solo Gastos</option>
                     </select>
                 </div>
-            </div>
-        </section>
-
-        <!-- Summary Cards -->
-        <section aria-label="Resumen Financiero" class="grid grid-cols-1 md:grid-cols-3 gap-5 font-inter">
-            <!-- Score Financiero -->
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 flex items-center justify-between">
                 <div>
-                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Score Financiero</h2>
-                    <div class="flex items-baseline gap-1.5">
-                        <span id="scoreValue" class="text-3xl font-black text-emerald-600">--</span>
-                        <span class="text-xs text-gray-400">/ 100</span>
-                    </div>
-                    <p id="scoreMsg" class="text-[11px] text-gray-400 mt-1">Cálculo de salud activa.</p>
+                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Categoría</label>
+                    <select id="filterCategory" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white">
+                        <option value="all">Todas las Categorías</option>
+                    </select>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-xl">
-                    🏆
-                </div>
-            </div>
-
-            <!-- Nivel de Endeudamiento -->
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 flex items-center justify-between">
                 <div>
-                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Endeudamiento Calculado</h2>
-                    <span id="debtValue" class="text-3xl font-black text-amber-600">--%</span>
-                    <div class="w-32 bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                        <div id="debtBar" class="h-full bg-amber-500 transition-all duration-700" style="width: 0%"></div>
-                    </div>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-xl">
-                    📊
-                </div>
-            </div>
-
-            <!-- Balance Período -->
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 flex items-center justify-between">
-                <div>
-                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Balance del Período</h2>
-                    <span id="balanceValue" class="text-3xl font-black text-gray-900 dark:text-white">$0</span>
-                    <div class="flex items-center gap-3 mt-1.5 text-[10px]">
-                        <span id="ingresosValue" class="text-emerald-600 font-bold">+Ingresos: $0</span>
-                        <span id="gastosValue" class="text-red-500 font-bold">-Gastos: $0</span>
-                    </div>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center text-xl">
-                    💰
+                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Día Específico</label>
+                    <input type="date" id="filterDate" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white" />
                 </div>
             </div>
         </section>
 
-        <!-- Visual Analytics: 2 Interactive Charts -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-5 font-inter">
-            <!-- Gráfica de Tendencia (8 Cols) -->
-            <div class="lg:col-span-8 bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">
-                    Evolución Temporal de Ingresos vs Gastos
-                </h3>
-                <div class="h-64 relative">
-                    <canvas id="timelineChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Gráfica de Donut de Categorías (4 Cols) -->
-            <div class="lg:col-span-4 bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">
-                    Distribución de Gastos
-                </h3>
-                <div class="h-64 relative flex items-center justify-center">
+        <!-- Gráfica de Distribución por Categoría y Tabla de Transacciones -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Donut Categorías (4 Cols) -->
+            <div class="lg:col-span-4 bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white font-josefin mb-3">Distribución por Categorías</h3>
+                <div class="h-56 relative flex items-center justify-center">
                     <canvas id="categoryDonutChart"></canvas>
                 </div>
-            </div>
-        </section>
-
-        <!-- Transactions Table (Printable Area for PDF) -->
-        <section id="printableArea" aria-label="Historial de Transacciones" class="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden font-inter">
-            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white font-playfair">Transacciones Registradas</h3>
-                    <span id="showingCount" class="text-xs text-gray-400">Mostrando 0 resultados</span>
-                </div>
-                <div class="w-full sm:w-64">
-                    <input type="text" id="searchTxn" placeholder="Buscar por descripción..." class="w-full px-3.5 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-xs bg-gray-50 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                </div>
+                <div id="categoryLegend" class="mt-4 space-y-1.5 text-xs max-h-32 overflow-y-auto pr-1"></div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50/50 dark:bg-gray-800/50 text-gray-400 text-[11px] uppercase tracking-wider">
-                            <th class="px-6 py-3.5 font-semibold">Descripción</th>
-                            <th class="px-6 py-3.5 font-semibold">Categoría</th>
-                            <th class="px-6 py-3.5 font-semibold">Fecha</th>
-                            <th class="px-6 py-3.5 font-semibold">Estado</th>
-                            <th class="px-6 py-3.5 font-semibold text-right">Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody id="txnTbody" class="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
-                        <tr>
-                            <td colspan="5" class="text-center py-8 text-gray-400">Cargando registros...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Tabla de Transacciones (8 Cols) -->
+            <div class="lg:col-span-8 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+                <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white font-josefin">Movimientos Registrados</h3>
+                    <span id="txFilteredCount" class="text-xs text-gray-500">Mostrando 0 transacciones</span>
+                </div>
+
+                <div class="overflow-x-auto flex-grow max-h-[380px] overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-500 font-semibold border-b border-gray-100 dark:border-gray-800 sticky top-0">
+                            <tr>
+                                <th class="p-3.5">Fecha</th>
+                                <th class="p-3.5">Descripción</th>
+                                <th class="p-3.5">Categoría</th>
+                                <th class="p-3.5 text-right">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/60">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </section>
+
+        </div>
 
     </div>
 </Layout>
 
 <script define:vars={{ API_URL }}>
-    const token = localStorage.getItem('financeai_token');
-    if (!token) {
-        window.location.href = '/login';
-    }
+    const userCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+    let rawTransactions = [];
+    let filteredTransactions = [];
+    let currentGranularity = 'day';
 
-    const preferredCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+    let multiLineChartInstance = null;
+    let categoryDonutInstance = null;
 
-    let allTransactions = [];
-    let allHistory = [];
-    let timelineChartInstance = null;
-    let categoryDonutChartInstance = null;
+    // Colores oficiales para las líneas con picos
+    const LINE_COLORS = {
+        total: '#EF4444',       // Rojo
+        ingresos: '#10B981',    // Verde esmeralda
+        necesidades: '#3B82F6', // Azul cielo
+        deseos: '#F59E0B'       // Ámbar
+    };
 
+    // Cargar datos
     async function loadData() {
+        const token = localStorage.getItem('financeai_token');
+        if (!token) return;
+
         try {
-            const [histRes, txRes] = await Promise.all([
-                fetch(`${API_URL}/api/v1/dashboard/history`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                fetch(`${API_URL}/api/v1/transactions`, { headers: { 'Authorization': `Bearer ${token}` } })
-            ]);
-
-            if (histRes.ok) allHistory = await histRes.json();
-            if (txRes.ok) allTransactions = await txRes.json();
-
-            // Si no hay transacciones en BD, cargamos ejemplos limpios
-            if (allTransactions.length === 0) {
-                allTransactions = [
-                    { id: 1, descripcion: 'Salario Mensual', categoria: 'Ingreso', monto: 4500, fecha: '2026-08-20' },
-                    { id: 2, descripcion: 'Alquiler Departamento', categoria: 'Vivienda', monto: -950, fecha: '2026-08-18' },
-                    { id: 3, descripcion: 'Supermercado y Alimentos', categoria: 'Alimentación', monto: -420, fecha: '2026-08-17' },
-                    { id: 4, descripcion: 'Combustible y Transporte', categoria: 'Transporte', monto: -180, fecha: '2026-08-16' },
-                    { id: 5, descripcion: 'Servicios de Luz e Internet', categoria: 'Servicios', monto: -120, fecha: '2026-08-14' },
-                    { id: 6, descripcion: 'Consulta Médica y Farmacia', categoria: 'Salud y bienestar', monto: -90, fecha: '2026-08-11' },
-                    { id: 7, descripcion: 'Cursos y Libros', categoria: 'Educación', monto: -75, fecha: '2026-08-08' }
-                ];
+            const res = await fetch(`${API_URL}/api/v1/transactions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                rawTransactions = await res.json();
+                populateCategoryFilter();
+                applyFilters();
             }
-
-            renderDashboard();
         } catch (e) {
-            console.error(e);
-            document.getElementById('txnTbody').innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-500">Error al conectar con el servidor.</td></tr>`;
+            console.error("Error al cargar historial:", e);
         }
     }
 
-    function filterTransactions() {
-        const quick = document.getElementById('quickPeriodFilter').value;
-        const year = document.getElementById('yearFilter').value;
-        const month = document.getElementById('monthFilter').value;
-        const exactDate = document.getElementById('dateFilter').value;
-        const type = document.getElementById('typeFilter').value;
-        const search = document.getElementById('searchTxn').value.toLowerCase().trim();
+    function populateCategoryFilter() {
+        const catSelect = document.getElementById('filterCategory');
+        const categories = [...new Set(rawTransactions.map(t => t.category || 'Otros'))].sort();
+        catSelect.innerHTML = '<option value="all">Todas las Categorías</option>' + 
+            categories.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function applyFilters() {
+        const period = document.getElementById('filterPeriod').value;
+        const type = document.getElementById('filterType').value;
+        const category = document.getElementById('filterCategory').value;
+        const date = document.getElementById('filterDate').value;
 
         const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
 
-        return allTransactions.filter(tx => {
-            const txDate = new Date(tx.fecha);
+        filteredTransactions = rawTransactions.filter(t => {
+            const tDate = new Date(t.date);
 
-            // Filtro Rápido
-            if (quick === 'today') {
-                const isToday = txDate.toISOString().slice(0, 10) === now.toISOString().slice(0, 10);
-                if (!isToday) return false;
-            } else if (quick === 'week') {
-                const diffDays = (now - txDate) / (1000 * 60 * 60 * 24);
-                if (diffDays > 7 || diffDays < 0) return false;
-            } else if (quick === 'month') {
-                const diffDays = (now - txDate) / (1000 * 60 * 60 * 24);
-                if (diffDays > 30 || diffDays < 0) return false;
-            } else if (quick === 'year') {
-                if (txDate.getFullYear() !== now.getFullYear()) return false;
+            if (type !== 'all' && t.type !== type) return false;
+            if (category !== 'all' && (t.category || 'Otros') !== category) return false;
+            if (date && t.date !== date) return false;
+
+            if (period === 'this_month') {
+                if (tDate.getFullYear() !== currentYear || tDate.getMonth() !== currentMonth) return false;
+            } else if (period === 'last_month') {
+                const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+                const yearOfLastMonth = currentMonth === 0 ? currentYear - 1 : currentYear;
+                if (tDate.getFullYear() !== yearOfLastMonth || tDate.getMonth() !== lastMonth) return false;
+            } else if (period === 'this_year') {
+                if (tDate.getFullYear() !== currentYear) return false;
             }
-
-            // Filtro Año
-            if (year !== 'all' && txDate.getFullYear().toString() !== year) return false;
-
-            // Filtro Mes
-            if (month !== 'all' && (txDate.getMonth() + 1).toString() !== month) return false;
-
-            // Filtro Fecha Exacta
-            if (exactDate && tx.fecha.slice(0, 10) !== exactDate) return false;
-
-            // Filtro Tipo
-            if (type === 'income' && tx.monto < 0) return false;
-            if (type === 'expense' && tx.monto > 0) return false;
-
-            // Búsqueda
-            if (search && !tx.descripcion.toLowerCase().includes(search)) return false;
 
             return true;
         });
+
+        renderKPIs();
+        renderTable();
+        renderMultiLinePeaksChart();
+        renderCategoryDonut();
     }
 
-    function renderDashboard() {
-        const filtered = filterTransactions();
+    function renderKPIs() {
+        let ingresos = 0;
+        let gastos = 0;
 
-        // Totales
-        let totalIngresos = 0;
-        let totalGastos = 0;
-        const categoryMap = {};
+        filteredTransactions.forEach(t => {
+            const amt = parseFloat(t.amount) || 0;
+            if (t.type === 'INCOME') ingresos += amt;
+            else gastos += amt;
+        });
 
-        filtered.forEach(tx => {
-            if (tx.monto > 0) {
-                totalIngresos += tx.monto;
+        const balance = ingresos - gastos;
+
+        document.getElementById('statTotalIngresos').textContent = `${userCurrency} ${ingresos.toLocaleString()}`;
+        document.getElementById('statTotalGastos').textContent = `${userCurrency} ${gastos.toLocaleString()}`;
+        document.getElementById('statBalanceNeto').textContent = `${userCurrency} ${balance.toLocaleString()}`;
+        document.getElementById('statTotalTransacciones').textContent = filteredTransactions.length.toString();
+        document.getElementById('txFilteredCount').textContent = `Mostrando ${filteredTransactions.length} de ${rawTransactions.length} transacciones`;
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('txTableBody');
+        if (filteredTransactions.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="p-8 text-center text-gray-400">
+                        No se encontraron transacciones con los filtros seleccionados.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filteredTransactions.map(t => {
+            const isIncome = t.type === 'INCOME';
+            const amountFormatted = `${isIncome ? '+' : '-'}${userCurrency} ${Number(t.amount).toLocaleString()}`;
+            const colorClass = isIncome ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold';
+
+            return `
+                <tr class="hover:bg-gray-50/60 dark:hover:bg-gray-800/40 transition">
+                    <td class="p-3.5 text-gray-500 font-mono text-[11px]">${t.date}</td>
+                    <td class="p-3.5 font-semibold text-gray-900 dark:text-white">${t.description || 'Sin descripción'}</td>
+                    <td class="p-3.5">
+                        <span class="inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                            ${t.category || 'Otros'}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-right ${colorClass}">${amountFormatted}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // ─── GRÁFICA MULTI-LÍNEA CON PICOS Y BAJADAS (Captura 232245) ───
+    function renderMultiLinePeaksChart() {
+        const ctx = document.getElementById('multiLinePeaksChart')?.getContext('2d');
+        if (!ctx) return;
+
+        if (multiLineChartInstance) multiLineChartInstance.destroy();
+
+        // Agrupar por Granularidad (Día, Semana, Mes)
+        const grouped = {};
+        filteredTransactions.forEach(t => {
+            let key = t.date;
+            if (currentGranularity === 'week') {
+                const d = new Date(t.date);
+                key = `Sem ${Math.ceil(d.getDate() / 7)} (${d.getMonth() + 1}/${d.getFullYear()})`;
+            } else if (currentGranularity === 'month') {
+                const d = new Date(t.date);
+                key = `${d.toLocaleString('es-ES', { month: 'short' })} ${d.getFullYear()}`;
+            }
+
+            if (!grouped[key]) {
+                grouped[key] = { totalGastos: 0, ingresos: 0, necesidades: 0, deseos: 0 };
+            }
+
+            const amt = parseFloat(t.amount) || 0;
+            if (t.type === 'INCOME') {
+                grouped[key].ingresos += amt;
             } else {
-                const g = Math.abs(tx.monto);
-                totalGastos += g;
-                const cat = tx.categoria || tx.descripcion || 'Otros';
-                categoryMap[cat] = (categoryMap[cat] || 0) + g;
+                grouped[key].totalGastos += amt;
+                const cat = t.category || 'Otros';
+                if (['Vivienda', 'Alimentación', 'Transporte', 'Servicios', 'Salud y bienestar', 'Educación'].includes(cat)) {
+                    grouped[key].necesidades += amt;
+                } else {
+                    grouped[key].deseos += amt;
+                }
             }
         });
 
-        const balance = totalIngresos - totalGastos;
+        const labels = Object.keys(grouped).sort();
+        const dataTotalGastos = labels.map(l => grouped[l].totalGastos);
+        const dataIngresos = labels.map(l => grouped[l].ingresos);
+        const dataNecesidades = labels.map(l => grouped[l].necesidades);
+        const dataDeseos = labels.map(l => grouped[l].deseos);
 
-        // UI Metrics
-        document.getElementById('balanceValue').textContent = `${preferredCurrency} ${balance.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
-        document.getElementById('ingresosValue').textContent = `+Ingresos: ${preferredCurrency} ${totalIngresos.toLocaleString()}`;
-        document.getElementById('gastosValue').textContent = `-Gastos: ${preferredCurrency} ${totalGastos.toLocaleString()}`;
-
-        // Score & Deuda
-        const latest = allHistory.length > 0 ? allHistory[allHistory.length - 1] : null;
-        const score = latest ? (latest.scoreFinanciero || 78) : (balance >= 0 ? 82 : 38);
-        document.getElementById('scoreValue').textContent = score;
-        document.getElementById('scoreValue').className = `text-3xl font-black ${score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-amber-600' : 'text-red-600'}`;
-        document.getElementById('scoreMsg').textContent = score >= 70 ? 'Saludable 🟢' : score >= 40 ? 'En riesgo ⚠️' : 'Crítico 🚨';
-
-        const debt = latest ? (latest.nivelEndeudamiento || 15) : (totalIngresos > 0 ? Math.round((totalGastos / totalIngresos) * 30) : 0);
-        document.getElementById('debtValue').textContent = `${debt}%`;
-        document.getElementById('debtBar').style.width = `${Math.min(debt, 100)}%`;
-
-        // Render Table
-        const tbody = document.getElementById('txnTbody');
-        if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-400">No hay movimientos que coincidan con los filtros.</td></tr>`;
-        } else {
-            tbody.innerHTML = filtered.map(tx => {
-                const isIngreso = tx.monto > 0;
-                return `
-                <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/80 transition-colors">
-                    <td class="px-6 py-3.5 font-medium text-gray-900 dark:text-gray-100">${tx.descripcion}</td>
-                    <td class="px-6 py-3.5">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                            ${tx.categoria || (isIngreso ? 'Ingreso' : 'Gasto')}
-                        </span>
-                    </td>
-                    <td class="px-6 py-3.5 text-gray-400">${tx.fecha ? tx.fecha.slice(0, 10) : '2026-08-20'}</td>
-                    <td class="px-6 py-3.5">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-                            Completado
-                        </span>
-                    </td>
-                    <td class="px-6 py-3.5 text-right font-bold ${isIngreso ? 'text-emerald-600' : 'text-gray-900 dark:text-white'}">
-                        ${isIngreso ? '+' : '-'}${preferredCurrency} ${Math.abs(tx.monto).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-        document.getElementById('showingCount').textContent = `Mostrando ${filtered.length} resultados`;
-
-        // Render Charts
-        renderCharts(filtered, categoryMap);
-    }
-
-    function renderCharts(filtered, categoryMap) {
-        // Chart 1: Timeline Bar Chart
-        const dates = [...new Set(filtered.map(t => t.fecha ? t.fecha.slice(0, 10) : '2026-08-20'))].sort();
-        const dailyIncome = dates.map(d => filtered.filter(t => t.fecha?.slice(0, 10) === d && t.monto > 0).reduce((a, b) => a + b.monto, 0));
-        const dailyExpense = dates.map(d => filtered.filter(t => t.fecha?.slice(0, 10) === d && t.monto < 0).reduce((a, b) => a + Math.abs(b.monto), 0));
-
-        const ctx1 = document.getElementById('timelineChart')?.getContext('2d');
-        if (ctx1) {
-            if (timelineChartInstance) timelineChartInstance.destroy();
-            timelineChartInstance = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: dates,
-                    datasets: [
-                        { label: 'Ingresos', data: dailyIncome, backgroundColor: '#10B981', borderRadius: 6 },
-                        { label: 'Gastos', data: dailyExpense, backgroundColor: '#EF4444', borderRadius: 6 }
-                    ]
+        multiLineChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.length > 0 ? labels : ['Sin datos'],
+                datasets: [
+                    {
+                        label: `Total Gastos (${userCurrency})`,
+                        data: dataTotalGastos.length > 0 ? dataTotalGastos : [0],
+                        borderColor: LINE_COLORS.total,
+                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                        borderWidth: 3,
+                        pointBackgroundColor: LINE_COLORS.total,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        tension: 0.35,
+                        fill: false
+                    },
+                    {
+                        label: `Ingresos (${userCurrency})`,
+                        data: dataIngresos.length > 0 ? dataIngresos : [0],
+                        borderColor: LINE_COLORS.ingresos,
+                        borderWidth: 2.5,
+                        borderDash: [4, 4],
+                        pointBackgroundColor: LINE_COLORS.ingresos,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.25,
+                        fill: false
+                    },
+                    {
+                        label: `Necesidades Básicas (${userCurrency})`,
+                        data: dataNecesidades.length > 0 ? dataNecesidades : [0],
+                        borderColor: LINE_COLORS.necesidades,
+                        borderWidth: 2,
+                        pointBackgroundColor: LINE_COLORS.necesidades,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4,
+                        tension: 0.3,
+                        fill: false
+                    },
+                    {
+                        label: `Estilo de Vida (${userCurrency})`,
+                        data: dataDeseos.length > 0 ? dataDeseos : [0],
+                        borderColor: LINE_COLORS.deseos,
+                        borderWidth: 2,
+                        pointBackgroundColor: LINE_COLORS.deseos,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4,
+                        tension: 0.3,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { family: 'Josefin Sans', size: 11 } }
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: { grid: { color: 'rgba(156, 163, 175, 0.1)' } }
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        grid: { color: 'rgba(156, 163, 175, 0.1)' },
+                        ticks: { callback: v => userCurrency + ' ' + v }
                     }
                 }
-            });
-        }
+            }
+        });
+    }
 
-        // Chart 2: Category Donut Chart
-        const catLabels = Object.keys(categoryMap);
-        const catValues = Object.values(categoryMap);
+    // Donut Categorías
+    function renderCategoryDonut() {
+        const ctx = document.getElementById('categoryDonutChart')?.getContext('2d');
+        if (!ctx) return;
 
-        const ctx2 = document.getElementById('categoryDonutChart')?.getContext('2d');
-        if (ctx2) {
-            if (categoryDonutChartInstance) categoryDonutChartInstance.destroy();
-            categoryDonutChartInstance = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: catLabels.length > 0 ? catLabels : ['Sin gastos'],
-                    datasets: [{
-                        data: catValues.length > 0 ? catValues : [1],
-                        backgroundColor: ['#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#10B981', '#EC4899', '#06B6D4', '#6366F1', '#14B8A6']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
-                    },
-                    cutout: '68%'
-                }
-            });
+        if (categoryDonutInstance) categoryDonutInstance.destroy();
+
+        const catTotals = {};
+        filteredTransactions.filter(t => t.type === 'EXPENSE').forEach(t => {
+            const cat = t.category || 'Otros';
+            catTotals[cat] = (catTotals[cat] || 0) + (parseFloat(t.amount) || 0);
+        });
+
+        const labels = Object.keys(catTotals);
+        const data = Object.values(catTotals);
+        const palette = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#64748B'];
+
+        categoryDonutInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels.length > 0 ? labels : ['Sin gastos'],
+                datasets: [{
+                    data: data.length > 0 ? data : [1],
+                    backgroundColor: labels.length > 0 ? palette.slice(0, labels.length) : ['#94A3B8'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '70%'
+            }
+        });
+
+        // Leyenda
+        const leg = document.getElementById('categoryLegend');
+        if (labels.length > 0) {
+            leg.innerHTML = labels.map((l, i) => `
+                <div class="flex justify-between items-center text-[11px] text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${palette[i % palette.length]}"></span>
+                        ${l}
+                    </span>
+                    <strong>${userCurrency} ${data[i].toLocaleString()}</strong>
+                </div>
+            `).join('');
+        } else {
+            leg.innerHTML = '<p class="text-center text-gray-400 text-xs">Sin datos registrados</p>';
         }
     }
 
-    // Event Listeners para Filtros
-    ['quickPeriodFilter', 'yearFilter', 'monthFilter', 'dateFilter', 'typeFilter'].forEach(id => {
-        document.getElementById(id)?.addEventListener('change', renderDashboard);
-    });
-    document.getElementById('searchTxn')?.addEventListener('input', renderDashboard);
+    // Botones de Granularidad
+    const btnDay = document.getElementById('btnGranularityDay');
+    const btnWeek = document.getElementById('btnGranularityWeek');
+    const btnMonth = document.getElementById('btnGranularityMonth');
 
-    // Exportar a Excel (.CSV)
-    document.getElementById('btnExportExcel')?.addEventListener('click', () => {
-        const filtered = filterTransactions();
-        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // UTF-8 BOM para tildes y caracteres especiales en Excel
-        csvContent += "ID,Descripcion,Categoria,Fecha,Estado,Monto,Moneda\r\n";
-
-        filtered.forEach(t => {
-            csvContent += `"${t.id || ''}","${t.descripcion}","${t.categoria || 'Gasto'}","${t.fecha || ''}","Completado","${t.monto}","${preferredCurrency}"\r\n`;
+    function setGranularity(mode) {
+        currentGranularity = mode;
+        [btnDay, btnWeek, btnMonth].forEach(b => {
+            b.className = 'px-3 py-1.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition';
         });
+        if (mode === 'day') btnDay.className = 'px-3 py-1.5 rounded-xl bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm transition';
+        if (mode === 'week') btnWeek.className = 'px-3 py-1.5 rounded-xl bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm transition';
+        if (mode === 'month') btnMonth.className = 'px-3 py-1.5 rounded-xl bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm transition';
+        renderMultiLinePeaksChart();
+    }
 
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `FinanceAI_Historial_${new Date().toISOString().slice(0, 10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    btnDay?.addEventListener('click', () => setGranularity('day'));
+    btnWeek?.addEventListener('click', () => setGranularity('week'));
+    btnMonth?.addEventListener('click', () => setGranularity('month'));
+
+    // Filtros listeners
+    document.getElementById('filterPeriod')?.addEventListener('change', applyFilters);
+    document.getElementById('filterType')?.addEventListener('change', applyFilters);
+    document.getElementById('filterCategory')?.addEventListener('change', applyFilters);
+    document.getElementById('filterDate')?.addEventListener('change', applyFilters);
+
+    document.getElementById('btnResetFilters')?.addEventListener('click', () => {
+        document.getElementById('filterPeriod').value = 'all';
+        document.getElementById('filterType').value = 'all';
+        document.getElementById('filterCategory').value = 'all';
+        document.getElementById('filterDate').value = '';
+        applyFilters();
     });
 
-    // Exportar a PDF (Impresión limpia y estilizada)
-    document.getElementById('btnExportPDF')?.addEventListener('click', () => {
+    // Exportar Excel
+    document.getElementById('btnExportExcel')?.addEventListener('click', () => {
+        if (filteredTransactions.length === 0) {
+            window.showToast?.('Exportación', 'No hay datos para exportar con los filtros actuales.', '⚠️');
+            return;
+        }
+        const headers = ["ID", "Fecha", "Descripcion", "Categoria", "Tipo", "Monto", "Moneda"];
+        const rows = filteredTransactions.map(t => [
+            t.id, t.date, `"${(t.description || '').replace(/"/g, '""')}"`, `"${t.category || ''}"`, t.type, t.amount, userCurrency
+        ]);
+        const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Reporte_Financiero_FinanceAI_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        window.showToast?.('¡Excel Descargado!', 'El reporte se generó correctamente.', '📊');
+    });
+
+    // Exportar PDF
+    document.getElementById('btnExportPdf')?.addEventListener('click', () => {
         window.print();
     });
 
+    // Iniciar carga
     loadData();
 </script>
-
-<style>
-@media print {
-    header, nav, #quickPeriodFilter, #yearFilter, #monthFilter, #dateFilter, #typeFilter, #searchTxn, #btnExportPDF, #btnExportExcel, #themeToggle, #userProfileSection {
-        display: none !important;
-    }
-    body {
-        background: white !important;
-        color: black !important;
-    }
-    #printableArea {
-        border: none !important;
-        box-shadow: none !important;
-    }
-}
-</style>

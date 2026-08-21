@@ -37,4 +37,14 @@ public class UserController {
                 userService.updateProfile(user, request)
         );
     }
+
+    @DeleteMapping("/profile")
+    public ResponseEntity<java.util.Map<String, String>> deleteAccount(
+            @AuthenticationPrincipal User user
+    ) {
+        userService.deleteAccount(user);
+        return ResponseEntity.ok(
+                java.util.Map.of("message", "Cuenta y todos sus registros eliminados exitosamente de la base de datos")
+        );
+    }
 }

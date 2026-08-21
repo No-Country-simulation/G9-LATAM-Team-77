@@ -624,15 +624,12 @@ def predict(input_json: str) -> str:
             # 1.1 Clasificación de Nivel (DS-08)
             if score_total >= 70:
                 nivel = "Saludable"
-                emoji = "✅"
                 probabilidad = 0.92
             elif score_total >= 40:
                 nivel = "Riesgo"
-                emoji = "⚠️"
                 probabilidad = 0.75
             else:
                 nivel = "Crítico"
-                emoji = "🚨"
                 probabilidad = 0.40
 
             # 1.2 Identificación de Causa Principal (Menor % relativo)
@@ -646,33 +643,33 @@ def predict(input_json: str) -> str:
 
             causa_clave, causa_datos = min(pilares.items(), key=lambda kv: kv[1]["pct"])
 
-            # 1.3 Generación de Mensaje en 3 Capas
+            # 1.3 Generación de Mensaje en 3 Capas (Sin emojis, para renderizar con SVGs en Frontend)
             diagnosticos = {
-                "Saludable": f"{emoji} Tu salud financiera está en nivel *Saludable* ({score_total:.0f}/100). Tus finanzas muestran equilibrio entre lo que ganas, gastas y ahorras.",
-                "Riesgo": f"{emoji} Tu salud financiera está en nivel *Riesgo* ({score_total:.0f}/100). Hay señales de desequilibrio que requieren atención para evitar un deterioro mayor.",
-                "Crítico": f"{emoji} Tu salud financiera está en nivel *Crítico* ({score_total:.0f}/100). Tus finanzas requieren medidas correctivas inmediatas."
+                "Saludable": f"Tu salud financiera está en nivel Saludable ({score_total:.0f}/100). Tus finanzas muestran un equilibrio óptimo entre ingresos, gastos operativos y capacidad de ahorro.",
+                "Riesgo": f"Tu salud financiera está en nivel Riesgo ({score_total:.0f}/100). Existen señales de presión en tu presupuesto que requieren ajustes para evitar sobreendeudamiento.",
+                "Crítico": f"Tu salud financiera está en nivel Crítico ({score_total:.0f}/100). Tus gastos superan los márgenes de seguridad financiera y se requieren medidas correctivas inmediatas."
             }
             diagnostico_texto = diagnosticos[nivel]
 
             plantillas_causa = {
-                "gasto_ingreso": f"El principal factor es {causa_datos['nombre']}: estás gastando el {ratio_gastos * 100:.0f}% de tu ingreso, lo que deja poco margen para imprevistos.",
-                "ahorro": f"El principal factor es {causa_datos['nombre']}: sólo estás reteniendo el {tasa_ahorro_pct:.0f}% de tu ingreso como ahorro.",
-                "endeudamiento": f"El principal factor es {causa_datos['nombre']}: el {tasa_deuda_pct:.0f}% de tu ingreso se destina a compromisos y deudas fijas."
+                "gasto_ingreso": f"Factor determinante: {causa_datos['nombre']} — estás destinando el {ratio_gastos * 100:.0f}% de tu ingreso a gastos corrientes, limitando tu margen de maniobra.",
+                "ahorro": f"Factor determinante: {causa_datos['nombre']} — tu tasa efectiva de ahorro se sitúa en {tasa_ahorro_pct:.0f}%, por debajo del objetivo financiero recomendado.",
+                "endeudamiento": f"Factor determinante: {causa_datos['nombre']} — el {tasa_deuda_pct:.0f}% de tus ingresos está comprometido en obligaciones fijas o pasivos."
             }
             causa_texto = plantillas_causa[causa_clave]
 
             plantillas_accion = {
-                ("gasto_ingreso", "Saludable"): "Acción sugerida: mantén tu ritmo actual y considera aumentar en 5 puntos porcentuales tu tasa de ahorro.",
-                ("gasto_ingreso", "Riesgo"): "Acción sugerida: identifica 1 categoría de 'deseo' (no esencial) y redúcela un 10% este período; revisa tus gastos recurrentes primero.",
-                ("gasto_ingreso", "Crítico"): "Acción sugerida: haz un recorte inmediato del 15-20% en gastos no esenciales durante 30 días y registra cada transacción.",
-                ("ahorro", "Saludable"): "Acción sugerida: automatiza una transferencia a tu cuenta de ahorro el mismo día que recibes tu ingreso.",
-                ("ahorro", "Riesgo"): "Acción sugerida: define una regla de 'ahorro primero': aparta al menos el 10% de cada ingreso antes de gastar.",
-                ("ahorro", "Crítico"): "Acción sugerida: crea un fondo de emergencia mínimo apartando el 5% de cada ingreso de forma intocable.",
-                ("endeudamiento", "Saludable"): "Acción sugerida: evalúa adelantar pagos a tu deuda con mayor tasa de interés para liberar flujo futuro.",
-                ("endeudamiento", "Riesgo"): "Acción sugerida: prioriza el pago de la deuda con la tasa más alta (método avalancha) y evita adquirir deuda nueva.",
-                ("endeudamiento", "Crítico"): "Acción sugerida: negocia plazos con tus acreedores y congela compras a cuotas hasta estabilizar tu flujo."
+                ("gasto_ingreso", "Saludable"): "Mantén tu disciplina de presupuesto y destina al menos 5% adicional de tus excedentes a instrumentos de inversión o fondos de liquidez.",
+                ("gasto_ingreso", "Riesgo"): "Identifica tus gastos no esenciales (deseos/estilo de vida) y establece un tope de reducción del 10% durante este ciclo.",
+                ("gasto_ingreso", "Crítico"): "Aplica un plan de austeridad temporal con recorte del 15% al 20% en partidas prescindibles y lleva registro diario de cada salida de capital.",
+                ("ahorro", "Saludable"): "Automatiza el ahorro programado al inicio del período (pagarse a uno mismo primero) antes de ejecutar cualquier gasto corriente.",
+                ("ahorro", "Riesgo"): "Establece como meta un fondo de reserva equivalente a 1 mes de gastos antes de realizar compras de discreción.",
+                ("ahorro", "Crítico"): "Crea un fondo de contingencia mínimo apartando el 5% de cada entrada de dinero de manera irrevocable.",
+                ("endeudamiento", "Saludable"): "Considera amortizaciones anticipadas a capital en créditos de tasa variable para blindar tu patrimonio.",
+                ("endeudamiento", "Riesgo"): "Aplica la estrategia de bola de nieve o avalancha para liquidar los pasivos con mayor costo financiero y evita nuevas líneas de crédito.",
+                ("endeudamiento", "Crítico"): "Reestructura o consolida tus compromisos financieros a plazos más sostenibles y congela compras diferidas a plazos."
             }
-            accion_texto = plantillas_accion.get((causa_clave, nivel), "Acción sugerida: mantén el registro diario de tus transacciones.")
+            accion_texto = plantillas_accion.get((causa_clave, nivel), "Mantén el registro estructurado de tus flujos para auditoría continua.")
 
             # 1.4 Reglas de Alertas 50/30/20 (Tolerancia 5 pp)
             cats_necesidades = {"Vivienda", "Alimentación", "Transporte", "Servicios", "Salud y bienestar", "Educación"}
@@ -689,18 +686,27 @@ def predict(input_json: str) -> str:
             if pct_necesidades > 55.0:
                 alertas_50_30_20.append({
                     "tipo": "necesidades_excedidas",
-                    "mensaje": f"Tus gastos en necesidades representan el {pct_necesidades}% de tu ingreso (benchmark: 50%)."
+                    "mensaje": f"Tus gastos en necesidades básicas representan el {pct_necesidades}% de tu ingreso (referencia recomendada: 50%)."
                 })
             if pct_deseos > 35.0:
                 alertas_50_30_20.append({
                     "tipo": "deseos_excedidos",
-                    "mensaje": f"Tus gastos discrecionales representan el {pct_deseos}% de tu ingreso (benchmark: 30%)."
+                    "mensaje": f"Tus gastos en estilo de vida y deseos representan el {pct_deseos}% de tu ingreso (referencia recomendada: 30%)."
                 })
             if pct_ahorro < 15.0:
                 alertas_50_30_20.append({
                     "tipo": "ahorro_insuficiente",
-                    "mensaje": f"Tu capacidad de ahorro actual ({pct_ahorro}%) está por debajo del benchmark recomendado (20%)."
+                    "mensaje": f"Tu margen de ahorro actual ({pct_ahorro}%) se encuentra por debajo de la referencia del 20% para estabilidad a mediano plazo."
                 })
+
+            # Consejos por categorías detectadas
+            consejos_categorias = []
+            if "Transporte" in resumen_gastos and resumen_gastos["Transporte"] > (ingreso_mensual * 0.15):
+                consejos_categorias.append("El rubro de Transporte supera el 15% de tus ingresos; evalúa optimizar rutas, carpooling o transporte masivo.")
+            if "Alimentación" in resumen_gastos and resumen_gastos["Alimentación"] > (ingreso_mensual * 0.25):
+                consejos_categorias.append("Tus gastos en Alimentación están por encima del 25%; planifica compras quincenales en supermercado y reduce pedidos a domicilio.")
+            if "Entretenimiento" in resumen_gastos and resumen_gastos["Entretenimiento"] > (ingreso_mensual * 0.10):
+                consejos_categorias.append("Los consumos en Entretenimiento exceden el 10%; audita suscripciones digitales y establece un presupuesto semanal fijo para ocio.")
 
             recomendaciones_finales = [
                 diagnostico_texto,
@@ -708,7 +714,9 @@ def predict(input_json: str) -> str:
                 accion_texto
             ]
             for al in alertas_50_30_20:
-                recomendaciones_finales.append(f"⚠️ {al['mensaje']}")
+                recomendaciones_finales.append(al['mensaje'])
+            for c in consejos_categorias:
+                recomendaciones_finales.append(c)
 
             return json.dumps({
                 "status": "success",
@@ -742,6 +750,7 @@ def predict(input_json: str) -> str:
                 "transacciones_categorizadas": transacciones_categorizadas,
                 "categorias_detectadas": list(resumen_gastos.keys()),
                 "recomendaciones": recomendaciones_finales,
+                "consejos_financieros": recomendaciones_finales
             }, ensure_ascii=False)
 
     except Exception as e:

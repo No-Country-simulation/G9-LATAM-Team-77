@@ -17,6 +17,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByUser(User user);
 
+    void deleteByUser(User user);
+
     @Query("""
         SELECT COALESCE(SUM(t.amount), 0)
         FROM Transaction t

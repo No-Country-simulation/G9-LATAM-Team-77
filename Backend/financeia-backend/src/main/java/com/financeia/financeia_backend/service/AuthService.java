@@ -98,4 +98,12 @@ public class AuthService {
                 user.getEmail()
         );
     }
+
+    public void resetPassword(com.financeia.financeia_backend.dto.auth.ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ese correo"));
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+    }
 }

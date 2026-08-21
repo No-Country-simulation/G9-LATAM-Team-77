@@ -39,4 +39,11 @@ public class AuthController {
             @Valid @RequestBody com.financeia.financeia_backend.dto.auth.GoogleSyncRequest request) {
         return ResponseEntity.ok(authService.googleSync(request));
     }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<java.util.Map<String, String>> resetPassword(
+            @Valid @RequestBody com.financeia.financeia_backend.dto.auth.ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(java.util.Map.of("message", "Contraseña actualizada exitosamente en la base de datos"));
+    }
 }
