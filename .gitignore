@@ -1,6 +1,31 @@
-﻿financeai-data-science/.venv/
+# Variables de Entorno
+.env
+
+# Backend (Java / Spring Boot)
+Backend/financeia-backend/target/
+*.jar
+*.class
+.mvn/wrapper/maven-wrapper.jar
+
+# Frontend (Astro / Node)
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.astro/
+
+# Data Science (Python)
+DataScient/venv/
+DataScient/__pycache__/
 __pycache__/
 *.pyc
+.pytest_cache/
+*.joblib
+*.csv
+
+# IDEs y otros
 .idea/
-.env
+.vscode/
+scratch/
+
+# Antiguas reglas del proyecto (restauradas por solicitud)
+financeai-data-science/.venv/
 dataset_maestro_transacciones.csv

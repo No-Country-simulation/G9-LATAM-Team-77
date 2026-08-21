@@ -245,10 +245,15 @@ def _safe_str(val, default: str = "") -> str:
 def _clasificar_descripcion(descripcion: str, pipeline) -> str:
     """Clasifica con el modelo ML; fallback al mapa manual."""
     desc_lower = _safe_str(descripcion).lower()
+    
+    if not desc_lower:
+        return "Otros"
+        
     # Intentar mapa manual primero (más rápido y determinista)
     for keyword, cat in SUBCATEGORIA_A_CATEGORIA.items():
         if keyword in desc_lower:
             return cat
+            
     # Fallback al modelo
     if pipeline is not None:
         try:

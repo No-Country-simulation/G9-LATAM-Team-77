@@ -19,6 +19,11 @@ import java.util.Map;
 public class DashboardService {
 
     private final TransactionRepository transactionRepository;
+    private final com.financeia.financeia_backend.repository.HistorialAnalisisRepository historialAnalisisRepository;
+
+    public List<com.financeia.financeia_backend.entity.HistorialAnalisis> getHistory(User user) {
+        return historialAnalisisRepository.findByUsuarioId(user.getId());
+    }
 
     public DashboardResponse getSummary(User user) {
 

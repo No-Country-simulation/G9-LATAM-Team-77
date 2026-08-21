@@ -1,6 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
 ---
 
 <Layout title="Dashboard de Análisis | FinanceAI">
@@ -177,11 +180,11 @@ import { API_URL } from '../lib/api';
     </div>
 </Layout>
 
-<script define:vars={{ API_URL }}>
-// ─── Proteger Dashboard: Redirigir a /login si no ha iniciado sesión ───
-if (!localStorage.getItem('financeai_token')) {
-    window.location.href = '/';
-}
+<script define:vars={{ API_URL, session }}>
+    // Proteccion de ruta
+    if (!session && !localStorage.getItem('financeai_token')) {
+        window.location.href = '/';
+    }
 
 // ─────────────────────────────────────────────
 // Categorias

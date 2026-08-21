@@ -26,4 +26,13 @@ public class DashboardController {
                 dashboardService.getSummary(user)
         );
     }
+
+    @GetMapping("/history")
+    public ResponseEntity<java.util.List<com.financeia.financeia_backend.entity.HistorialAnalisis>> getHistory(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(
+                dashboardService.getHistory(user)
+        );
+    }
 }

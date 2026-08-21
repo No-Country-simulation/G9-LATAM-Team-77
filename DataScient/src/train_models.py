@@ -14,6 +14,8 @@ def train_transaction_model(data_path, model_path):
     
     # Eliminar filas sin descripcion o categoria
     df = df.dropna(subset=['descripcion', 'categoria'])
+    df = df[df['descripcion'].astype(str).str.strip() != '']
+    df = df[df['categoria'].astype(str).str.strip() != '']
     
     X = df['descripcion']
     y = df['categoria']

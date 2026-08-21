@@ -38,13 +38,11 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             <span id="backendStatusText">Backend...</span>
         </div>
 
-        <!-- Auth Button (Hidden on /login) -->
-        {currentPath !== 'login' && (
-            <a href="/login" id="authNavBtn"
-                class="text-xs font-semibold px-3.5 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors">
-                Iniciar Sesión
-            </a>
-        )}
+        <!-- Auth Button (Solo visible cuando hay sesión para cerrar) -->
+        <a href="#" id="authNavBtn"
+            class="hidden text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors">
+            Cerrar Sesión
+        </a>
 
         <!-- Dark mode toggle -->
         <button id="themeToggle"

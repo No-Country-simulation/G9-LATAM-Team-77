@@ -23,6 +23,9 @@ class DashboardServiceTest {
     @Mock
     private TransactionRepository transactionRepository;
 
+    @Mock
+    private com.financeia.financeia_backend.repository.HistorialAnalisisRepository historialAnalisisRepository;
+
     private DashboardService dashboardService;
 
     private User user;
@@ -30,7 +33,7 @@ class DashboardServiceTest {
     @BeforeEach
     void setUp() {
 
-        dashboardService = new DashboardService(transactionRepository);
+        dashboardService = new DashboardService(transactionRepository, historialAnalisisRepository);
 
         user = new User();
         user.setId(1L);

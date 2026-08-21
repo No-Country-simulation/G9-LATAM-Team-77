@@ -1,6 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
+if (session) {
+	return Astro.redirect('/dashboard');
+}
 ---
 
 <Layout title="Iniciar Sesión | FinanceAI">
@@ -159,6 +165,8 @@ import { API_URL } from '../lib/api';
 					</svg>
 					Google
 				</button>
+
+
 
 				<!-- Toggle between login and registration -->
 				<div class="text-center text-xs text-gray-500 dark:text-gray-400 pt-2">
