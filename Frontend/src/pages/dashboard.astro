@@ -53,14 +53,14 @@ const hasServerSession = !!session;
                     <span id="periodBadge" class="text-[11px] font-bold px-2.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg">Mensual</span>
                 </div>
 
-                <!-- Selector de Periodicidad y Ventana de Fechas -->
+                <!-- Selector de Periodicidad y Ventana de Fechas (Historial de 2 años atrás hasta hoy) -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
                             Periodicidad
                         </label>
                         <select id="selectPeriodicity" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="mensual" selected>Mensual (Mes Completo)</option>
+                            <option value="mensual" selected>Mensual (Mes)</option>
                             <option value="quincenal">Quincenal (15 Días)</option>
                             <option value="semanal">Semanal (7 Días)</option>
                         </select>
@@ -71,12 +71,12 @@ const hasServerSession = !!session;
                             Tramo del Período
                         </label>
                         <select id="selectSubPeriod" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <!-- Opciones dinámicas -->
+                            <!-- Opciones dinámicas de los últimos 24 meses generadas con JS -->
                         </select>
                     </div>
                 </div>
 
-                <!-- Rango de Fechas Permitido -->
+                <!-- Rango de Fechas Permitido (Sin permitir fechas futuras) -->
                 <div class="p-2.5 bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-xl text-[11px] text-blue-700 dark:text-blue-300 flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                         <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +84,7 @@ const hasServerSession = !!session;
                         </svg>
                         <span>Límite de fechas:</span>
                     </div>
-                    <strong id="dateRangeNotice" class="font-mono text-xs">2026-08-01 al 2026-08-31</strong>
+                    <strong id="dateRangeNotice" class="font-mono text-xs">-- al --</strong>
                 </div>
 
                 <!-- Ingreso del Período -->
@@ -188,7 +188,7 @@ const hasServerSession = !!session;
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white font-josefin">Consejos y Recomendaciones de IA</h3>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white font-josefin">Consejos y Recomendaciones de IA.</h3>
                         </div>
                         <span class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-1 rounded-lg">Data Science Engine</span>
                     </div>
@@ -378,41 +378,86 @@ const hasServerSession = !!session;
         "Otros"
     ];
 
-    // ─── GESTIÓN DE PERIODICIDAD Y LÍMITES DE FECHA ───
-    let currentMinDate = "2026-08-01";
-    let currentMaxDate = "2026-08-31";
+    // ─── GESTIÓN DE PERIODICIDAD DINÁMICA (Últimos 24 meses hasta la fecha de hoy) ───
+    const now = new Date();
+    const todayISO = now.toISOString().slice(0, 10);
+    
+    let currentMinDate = todayISO.slice(0, 7) + "-01";
+    let currentMaxDate = todayISO;
 
     const selectPeriodicity = document.getElementById('selectPeriodicity');
     const selectSubPeriod = document.getElementById('selectSubPeriod');
     const periodBadge = document.getElementById('periodBadge');
     const dateRangeNotice = document.getElementById('dateRangeNotice');
 
+    const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
     function updateSubPeriods() {
         const periodicity = selectPeriodicity.value;
         periodBadge.textContent = periodicity.charAt(0).toUpperCase() + periodicity.slice(1);
 
+        let optionsHTML = '';
+
         if (periodicity === 'mensual') {
-            selectSubPeriod.innerHTML = `
-                <option value="2026-08-01|2026-08-31" selected>Agosto 2026</option>
-                <option value="2026-07-01|2026-07-31">Julio 2026</option>
-                <option value="2026-06-01|2026-06-30">Junio 2026</option>
-            `;
+            // Generar los últimos 24 meses hacia atrás
+            for (let i = 0; i < 24; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const year = d.getFullYear();
+                const month = d.getMonth();
+                const mStr = String(month + 1).padStart(2, '0');
+                
+                const start = `${year}-${mStr}-01`;
+                // Último día del mes o hoy si es el mes actual
+                const lastDay = new Date(year, month + 1, 0).getDate();
+                let end = `${year}-${mStr}-${String(lastDay).padStart(2, '0')}`;
+                if (i === 0 && end > todayISO) {
+                    end = todayISO;
+                }
+
+                const isSelected = i === 0 ? 'selected' : '';
+                optionsHTML += `<option value="${start}|${end}" ${isSelected}>${MONTH_NAMES[month]} ${year}</option>`;
+            }
         } else if (periodicity === 'quincenal') {
-            selectSubPeriod.innerHTML = `
-                <option value="2026-08-01|2026-08-15">1ra Quincena Ago (1-15)</option>
-                <option value="2026-08-16|2026-08-31" selected>2da Quincena Ago (16-31)</option>
-                <option value="2026-07-01|2026-07-15">1ra Quincena Jul (1-15)</option>
-                <option value="2026-07-16|2026-07-31">2da Quincena Jul (16-31)</option>
-            `;
+            // Generar quincenas de los últimos 24 meses
+            for (let i = 0; i < 24; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const year = d.getFullYear();
+                const month = d.getMonth();
+                const mStr = String(month + 1).padStart(2, '0');
+                const lastDay = new Date(year, month + 1, 0).getDate();
+
+                const q2Start = `${year}-${mStr}-16`;
+                let q2End = `${year}-${mStr}-${String(lastDay).padStart(2, '0')}`;
+                if (i === 0 && q2End > todayISO) q2End = todayISO;
+
+                const q1Start = `${year}-${mStr}-01`;
+                let q1End = `${year}-${mStr}-15`;
+                if (i === 0 && q1End > todayISO) q1End = todayISO;
+
+                // Solo agregar 2da quincena si la fecha actual ya llegó al día 16 o es mes pasado
+                if (i > 0 || now.getDate() >= 16) {
+                    const isSelected = i === 0 ? 'selected' : '';
+                    optionsHTML += `<option value="${q2Start}|${q2End}" ${isSelected}>2da Quincena ${MONTH_NAMES[month].slice(0, 3)} ${year} (16-${q2End.slice(8)})</option>`;
+                }
+                const isSelectedQ1 = (i === 0 && now.getDate() < 16) ? 'selected' : '';
+                optionsHTML += `<option value="${q1Start}|${q1End}" ${isSelectedQ1}>1ra Quincena ${MONTH_NAMES[month].slice(0, 3)} ${year} (01-${q1End.slice(8)})</option>`;
+            }
         } else if (periodicity === 'semanal') {
-            selectSubPeriod.innerHTML = `
-                <option value="2026-08-17|2026-08-23" selected>Semana 3 Ago (17-23)</option>
-                <option value="2026-08-24|2026-08-30">Semana 4 Ago (24-30)</option>
-                <option value="2026-08-10|2026-08-16">Semana 2 Ago (10-16)</option>
-                <option value="2026-08-03|2026-08-09">Semana 1 Ago (03-09)</option>
-            `;
+            // Generar semanas hacia atrás
+            for (let w = 0; w < 48; w++) {
+                const dEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (w * 7));
+                const dStart = new Date(dEnd.getFullYear(), dEnd.getMonth(), dEnd.getDate() - 6);
+                
+                const startStr = dStart.toISOString().slice(0, 10);
+                let endStr = dEnd.toISOString().slice(0, 10);
+                if (endStr > todayISO) endStr = todayISO;
+
+                const isSelected = w === 0 ? 'selected' : '';
+                optionsHTML += `<option value="${startStr}|${endStr}" ${isSelected}>Semana del ${startStr} al ${endStr}</option>`;
+            }
         }
 
+        selectSubPeriod.innerHTML = optionsHTML;
         applyDateBounds();
     }
 
@@ -420,6 +465,11 @@ const hasServerSession = !!session;
         const parts = selectSubPeriod.value.split('|');
         currentMinDate = parts[0];
         currentMaxDate = parts[1];
+
+        // Asegurar que no exceda nunca la fecha actual de la máquina
+        if (currentMaxDate > todayISO) {
+            currentMaxDate = todayISO;
+        }
 
         dateRangeNotice.textContent = `${currentMinDate} al ${currentMaxDate}`;
 
@@ -436,8 +486,8 @@ const hasServerSession = !!session;
 
     // Estado inicial de transacciones
     let transacciones = [
-        { id: 1, descripcion: 'Transporte', monto: 420, fecha: '2026-08-18' },
-        { id: 2, descripcion: 'Educación', monto: 500, fecha: '2026-08-20' }
+        { id: 1, descripcion: 'Transporte', monto: 420, fecha: todayISO },
+        { id: 2, descripcion: 'Educación', monto: 500, fecha: todayISO }
     ];
 
     function renderTransacciones() {
@@ -486,7 +536,11 @@ const hasServerSession = !!session;
 
         document.querySelectorAll('.tx-date').forEach((inp, idx) => {
             inp.addEventListener('change', () => {
-                transacciones[idx].fecha = inp.value;
+                let val = inp.value;
+                if (val > currentMaxDate) val = currentMaxDate;
+                if (val < currentMinDate) val = currentMinDate;
+                transacciones[idx].fecha = val;
+                inp.value = val;
             });
         });
     }
@@ -537,7 +591,40 @@ const hasServerSession = !!session;
             if (res.ok) {
                 const data = await res.json();
                 updateDashboardResults(data);
-                window.showToast('¡Análisis Completado!', 'Resultados generados con el motor de IA y explicabilidad.', '🧠');
+
+                // Acumular transacciones permanentemente en el historial sin borrar meses anteriores
+                let existingHistory = [];
+                try {
+                    existingHistory = JSON.parse(localStorage.getItem('financeai_all_transactions') || '[]');
+                } catch (_) {
+                    existingHistory = [];
+                }
+
+                const timestampBase = Date.now();
+                const newTxns = [
+                    {
+                        id: timestampBase,
+                        description: `Ingreso del Período (${selectSubPeriod.options[selectSubPeriod.selectedIndex]?.text || ''})`,
+                        amount: ingreso,
+                        category: 'Ingresos',
+                        type: 'INCOME',
+                        date: currentMinDate
+                    },
+                    ...transacciones.map((t, idx) => ({
+                        id: timestampBase + idx + 1,
+                        description: t.descripcion,
+                        amount: t.monto,
+                        category: t.descripcion,
+                        type: 'EXPENSE',
+                        date: t.fecha || currentMinDate
+                    }))
+                ];
+
+                const updatedHistory = [...existingHistory, ...newTxns];
+                localStorage.setItem('financeai_all_transactions', JSON.stringify(updatedHistory));
+                localStorage.setItem('financeai_dashboard_txns', JSON.stringify(updatedHistory));
+
+                window.showToast('¡Análisis Completado!', 'Resultados generados con el motor de IA', '🧠');
             } else {
                 window.showToast('Error en Análisis', `No fue posible completar el análisis (HTTP ${res.status}).`, '❌');
             }

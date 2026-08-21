@@ -24,18 +24,22 @@ const hasServerSession = !!session;
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-josefin">Historial Financiero</h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Evolución temporal con picos y tendencias, distribución por categorías y reportes exportables.</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Evolución temporal con picos y tendencias, filtros de calendario por mes/rango y gestión del historial.</p>
             </div>
             
             <!-- Actions -->
-            <div class="flex items-center gap-3">
-                <button id="btnExportExcel" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+            <div class="flex items-center flex-wrap gap-2.5">
+                <button id="btnExportExcel" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Exportar a Excel
                 </button>
-                <button id="btnExportPdf" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-gray-100 hover:bg-black dark:hover:bg-white text-white dark:text-gray-900 rounded-xl text-xs font-semibold shadow-sm transition">
+                <button id="btnExportPdf" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-black dark:hover:bg-white text-white dark:text-gray-900 rounded-xl text-xs font-semibold shadow-sm transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    Imprimir Reporte (PDF)
+                    Imprimir Reporte
+                </button>
+                <button id="btnOpenClearHistoryModal" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/60 rounded-xl text-xs font-semibold transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Borrar Todo el Historial
                 </button>
             </div>
         </header>
@@ -83,15 +87,15 @@ const hasServerSession = !!session;
             </div>
         </section>
 
-        <!-- GRÁFICA MULTI-LÍNEA CON PICOS, SUBIDAS Y BAJADAS TEMPORALES (Screenshot Requirement) -->
+        <!-- GRÁFICA MULTI-LÍNEA CON PICOS Y FLUCTUACIONES TEMPORALES -->
         <section class="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white font-josefin flex items-center gap-2">
                         <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
-                        Evolución Comparativa y Tendencia de Flujos
+                        Evolución Comparativa y Fluctuación de Flujos
                     </h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Visualización de fluctuaciones, subidas, bajadas y picos de consumo en el tiempo.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Líneas de gastos, necesidades, estilo de vida e ingresos con picos y valles temporales.</p>
                 </div>
 
                 <!-- Selector de Granularidad de Tiempo -->
@@ -102,46 +106,67 @@ const hasServerSession = !!session;
                 </div>
             </div>
 
-            <!-- Canvas de la Gráfica de Picos y Bajadas -->
+            <!-- Canvas de la Gráfica de Picos -->
             <div class="h-72 w-full relative">
                 <canvas id="multiLinePeaksChart"></canvas>
             </div>
         </section>
 
-        <!-- Filtros Rápidos y Detallados -->
+        <!-- FILTROS AVANZADOS CON CALENDARIOS (Mes Específico & Rango Inicio-Fin limitado a 2 años) -->
         <section class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Filtrar Histórico</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                    Filtrar Histórico (Máximo 2 Años Atrás)
+                </h3>
                 <button id="btnResetFilters" class="text-xs text-blue-600 hover:underline">Restablecer filtros</button>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+                
+                <!-- 1. Calendario de Mes Específico -->
                 <div>
-                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Período Rápido</label>
-                    <select id="filterPeriod" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white">
-                        <option value="all">Todo el Historial</option>
-                        <option value="this_month">Este Mes</option>
-                        <option value="last_month">Mes Anterior</option>
-                        <option value="this_year">Este Año</option>
-                    </select>
+                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                        Seleccionar Mes
+                    </label>
+                    <input type="month" id="filterMonthPicker"
+                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none" />
                 </div>
+
+                <!-- 2. Rango Específico: Fecha Inicio -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                        Rango: Fecha Inicio
+                    </label>
+                    <input type="date" id="filterDateStart"
+                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+
+                <!-- 3. Rango Específico: Fecha Fin -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                        Rango: Fecha Fin
+                    </label>
+                    <input type="date" id="filterDateEnd"
+                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+
+                <!-- 4. Tipo de Flujo -->
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Tipo de Flujo</label>
-                    <select id="filterType" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white">
+                    <select id="filterType" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white outline-none">
                         <option value="all">Ingresos y Gastos</option>
                         <option value="INCOME">Solo Ingresos</option>
                         <option value="EXPENSE">Solo Gastos</option>
                     </select>
                 </div>
+
+                <!-- 5. Categoría -->
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Categoría</label>
-                    <select id="filterCategory" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white">
+                    <select id="filterCategory" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white outline-none">
                         <option value="all">Todas las Categorías</option>
                     </select>
-                </div>
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Día Específico</label>
-                    <input type="date" id="filterDate" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white" />
                 </div>
             </div>
         </section>
@@ -185,6 +210,29 @@ const hasServerSession = !!session;
         </div>
 
     </div>
+
+    <!-- Modal para Confirmar Borrado de Todo el Historial -->
+    <div id="clearHistoryModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-md">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-gray-200 dark:border-gray-800 animate-scale-in text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 mx-auto flex items-center justify-center text-xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white font-josefin">¿Borrar todo el historial?</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                    Esta acción eliminará permanentemente todas las transacciones registradas de todos los meses y años.
+                </p>
+            </div>
+            <div class="flex gap-2.5 pt-2">
+                <button id="btnCancelClearHistory" class="flex-1 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                    Cancelar
+                </button>
+                <button id="btnConfirmClearHistory" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl text-xs shadow-sm transition">
+                    Sí, Borrar Todo
+                </button>
+            </div>
+        </div>
+    </div>
 </Layout>
 
 <script define:vars={{ API_URL }}>
@@ -196,6 +244,30 @@ const hasServerSession = !!session;
     let multiLineChartInstance = null;
     let categoryDonutInstance = null;
 
+    // Configuración de Límites de Fecha: 2 años atrás hasta la fecha de hoy
+    const now = new Date();
+    const todayISO = now.toISOString().slice(0, 10);
+    
+    const twoYearsAgoDate = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate());
+    const minAllowedISO = twoYearsAgoDate.toISOString().slice(0, 10);
+
+    const filterMonthPicker = document.getElementById('filterMonthPicker');
+    const filterDateStart = document.getElementById('filterDateStart');
+    const filterDateEnd = document.getElementById('filterDateEnd');
+
+    if (filterMonthPicker) {
+        filterMonthPicker.min = minAllowedISO.slice(0, 7);
+        filterMonthPicker.max = todayISO.slice(0, 7);
+    }
+    if (filterDateStart) {
+        filterDateStart.min = minAllowedISO;
+        filterDateStart.max = todayISO;
+    }
+    if (filterDateEnd) {
+        filterDateEnd.min = minAllowedISO;
+        filterDateEnd.max = todayISO;
+    }
+
     // Colores oficiales para las líneas con picos
     const LINE_COLORS = {
         total: '#EF4444',       // Rojo
@@ -204,23 +276,69 @@ const hasServerSession = !!session;
         deseos: '#F59E0B'       // Ámbar
     };
 
-    // Cargar datos
+    // Dataset base de ejemplo para inicialización si no se ha borrado
+    const INITIAL_SAMPLE_TRANSACTIONS = [
+        { id: 101, description: 'Sueldo Quincenal Base', amount: 4500, category: 'Ingresos', type: 'INCOME', date: '2026-08-01' },
+        { id: 102, description: 'Renta Depto', amount: 1200, category: 'Vivienda', type: 'EXPENSE', date: '2026-08-03' },
+        { id: 103, description: 'Supermercado Mensual', amount: 650, category: 'Alimentación', type: 'EXPENSE', date: '2026-08-06' },
+        { id: 104, description: 'Gasolina y Transporte', amount: 420, category: 'Transporte', type: 'EXPENSE', date: '2026-08-10' },
+        { id: 105, description: 'Servicios de Luz y Agua', amount: 180, category: 'Servicios', type: 'EXPENSE', date: '2026-08-13' },
+        { id: 106, description: 'Ingreso Extra Consultoría', amount: 800, category: 'Ingresos', type: 'INCOME', date: '2026-08-15' },
+        { id: 107, description: 'Cursos y Libros', amount: 500, category: 'Educación', type: 'EXPENSE', date: '2026-08-18' },
+        { id: 108, description: 'Cena y Salidas', amount: 260, category: 'Entretenimiento', type: 'EXPENSE', date: '2026-08-20' },
+        { id: 109, description: 'Farmacia y Vitaminas', amount: 140, category: 'Salud y bienestar', type: 'EXPENSE', date: '2026-07-24' },
+        { id: 110, description: 'Ropa y Accesorios', amount: 310, category: 'Compras', type: 'EXPENSE', date: '2026-07-28' },
+        { id: 111, description: 'Ingreso Nómina Julio', amount: 4200, category: 'Ingresos', type: 'INCOME', date: '2026-07-01' },
+        { id: 112, description: 'Mantenimiento Vehicular', amount: 750, category: 'Transporte', type: 'EXPENSE', date: '2026-07-15' }
+    ];
+
+    // Cargar datos acumulativos
     async function loadData() {
         const token = localStorage.getItem('financeai_token');
-        if (!token) return;
+        let fetchedTx = [];
 
-        try {
-            const res = await fetch(`${API_URL}/api/v1/transactions`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                rawTransactions = await res.json();
-                populateCategoryFilter();
-                applyFilters();
+        if (token) {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/transactions`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    fetchedTx = await res.json();
+                }
+            } catch (e) {
+                console.warn("Fallo fetch transacciones:", e);
             }
-        } catch (e) {
-            console.error("Error al cargar historial:", e);
         }
+
+        const isHistoryExplicitlyCleared = localStorage.getItem('financeai_history_cleared') === 'true';
+
+        if (Array.isArray(fetchedTx) && fetchedTx.length > 0) {
+            rawTransactions = fetchedTx.map(t => ({
+                id: t.id,
+                description: t.description || t.descripcion || 'Transacción',
+                amount: parseFloat(t.amount || t.monto || 0),
+                category: t.category || t.categoria || 'Otros',
+                type: t.type || (parseFloat(t.amount || t.monto) < 0 ? 'EXPENSE' : 'INCOME'),
+                date: (t.date || t.fecha || todayISO).toString().slice(0, 10)
+            }));
+        } else {
+            const savedLocal = localStorage.getItem('financeai_all_transactions');
+            if (savedLocal) {
+                try {
+                    rawTransactions = JSON.parse(savedLocal);
+                } catch (_) {
+                    rawTransactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                }
+            } else {
+                rawTransactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                if (!isHistoryExplicitlyCleared) {
+                    localStorage.setItem('financeai_all_transactions', JSON.stringify(INITIAL_SAMPLE_TRANSACTIONS));
+                }
+            }
+        }
+
+        populateCategoryFilter();
+        applyFilters();
     }
 
     function populateCategoryFilter() {
@@ -231,31 +349,28 @@ const hasServerSession = !!session;
     }
 
     function applyFilters() {
-        const period = document.getElementById('filterPeriod').value;
+        const selectedMonth = filterMonthPicker?.value; // "YYYY-MM"
+        const startDate = filterDateStart?.value;       // "YYYY-MM-DD"
+        const endDate = filterDateEnd?.value;           // "YYYY-MM-DD"
         const type = document.getElementById('filterType').value;
         const category = document.getElementById('filterCategory').value;
-        const date = document.getElementById('filterDate').value;
-
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
 
         filteredTransactions = rawTransactions.filter(t => {
-            const tDate = new Date(t.date);
+            const tDate = (t.date || todayISO).slice(0, 10);
 
+            // Filtro por tipo
             if (type !== 'all' && t.type !== type) return false;
+            // Filtro por categoría
             if (category !== 'all' && (t.category || 'Otros') !== category) return false;
-            if (date && t.date !== date) return false;
 
-            if (period === 'this_month') {
-                if (tDate.getFullYear() !== currentYear || tDate.getMonth() !== currentMonth) return false;
-            } else if (period === 'last_month') {
-                const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-                const yearOfLastMonth = currentMonth === 0 ? currentYear - 1 : currentYear;
-                if (tDate.getFullYear() !== yearOfLastMonth || tDate.getMonth() !== lastMonth) return false;
-            } else if (period === 'this_year') {
-                if (tDate.getFullYear() !== currentYear) return false;
+            // Filtro por mes específico de calendario
+            if (selectedMonth && !tDate.startsWith(selectedMonth)) {
+                return false;
             }
+
+            // Filtro por rango de fechas (Inicio y Fin)
+            if (startDate && tDate < startDate) return false;
+            if (endDate && tDate > endDate) return false;
 
             return true;
         });
@@ -318,7 +433,7 @@ const hasServerSession = !!session;
         }).join('');
     }
 
-    // ─── GRÁFICA MULTI-LÍNEA CON PICOS Y BAJADAS (Captura 232245) ───
+    // ─── GRÁFICA MULTI-LÍNEA CON PICOS Y FLUCTUACIONES ───
     function renderMultiLinePeaksChart() {
         const ctx = document.getElementById('multiLinePeaksChart')?.getContext('2d');
         if (!ctx) return;
@@ -330,10 +445,10 @@ const hasServerSession = !!session;
         filteredTransactions.forEach(t => {
             let key = t.date;
             if (currentGranularity === 'week') {
-                const d = new Date(t.date);
+                const d = new Date(t.date + 'T00:00:00');
                 key = `Sem ${Math.ceil(d.getDate() / 7)} (${d.getMonth() + 1}/${d.getFullYear()})`;
             } else if (currentGranularity === 'month') {
-                const d = new Date(t.date);
+                const d = new Date(t.date + 'T00:00:00');
                 key = `${d.toLocaleString('es-ES', { month: 'short' })} ${d.getFullYear()}`;
             }
 
@@ -514,17 +629,57 @@ const hasServerSession = !!session;
     btnMonth?.addEventListener('click', () => setGranularity('month'));
 
     // Filtros listeners
-    document.getElementById('filterPeriod')?.addEventListener('change', applyFilters);
+    filterMonthPicker?.addEventListener('change', () => {
+        // Al seleccionar un mes específico, limpiar rango para evitar conflicto
+        if (filterDateStart) filterDateStart.value = '';
+        if (filterDateEnd) filterDateEnd.value = '';
+        applyFilters();
+    });
+
+    filterDateStart?.addEventListener('change', () => {
+        if (filterMonthPicker) filterMonthPicker.value = '';
+        applyFilters();
+    });
+
+    filterDateEnd?.addEventListener('change', () => {
+        if (filterMonthPicker) filterMonthPicker.value = '';
+        applyFilters();
+    });
+
     document.getElementById('filterType')?.addEventListener('change', applyFilters);
     document.getElementById('filterCategory')?.addEventListener('change', applyFilters);
-    document.getElementById('filterDate')?.addEventListener('change', applyFilters);
 
     document.getElementById('btnResetFilters')?.addEventListener('click', () => {
-        document.getElementById('filterPeriod').value = 'all';
+        if (filterMonthPicker) filterMonthPicker.value = '';
+        if (filterDateStart) filterDateStart.value = '';
+        if (filterDateEnd) filterDateEnd.value = '';
         document.getElementById('filterType').value = 'all';
         document.getElementById('filterCategory').value = 'all';
-        document.getElementById('filterDate').value = '';
         applyFilters();
+    });
+
+    // Modal para Borrar Todo el Historial
+    const clearHistoryModal = document.getElementById('clearHistoryModal');
+    document.getElementById('btnOpenClearHistoryModal')?.addEventListener('click', () => {
+        clearHistoryModal.classList.remove('hidden');
+    });
+
+    document.getElementById('btnCancelClearHistory')?.addEventListener('click', () => {
+        clearHistoryModal.classList.add('hidden');
+    });
+
+    document.getElementById('btnConfirmClearHistory')?.addEventListener('click', () => {
+        rawTransactions = [];
+        filteredTransactions = [];
+        localStorage.setItem('financeai_all_transactions', JSON.stringify([]));
+        localStorage.setItem('financeai_dashboard_txns', JSON.stringify([]));
+        localStorage.setItem('financeai_history_cleared', 'true');
+        
+        clearHistoryModal.classList.add('hidden');
+        populateCategoryFilter();
+        applyFilters();
+
+        window.showToast?.('Historial Eliminado', 'Todas las transacciones históricas han sido borradas.', '🗑️');
     });
 
     // Exportar Excel
