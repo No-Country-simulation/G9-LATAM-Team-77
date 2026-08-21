@@ -71,4 +71,31 @@ public class AuthService {
                 user.getEmail()
         );
     }
+
+    public LoginResponse googleSync(com.financeia.financeia_backend.dto.auth.GoogleSyncRequest request) {
+        User user = userRepository.findByEmail(request.email()).orElse(null);
+
+        if (user == null) {
+            try {
+                User newUser = new User();
+                newUser.setName(request.name());
+                newUser.setEmail(request.email());
+                newUser.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+                newUser.setRole(Role.USER);
+                user = userRepository.save(newUser);
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                // Si hubo condición de carrera y otro hilo lo insertó primero, lo recuperamos
+                user = userRepository.findByEmail(request.email())
+                        .orElseThrow(() -> new RuntimeException("Error al sincronizar Google Auth"));
+            }
+        }
+
+        String token = jwtService.generateToken(user.getEmail());
+        return new LoginResponse(
+                token,
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+    }
 }

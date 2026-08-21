@@ -87,13 +87,14 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
         }
         if (authNavBtn) {
             authNavBtn.textContent = 'Cerrar Sesión';
-            authNavBtn.className = 'text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors';
+            authNavBtn.className = 'text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors block';
             authNavBtn.href = '#';
             authNavBtn.onclick = (e) => {
                 e.preventDefault();
                 localStorage.removeItem('financeai_token');
                 localStorage.removeItem('financeai_user');
-                window.location.href = '/login';
+                // Al ser un script inline, redirigimos a la ruta nativa de Auth.js para cerrar sesión
+                window.location.href = '/api/auth/signout?callbackUrl=/';
             };
         }
     } else {

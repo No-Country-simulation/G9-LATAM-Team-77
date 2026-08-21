@@ -33,4 +33,10 @@ public class AuthController {
 
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @PostMapping("/google-sync")
+    public ResponseEntity<LoginResponse> googleSync(
+            @Valid @RequestBody com.financeia.financeia_backend.dto.auth.GoogleSyncRequest request) {
+        return ResponseEntity.ok(authService.googleSync(request));
+    }
 }

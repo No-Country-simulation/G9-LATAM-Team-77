@@ -186,6 +186,24 @@ const session = await getSession(Astro.request);
         window.location.href = '/';
     }
 
+    // Truco: Sincronizar Google Auth con el Backend de Spring Boot para obtener JWT
+    if (session && !localStorage.getItem('financeai_token')) {
+        fetch(`${API_URL}/api/v1/auth/google-sync`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: session.user?.email || "google@example.com",
+                name: session.user?.name || "Usuario de Google"
+            })
+        }).then(res => res.json()).then(data => {
+            if (data && data.token) {
+                localStorage.setItem('financeai_token', data.token);
+                localStorage.setItem('financeai_user', JSON.stringify(data));
+                window.location.reload(); 
+            }
+        }).catch(err => console.error("Error en sincronizacion con Google:", err));
+    }
+
 // ─────────────────────────────────────────────
 // Categorias
 // ─────────────────────────────────────────────
