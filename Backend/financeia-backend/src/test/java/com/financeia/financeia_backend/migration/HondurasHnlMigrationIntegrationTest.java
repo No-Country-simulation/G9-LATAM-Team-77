@@ -42,7 +42,7 @@ class HondurasHnlMigrationIntegrationTest {
 
     @Test
     void debeAplicarV5YRegistrarUsuarioConHondurasYHnl() {
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("5");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("6");
 
         Long paisId = jdbcTemplate.queryForObject(
                 "SELECT id FROM paises WHERE codigo = ?",

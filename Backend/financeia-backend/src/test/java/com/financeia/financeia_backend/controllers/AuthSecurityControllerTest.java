@@ -6,6 +6,7 @@ import com.financeia.financeia_backend.exception.ApiException;
 import com.financeia.financeia_backend.repository.UserRepository;
 import com.financeia.financeia_backend.service.AuthService;
 import com.financeia.financeia_backend.service.JwtService;
+import com.financeia.financeia_backend.service.PasswordResetService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -30,6 +31,9 @@ class AuthSecurityControllerTest {
 
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    private PasswordResetService passwordResetService;
 
     @MockitoBean
     private JwtService jwtService;
@@ -65,5 +69,37 @@ class AuthSecurityControllerTest {
                                 """))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Credenciales inválidas"));
+    }
+
+    @Test
+    void shouldAllowForgotPasswordWithoutAuthentication() throws Exception {
+        when(passwordResetService.requestPasswordReset(any())).thenReturn(
+                new com.financeia.financeia_backend.dto.auth.MessageResponse(
+                        PasswordResetService.FORGOT_PASSWORD_RESPONSE)
+        );
+
+        mockMvc.perform(post("/api/v1/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"ana@test.com"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(PasswordResetService.FORGOT_PASSWORD_RESPONSE));
+    }
+
+    @Test
+    void shouldAllowResetPasswordWithoutAuthentication() throws Exception {
+        when(passwordResetService.resetPassword(any())).thenReturn(
+                new com.financeia.financeia_backend.dto.auth.MessageResponse(
+                        PasswordResetService.RESET_PASSWORD_RESPONSE)
+        );
+
+        mockMvc.perform(post("/api/v1/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"token":"token-seguro","newPassword":"NuevaClave#2026"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(PasswordResetService.RESET_PASSWORD_RESPONSE));
     }
 }

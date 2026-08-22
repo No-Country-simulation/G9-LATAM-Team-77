@@ -13,7 +13,7 @@ importers:
         version: 11.1.2(astro@7.2.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(jiti@2.7.0))
       '@auth/core':
         specifier: ^0.34.3
-        version: 0.34.3(nodemailer@6.10.1)
+        version: 0.34.3
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.2.1(esbuild@0.28.2)(jiti@2.7.0))
@@ -22,10 +22,7 @@ importers:
         version: 7.2.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(jiti@2.7.0)
       auth-astro:
         specifier: ^4.2.0
-        version: 4.2.0(@auth/core@0.34.3(nodemailer@6.10.1))(astro@7.2.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(jiti@2.7.0))
-      nodemailer:
-        specifier: ^6.10.1
-        version: 6.10.1
+        version: 4.2.0(@auth/core@0.34.3)(astro@7.2.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(jiti@2.7.0))
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -1526,10 +1523,6 @@ packages:
   node-mock-http@1.0.5:
     resolution: {integrity: sha512-KQyt/wLjG3TAc7DOUhpqWzgd4ERxR80JOlTK5VE5R1S12IaPVN5qkj4klBce9HPG1Njuup4Sb5bljaT34lIyjw==}
 
-  nodemailer@6.10.1:
-    resolution: {integrity: sha512-Z+iLaBGVaSjbIzQ4pX6XV41HrooLsQ10ZWPUehGmuantvzWoDVBnmsdUcOIDM1t+yPor5pDhVlDESgOMEGxhHA==}
-    engines: {node: '>=6.0.0'}
-
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
@@ -2163,7 +2156,7 @@ snapshots:
       is-docker: 4.0.0
       package-manager-detector: 1.8.0
 
-  '@auth/core@0.34.3(nodemailer@6.10.1)':
+  '@auth/core@0.34.3':
     dependencies:
       '@panva/hkdf': 1.2.1
       '@types/cookie': 0.6.0
@@ -2172,8 +2165,6 @@ snapshots:
       oauth4webapi: 2.17.0
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
-    optionalDependencies:
-      nodemailer: 6.10.1
 
   '@babel/helper-string-parser@7.29.7': {}
 
@@ -2851,9 +2842,9 @@ snapshots:
       - uploadthing
       - yaml
 
-  auth-astro@4.2.0(@auth/core@0.34.3(nodemailer@6.10.1))(astro@7.2.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(jiti@2.7.0)):
+  auth-astro@4.2.0(@auth/core@0.34.3)(astro@7.2.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(jiti@2.7.0)):
     dependencies:
-      '@auth/core': 0.34.3(nodemailer@6.10.1)
+      '@auth/core': 0.34.3
       astro: 7.2.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(jiti@2.7.0)
       set-cookie-parser: 2.7.2
 
@@ -3392,8 +3383,6 @@ snapshots:
   node-fetch-native@1.6.7: {}
 
   node-mock-http@1.0.5: {}
-
-  nodemailer@6.10.1: {}
 
   normalize-path@3.0.0: {}
 

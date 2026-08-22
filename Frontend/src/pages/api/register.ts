@@ -1,11 +1,10 @@
 import { API_URL } from '../../lib/api';
 import type { APIRoute } from 'astro';
-import { sendWelcomeEmail } from '../../lib/email';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { email, password, name } = body;
+    const { email, password } = body;
 
     if (!email || !password) {
       return new Response(JSON.stringify({ error: "Email and password are required" }), {
@@ -14,10 +13,9 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Call backend API to register
     const res = await fetch(`${API_URL}/api/v1/auth/register`, {
       method: "POST",
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" }
     });
 
@@ -30,9 +28,6 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const data = await res.json();
-
-    // Send welcome email after successful registration
-    await sendWelcomeEmail(email);
 
     return new Response(JSON.stringify({ success: true, data }), {
       status: 200,

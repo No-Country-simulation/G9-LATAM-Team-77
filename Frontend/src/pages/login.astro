@@ -74,12 +74,33 @@ import { API_URL } from '../lib/api';
                             <input id="password" type="password" required autocomplete="current-password" minlength="6" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
                         </label>
 
+                        <div id="forgotPasswordRow" class="text-right">
+                            <button id="forgotPasswordBtn" type="button" class="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                                ¿Olvidaste tu contraseña?
+                            </button>
+                        </div>
+
                         <button id="submitBtn" type="submit" class="w-full rounded-xl bg-gray-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600 dark:hover:bg-blue-700">
                             Iniciar sesión
                         </button>
                     </form>
 
-                    <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div id="forgotPanel" class="mt-6 hidden">
+                        <form id="forgotForm" class="space-y-4" aria-label="Recuperar contraseña">
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                Correo electrónico
+                                <input id="forgotEmail" type="email" required autocomplete="email" placeholder="tu@correo.com" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                            </label>
+                            <button id="forgotSubmitBtn" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+                                Enviar enlace de recuperación
+                            </button>
+                        </form>
+                        <button id="backToLoginBtn" type="button" class="mt-5 w-full text-center text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                            Volver al inicio de sesión
+                        </button>
+                    </div>
+
+                    <div id="modeToggle" class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
                         <span id="toggleQuestion">¿Aún no tienes cuenta?</span>
                         <button id="toggleModeBtn" type="button" class="ml-1 font-semibold text-blue-600 hover:underline dark:text-blue-400">Regístrate</button>
                     </div>
@@ -106,6 +127,11 @@ import { API_URL } from '../lib/api';
     const currencySelect = byId('monedaId');
     const catalogStatus = byId('catalogStatus');
     const retryCatalogs = byId('retryCatalogs');
+    const forgotPanel = byId('forgotPanel');
+    const forgotForm = byId('forgotForm');
+    const forgotSubmitButton = byId('forgotSubmitBtn');
+    const modeToggle = byId('modeToggle');
+    const forgotPasswordRow = byId('forgotPasswordRow');
     let registerMode = false;
     let catalogsReady = false;
 
@@ -202,6 +228,50 @@ import { API_URL } from '../lib/api';
         setSession(data);
     }
 
+    function setForgotMode(enabled) {
+        form.classList.toggle('hidden', enabled);
+        forgotPanel.classList.toggle('hidden', !enabled);
+        modeToggle.classList.toggle('hidden', enabled);
+        alertBox.classList.add('hidden');
+        byId('formTitle').textContent = enabled ? 'Recupera tu acceso' : 'Bienvenido de nuevo';
+        byId('formSubtitle').textContent = enabled
+            ? 'Te enviaremos un enlace seguro si el correo pertenece a una cuenta.'
+            : 'Accede a tu panel financiero.';
+        if (enabled) {
+            byId('forgotEmail').value = byId('email').value.trim();
+            byId('forgotEmail').focus();
+        }
+    }
+
+    byId('forgotPasswordBtn').addEventListener('click', () => setForgotMode(true));
+    byId('backToLoginBtn').addEventListener('click', () => setForgotMode(false));
+
+    forgotForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = byId('forgotEmail').value.trim();
+        forgotSubmitButton.disabled = true;
+        forgotSubmitButton.textContent = 'Enviando…';
+
+        try {
+            const response = await fetch(`${API_URL}/api/v1/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            const data = await readJson(response);
+            if (!response.ok) {
+                throw new Error(data.message || 'No fue posible procesar la solicitud. Inténtalo nuevamente.');
+            }
+            showAlert(data.message || 'Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.', false);
+            forgotForm.reset();
+        } catch (error) {
+            showAlert(error instanceof Error ? error.message : 'No fue posible procesar la solicitud. Inténtalo nuevamente.');
+        } finally {
+            forgotSubmitButton.disabled = false;
+            forgotSubmitButton.textContent = 'Enviar enlace de recuperación';
+        }
+    });
+
     byId('toggleModeBtn').addEventListener('click', () => {
         registerMode = !registerMode;
         registerFields.classList.toggle('hidden', !registerMode);
@@ -210,6 +280,7 @@ import { API_URL } from '../lib/api';
         byId('toggleQuestion').textContent = registerMode ? '¿Ya tienes cuenta?' : '¿Aún no tienes cuenta?';
         byId('toggleModeBtn').textContent = registerMode ? 'Inicia sesión' : 'Regístrate';
         submitButton.textContent = registerMode ? 'Crear cuenta' : 'Iniciar sesión';
+        forgotPasswordRow.classList.toggle('hidden', registerMode);
         if (registerMode && !catalogsReady) loadCatalogs();
     });
 
