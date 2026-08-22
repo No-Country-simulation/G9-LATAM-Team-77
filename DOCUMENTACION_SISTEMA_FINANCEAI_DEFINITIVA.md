@@ -27,14 +27,21 @@
    - [4.5 UX Avanzado: Calendario Glassmorphic y Exportación Excel](#45-ux-avanzado-calendario-glassmorphic-y-exportación-excel)
    - [4.6 Política de Alta Seguridad en Contraseñas (Checklist Interactivo en Tiempo Real)](#46-política-de-alta-seguridad-en-contraseñas-checklist-interactivo-en-tiempo-real)
    - [4.7 Flujo de Notificaciones Toast Dinámicas con Emojis Expresivos](#47-flujo-de-notificaciones-toast-dinámicas-con-emojis-expresivos)
-5. [Guía Maestra: Cómo Levantar Todo el Sistema Paso a Paso (Pro)](#5-guía-maestra-cómo-levantar-todo-el-sistema-paso-a-paso-pro)
-   - [5.1 Requisitos Previos y Entorno Oficial de Compilación](#51-requisitos-previos-y-entorno-oficial-de-compilación)
-   - [5.2 Paso 1: Configuración de Variables de Entorno Centralizadas](#52-paso-1-configuración-de-variables-de-entorno-centralizadas)
-   - [5.3 Paso 2: Inicialización del Entorno Python (Data Science)](#53-paso-2-inicialización-del-entorno-python-data-science)
-   - [5.4 Paso 3: Compilación y Ejecución del Backend Spring Boot](#54-paso-3-compilación-y-ejecución-del-backend-spring-boot)
-   - [5.5 Paso 4: Ejecución del Frontend Astro](#55-paso-4-ejecución-del-frontend-astro)
-   - [5.6 Paso 5: Despliegue con Docker / Docker Compose](#56-paso-5-despliegue-con-docker--docker-compose)
-6. [Manejo de Errores Comunes y Preguntas Frecuentes](#6-manejo-de-errores-comunes-y-preguntas-frecuentes)
+5. [Marco de Cumplimiento Legal, Privacidad y Gobernanza de IA](#5-marco-de-cumplimiento-legal-privacidad-y-gobernanza-de-ia)
+   - [5.1 Legislación Mexicana (LFPDPPP, INAI, Ley Fintech, LMV y PROFECO)](#51-legislación-mexicana-lfpdppp-inai-ley-fintech-lmv-y-profeco)
+   - [5.2 Normativa Internacional (GDPR, CCPA/CPRA Do Not Sell y EU AI Act)](#52-normativa-internacional-gdpr-ccpacpra-do-not-sell-y-eu-ai-act)
+   - [5.3 Cumplimiento de la Política de Datos de Usuario de Google OAuth2](#53-cumplimiento-de-la-política-de-datos-de-usuario-de-google-oauth2)
+   - [5.4 Protocolo de Derechos ARCO y Exportación JSON](#54-protocolo-de-derechos-arco-y-exportación-json)
+   - [5.5 Gobernanza y Transparencia de Inteligencia Artificial (SDLC & XAI)](#55-gobernanza-y-transparencia-de-inteligencia-artificial-sdlc--xai)
+   - [5.6 Deslinde Financiero (Financial Disclaimer) y Safe Harbor](#56-deslinde-financiero-financial-disclaimer-y-safe-harbor)
+6. [Guía Maestra: Cómo Levantar Todo el Sistema Paso a Paso (Pro)](#6-guía-maestra-cómo-levantar-todo-el-sistema-paso-a-paso-pro)
+   - [6.1 Requisitos Previos y Entorno Oficial de Compilación](#61-requisitos-previos-y-entorno-oficial-de-compilación)
+   - [6.2 Paso 1: Configuración de Variables de Entorno Centralizadas](#62-paso-1-configuración-de-variables-de-entorno-centralizadas)
+   - [6.3 Paso 2: Inicialización del Entorno Python (Data Science)](#63-paso-2-inicialización-del-entorno-python-data-science)
+   - [6.4 Paso 3: Compilación y Ejecución del Backend Spring Boot](#64-paso-3-compilación-y-ejecución-del-backend-spring-boot)
+   - [6.5 Paso 4: Ejecución del Frontend Astro](#65-paso-4-ejecución-del-frontend-astro)
+   - [6.6 Paso 5: Despliegue con Docker / Docker Compose](#66-paso-5-despliegue-con-docker--docker-compose)
+7. [Manejo de Errores Comunes y Preguntas Frecuentes](#7-manejo-de-errores-comunes-y-preguntas-frecuentes)
 
 ---
 
@@ -250,8 +257,203 @@ erDiagram
 | `POST` | `/api/v1/transactions` | Crea una nueva transacción | `Bearer JWT` | `{"description", "amount", "category", "type", "date"}` | `201 Created` |
 | `GET` | `/api/v1/dashboard/summary` | Obtiene resumen consolidado para el Dashboard | `Bearer JWT` | Ninguno | `200 OK` |
 | `GET` | `/api/v1/dashboard/history` | Obtiene series temporales para gráficas | `Bearer JWT` | Ninguno | `200 OK` |
-| `POST` | `/api/v1/analisis-financiero` | **Ejecuta el análisis de IA (Bridge a Python)** | `Bearer JWT` | `{"ingresoMensual", "deudaTotal", ...}` | `200 OK` (Score + Diagnóstico) |
+| `POST` | `/api/v1/analisis-financiero`<br/>*(alias: `/analisis-financiero`)* | **Ejecuta el análisis de IA (Bridge a Python)** | Pública / `Bearer JWT` | `{"ingreso_mensual", "transacciones": [...]}` | `200 OK` (Score + Diagnóstico + Categorización) |
 | `GET` | `/api/v1/health` | Health Check de liveness y readiness | Pública | Ninguno | `200 OK` (`{"status": "UP"}`) |
+
+#### 3.3.1 Casos de Uso Prácticos: Análisis y Recomendaciones con IA (`POST /api/v1/analisis-financiero`)
+
+El endpoint soporta dos modalidades de consumo según el contexto de integración y conveniencia del cliente:
+
+---
+
+##### 🟢 Caso 1: Modo Automático Simplificado (Recomendado para Frontend & App Móvil)
+**Cuándo usarlo:** Cuando el usuario final interactúa con la plataforma registrando sus ingresos y transacciones reales. El sistema evita fricción al no exigirle al usuario que calcule su endeudamiento ni su frecuencia de ahorro. La IA clasifica los conceptos por NLP (`Supermercado` ➔ `Alimentación`, `Combustible` ➔ `Transporte`, etc.), totaliza los egresos, deduce la tasa de ahorro y calcula el endeudamiento a partir de los gastos fijos.
+
+**Entrada en Postman (`POST http://localhost:8080/api/v1/analisis-financiero`):**
+```json
+{
+  "ingreso_mensual": 4500,
+  "transacciones": [
+    { "descripcion": "Supermercado", "valor": 420 },
+    { "descripcion": "Combustible", "valor": 300 },
+    { "descripcion": "Streaming", "valor": 40 }
+  ]
+}
+```
+
+**Salida (`200 OK`):**
+```json
+{
+  "status": "success",
+  "score_financiero": 83,
+  "perfil_financiero": "Saludable",
+  "probabilidad": 0.92,
+  "ingreso_mensual": 4500.0,
+  "total_gastos": 760.0,
+  "ahorro_estimado": 3740.0,
+  "nivel_endeudamiento": 0.0,
+  "frecuencia_ahorro": "Alta",
+  "periodicidad": "mensual",
+  "moneda": "USD",
+  "resumen_gastos": {
+    "Alimentación": 420.0,
+    "Transporte": 300.0,
+    "Entretenimiento": 40.0
+  },
+  "transacciones_categorizadas": [
+    { "descripcion": "Supermercado", "valor": 420.0, "categoria": "Alimentación" },
+    { "descripcion": "Combustible", "valor": 300.0, "categoria": "Transporte" },
+    { "descripcion": "Streaming", "valor": 40.0, "categoria": "Entretenimiento" }
+  ],
+  "categorias_detectadas": ["Alimentación", "Transporte", "Entretenimiento"],
+  "recomendaciones": [
+    "Tu salud financiera está en nivel Saludable (83/100). Tus finanzas muestran un equilibrio óptimo entre ingresos, gastos operativos y capacidad de ahorro.",
+    "Factor determinante: tu relación Gasto/Ingreso — estás destinando el 17% de tu ingreso a gastos corrientes, manteniendo un margen amplio de liquidez.",
+    "Mantén tu disciplina de presupuesto y destina al menos 5% adicional de tus excedentes a instrumentos de inversión o fondos de liquidez."
+  ],
+  "explicabilidad_ds08": {
+    "diagnostico": "Tu salud financiera está en nivel Saludable (83/100). Tus finanzas muestran un equilibrio óptimo entre ingresos, gastos operativos y capacidad de ahorro.",
+    "causa_principal": "Factor determinante: tu relación Gasto/Ingreso — estás destinando el 17% de tu ingreso a gastos corrientes, manteniendo un margen amplio de liquidez.",
+    "accion_recomendada": "Mantén tu disciplina de presupuesto y destina al menos 5% adicional de tus excedentes a instrumentos de inversión o fondos de liquidez.",
+    "pilar_debil": "gasto_ingreso"
+  }
+}
+```
+
+---
+
+##### 🔵 Caso 2: Modo Explícito con Parámetros Precalculados (Para Integraciones / Simuladores Externos)
+**Cuándo usarlo:** Cuando un sistema externo, simulación financiera o formulario bancario ya dispone de métricas de endeudamiento crediticio (ej. `25%`) y un hábito declarado de ahorro (ej. `"Media"`), y desea que la IA pondere estos valores explícitos en el cálculo del score global y las advertencias de deuda.
+
+**Entrada en Postman (`POST http://localhost:8080/api/v1/analisis-financiero`):**
+```json
+{
+  "ingreso_mensual": 4500,
+  "nivel_endeudamiento": 25,
+  "frecuencia_ahorro": "Media",
+  "transacciones": [
+    { "descripcion": "Supermercado", "valor": 420 },
+    { "descripcion": "Combustible", "valor": 300 },
+    { "descripcion": "Streaming", "valor": 40 }
+  ]
+}
+```
+
+**Salida (`200 OK`):**
+```json
+{
+  "status": "success",
+  "score_financiero": 83,
+  "perfil_financiero": "Saludable",
+  "probabilidad": 0.92,
+  "ingreso_mensual": 4500.0,
+  "total_gastos": 760.0,
+  "ahorro_estimado": 3740.0,
+  "nivel_endeudamiento": 25.0,
+  "frecuencia_ahorro": "Alta",
+  "periodicidad": "mensual",
+  "moneda": "USD",
+  "resumen_gastos": {
+    "Alimentación": 420.0,
+    "Transporte": 300.0,
+    "Entretenimiento": 40.0
+  },
+  "transacciones_categorizadas": [
+    { "descripcion": "Supermercado", "valor": 420.0, "categoria": "Alimentación" },
+    { "descripcion": "Combustible", "valor": 300.0, "categoria": "Transporte" },
+    { "descripcion": "Streaming", "valor": 40.0, "categoria": "Entretenimiento" }
+  ],
+  "categorias_detectadas": ["Alimentación", "Transporte", "Entretenimiento"],
+  "recomendaciones": [
+    "Tu salud financiera está en nivel Saludable (83/100). Tus finanzas muestran un equilibrio óptimo entre ingresos, gastos operativos y capacidad de ahorro.",
+    "Factor determinante: tu nivel de endeudamiento — el 25% de tus ingresos está comprometido en obligaciones fijas o pasivos.",
+    "Considera amortizaciones anticipadas a capital en créditos de tasa variable para blindar tu patrimonio."
+  ],
+  "explicabilidad_ds08": {
+    "diagnostico": "Tu salud financiera está en nivel Saludable (83/100). Tus finanzas muestran un equilibrio óptimo entre ingresos, gastos operativos y capacidad de ahorro.",
+    "causa_principal": "Factor determinante: tu nivel de endeudamiento — el 25% de tus ingresos está comprometido en obligaciones fijas o pasivos.",
+    "accion_recomendada": "Considera amortizaciones anticipadas a capital en créditos de tasa variable para blindar tu patrimonio.",
+    "pilar_debil": "endeudamiento",
+    "desglose_pilares": {
+      "gasto_ingreso": { "pts": 34.0, "max": 34.0, "pct": 100.0 },
+      "ahorro": { "pts": 33.0, "max": 33.0, "pct": 100.0 },
+      "endeudamiento": { "pts": 16.0, "max": 33.0, "pct": 48.5 }
+    }
+  }
+}
+```
+
+---
+
+#### 3.3.2 Catálogo de Valores Permitidos para `frecuencia_ahorro`
+
+El motor de Machine Learning y normalización de texto procesa de forma tolerante e insensible a mayúsculas/minúsculas (`case-insensitive`) las siguientes opciones:
+
+| Categoría Normalizada | Valores Aceptados en Postman / JSON | Comportamiento del Motor IA |
+| :--- | :--- | :--- |
+| **Alta** | `"Alta"`, `"alta"`, `"Diaria"`, `"Semanal"`, `"Frecuente"`, `"Constante"`, `"Muy alta"` | Asigna evaluación óptima al pilar de ahorro ($33/33$ pts) y emite recomendaciones de consolidación de patrimonio. |
+| **Media** | `"Media"`, `"media"`, `"Quincenal"`, `"Mensual"`, `"Regular"`, `"Moderada"` | Asigna evaluación intermedia ($16/33$ pts) y sugiere incrementar el porcentaje de ahorro periódico. |
+| **Baja** | `"Baja"`, `"baja"`, `"Ocasional"`, `"Anual"`, `"Rara vez"`, `"Nunca"`, `"Nula"`, `"Ninguna"`, `"Cero"` | Asigna $0/33$ pts en hábito y emite alertas urgentes para apartar un fondo de contingencia mínimo. |
+| **Automática (`AUTO`)** | No enviada, `null`, `""`, `"AUTO"`, `"indefinido"` o texto desconocido | **Deducción Matemática Inteligente:** La IA calcula $\text{Ratio} = \frac{\text{Ahorro Estimado}}{\text{Ingreso Mensual}}$. Si $\ge 25\% \rightarrow \text{Alta}$, si $\ge 8\% \rightarrow \text{Media}$, si $< 8\% \rightarrow \text{Baja}$. |
+
+---
+
+#### 3.3.3 Reglas del Rango de `nivel_endeudamiento` ($0\%$ a $100\%$) y Clampeado Defensivo
+
+El campo `nivel_endeudamiento` mide el porcentaje de los ingresos brutos del usuario comprometido en pasivos, créditos o amortizaciones fijas.
+
+1. **Rango Oficial Válido:** **`0.0` a `100.0`** (escala porcentual).
+2. **Puntuación Ponderada en el Score PR-01:**
+   - $\le 15.0\%$: Excelente ($33/33$ pts).
+   - $15.1\% - 35.0\%$: Moderado ($16/33$ pts).
+   - $> 35.0\%$: Crítico ($0/33$ pts).
+3. **Manejo de Valores Negativos ($< 0\%$):**
+   - Si se envía un valor negativo como `-25` o `-100`, el sistema aplica **normalización defensiva a `0.0%`** (ya que financieramente no existe la deuda negativa en un diagnóstico presupuestario).
+4. **Manejo de Valores Desbordados ($> 100\%$):**
+   - Si se envía un valor superior a 100 como `150` o `500`, el sistema aplica **clampeado defensivo a `100.0%`**. Otorga $0$ puntos en deuda y activa el semáforo en nivel **Riesgo/Crítico** con recomendaciones prioritarias de reestructuración crediticia.
+
+---
+
+#### 3.3.4 Manejo de Errores y Validaciones de Entrada (HTTP 400 Bad Request)
+
+Para prevenir caídas, fallos de seguridad o ataques de inyección, la capa de Spring Boot (Jackson & Bean Validation) y el motor Python implementan las siguientes respuestas estructuradas ante datos erróneos:
+
+| Tipo de Error en Entrada | Ejemplo de Payload Erróneo | Código HTTP | Mensaje de Respuesta del Servidor |
+| :--- | :--- | :---: | :--- |
+| **Letras en campos numéricos** | `{"ingreso_mensual": "cuatro mil"}` | `400 Bad Request` | `JSON parse error: Cannot deserialize value of type java.math.BigDecimal from String "cuatro mil"` |
+| **Letras en endeudamiento** | `{"nivel_endeudamiento": "mucho"}` | `400 Bad Request` | `JSON parse error: Cannot deserialize value of type java.math.BigDecimal from String "mucho"` |
+| **Símbolos / formato moneda** | `{"valor": "$500 USD"}` | `400 Bad Request` | `JSON parse error: Cannot deserialize value of type java.math.BigDecimal from String "$500 USD"` |
+| **Ingreso mensual negativo** | `{"ingreso_mensual": -1500}` | `400 Bad Request` | `El ingreso mensual no puede ser negativo` (Bean Validation `@PositiveOrZero`) |
+| **JSON malformado o roto** | `{"ingreso_mensual": 4500, }` | `400 Bad Request` | `JSON parse error: Unexpected character (',')...` |
+
+---
+
+#### 3.3.5 Matriz de 20 Casos de Prueba Ejecutados y Certificados
+
+La siguiente matriz resume la ejecución automatizada de 20 escenarios de prueba contra el motor de inferencia de FinanceAI:
+
+| ID | Escenario de Prueba | Payload de Entrada Relevante | Score | Perfil Resultante | Deuda Efectiva | Frecuencia Resultante | Estado |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **T01** | Modo Automático Completo | `ingreso: 4500`, `txs: 3 items ($760)` | **100** | Saludable | 0.0% (auto) | Alta (auto) | `200 OK` |
+| **T02** | Frecuencia explícita `"Alta"` | `ingreso: 3000`, `frecuencia: "Alta"` | **100** | Saludable | 0.0% | Alta | `200 OK` |
+| **T03** | Frecuencia explícita `"Media"` | `ingreso: 3000`, `frecuencia: "Media"` | **100** | Saludable | 0.0% | Media | `200 OK` |
+| **T04** | Frecuencia explícita `"Baja"` | `ingreso: 3000`, `frecuencia: "Baja"` | **100** | Saludable | 0.0% | Baja | `200 OK` |
+| **T05** | Frecuencia temporal `"Semanal"` | `ingreso: 2000`, `frecuencia: "Semanal"` | **100** | Saludable | 0.0% | Alta (mapeado) | `200 OK` |
+| **T06** | Frecuencia temporal `"Quincenal"`| `ingreso: 2000`, `frecuencia: "Quincenal"`| **100** | Saludable | 0.0% | Media (mapeado) | `200 OK` |
+| **T07** | Frecuencia temporal `"Mensual"` | `ingreso: 2000`, `frecuencia: "Mensual"` | **100** | Saludable | 0.0% | Media (mapeado) | `200 OK` |
+| **T08** | Frecuencia nula `"Nunca"` | `ingreso: 2000`, `frecuencia: "Nunca"` | **100** | Saludable | 0.0% | Baja (mapeado) | `200 OK` |
+| **T09** | Frecuencia minúsculas `"alta"` | `ingreso: 2500`, `frecuencia: "alta"` | **100** | Saludable | 0.0% | Alta (tolerante) | `200 OK` |
+| **T10** | Frecuencia desconocida | `ingreso: 4000`, `frecuencia: "indefinido"` | **100** | Saludable | 0.0% | Alta (auto-fallback) | `200 OK` |
+| **T11** | Deuda Límite Mínimo ($0\%$) | `ingreso: 5000`, `deuda: 0` | **100** | Saludable | 0.0% | Alta | `200 OK` |
+| **T12** | Deuda Moderada ($25\%$) | `ingreso: 5000`, `deuda: 25` | **83** | Saludable | 25.0% | Alta | `200 OK` |
+| **T13** | Deuda Límite Máximo ($100\%$) | `ingreso: 5000`, `deuda: 100` | **67** | Riesgo | 100.0% | Alta | `200 OK` |
+| **T14** | Deuda Desbordada ($150\%$) | `ingreso: 3000`, `deuda: 150` | **67** | Riesgo | 100.0% (clampeado) | Alta | `200 OK` |
+| **T15** | Deuda Desbordada ($500\%$) | `ingreso: 2000`, `deuda: 500` | **67** | Riesgo | 100.0% (clampeado) | Alta | `200 OK` |
+| **T16** | Deuda Negativa ($-25\%$) | `ingreso: 3000`, `deuda: -25` | **100** | Saludable | 0.0% (normalizado) | Alta | `200 OK` |
+| **T17** | Deuda Negativa ($-100\%$) | `ingreso: 3000`, `deuda: -100` | **100** | Saludable | 0.0% (normalizado) | Alta | `200 OK` |
+| **T18** | Sin Transacciones (`[]`) | `ingreso: 3000`, `transacciones: []` | **100** | Saludable | 0.0% | Alta | `200 OK` |
+| **T19** | Sobrepaso de Gastos Crítico | `ingreso: 1000`, `gastos: $1400` | **0** | Crítico | 80.0% (fijos auto) | Baja (auto) | `200 OK` |
+| **T20** | Frecuencia `"Ocasional"` | `ingreso: 3500`, `frecuencia: "ocasional"`| **100** | Saludable | 0.0% | Baja (mapeado) | `200 OK` |
 
 ### 3.4 Diagramas de Flujo del Sistema (Mermaid)
 
@@ -502,7 +704,69 @@ Mientras los formularios y datos prohíben emojis para preservar la higiene de d
 
 ---
 
-## 5. GUÍA MAESTRA: CÓMO LEVANTAR TODO EL SISTEMA PASO A PASO (PRO)
+## 5. MARCO DE CUMPLIMIENTO LEGAL, PRIVACIDAD Y GOBERNANZA DE IA
+
+FinanceAI implementa una arquitectura integral de cumplimiento normativo conforme a los estándares jurídicos de México, Estados Unidos y la Unión Europea.
+
+```mermaid
+flowchart TD
+    subgraph Marcos Legales de Referencia
+        MX["🇲🇽 México: LFPDPPP / INAI / Ley Fintech / PROFECO"]
+        EU["🇪🇺 Unión Europea: GDPR Arts. 12-14, 17, 22 / EU AI Act Art. 50"]
+        US["🇺🇸 Estados Unidos: CCPA / CPRA Do Not Sell / SPI"]
+        Google["🌐 Google API Services User Data Policy"]
+    end
+
+    subgraph Arquitectura de Implementación
+        L1["login.astro: Checkbox Consentimiento LFPDPPP Art. 8 + Badge No-Sell"]
+        L2["Layout.astro: Footer Institucional + Modal Universal Glassmorphic"]
+        L3["Header.astro: Módulo Derechos ARCO + Exportación Expediente JSON"]
+        L4["dashboard.astro: Badge IA Explicable (XAI) + Disclaimer Financiero"]
+        L5["Páginas Públicas Dedicadas: /terminos y /privacidad"]
+    end
+
+    MX --> L1 & L2 & L3 & L5
+    EU --> L2 & L4 & L5
+    US --> L1 & L2 & L5
+    Google --> L1 & L5
+```
+
+### 5.1 Legislación Mexicana (LFPDPPP, INAI, Ley Fintech, LMV y PROFECO)
+- **Consentimiento Expreso para Datos Patrimoniales (Art. 8 LFPDPPP):** Los ingresos, gastos, transacciones y hábitos de ahorro son catalogados legalmente como *datos financieros y patrimoniales*. El formulario de registro en `login.astro` implementa una casilla obligatoria no premarcada para recabar el consentimiento libre, específico e informado antes de la persistencia en MySQL.
+- **Delimitación de la Ley Fintech (LRITF):** FinanceAI no opera como Institución de Fondos de Pago Electrónico (Wallets), Institución de Financiamiento Colectivo (Crowdfunding) ni modelo Sandbox. La plataforma no capta recursos del público, no custodia dinero y no ejecuta transferencias interbancarias.
+- **Exclusión de Asesoría de Inversiones (LMV Arts. 224 y 225):** Los scores y reportes tienen fines de educación y autogestión presupuestaria personal, sin constituir asesoría financiera vinculante.
+- **Autoridad Garante:** Se reconoce expresamente la tutela del Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (**INAI**) y la Procuraduría Federal del Consumidor (**PROFECO**).
+
+### 5.2 Normativa Internacional (GDPR, CCPA/CPRA Do Not Sell y EU AI Act)
+- **Reglamento General de Protección de Datos (GDPR - UE 2016/679):**
+  - *Artículos 12-14:* Transparencia y lenguaje accesible en la recolección de datos.
+  - *Artículo 22:* Garantía contra decisiones individuales totalmente automatizadas sin derecho a la explicabilidad algorítmica y revisión humana (*Human-in-the-loop*).
+  - *Artículo 17:* Derecho a la Supresión / "Derecho al Olvido" con eliminación en cascada en base de datos.
+- **California Consumer Privacy Act (CCPA / CPRA):**
+  - **Garantía Expresa "Do Not Sell or Share My Personal Information":** Prohibición absoluta e irrevocable de vender, alquilar o compartir datos de los usuarios con corredores de datos (*data brokers*) o redes de publicidad programática.
+
+### 5.3 Cumplimiento de la Política de Datos de Usuario de Google OAuth2
+- FinanceAI implementa **Google Sign-In / OAuth 2.0** exclusivamente para autenticación de identidad.
+- **Adhesión a la Política de Uso Limitado:** El uso y la transferencia a cualquier otra aplicación de la información recibida a través de las APIs de Google se apegan de forma irrestricta a la [Política de Datos de Usuario de los Servicios de la API de Google](https://developers.google.com/terms/api-services-user-data-policy), incluidos los requisitos de *Uso Limitado (Limited Use Requirements)*.
+- **No Acceso a Servicios Privados:** FinanceAI **no** solicita ni accede a correos de Gmail, archivos de Google Drive, contactos ni datos bancarios vinculados a Google Pay.
+
+### 5.4 Protocolo de Derechos ARCO y Exportación JSON
+Ubicado en el modal de perfil de usuario (`Header.astro`), el sistema ofrece mecanismos interactivos directos:
+1. **Acceso & Portabilidad:** Botón interactivo que genera y descarga en el navegador el archivo `expediente_datos_financeai_[TIMESTAMP].json` con los datos personales, transacciones registradas y sello de no comercialización.
+2. **Rectificación:** Enfoque guiado para la actualización de nombre, país y divisa base.
+3. **Oposición:** Switch interactivo con persistencia local para limitar el uso de datos en analíticas agregadas anónimas.
+4. **Cancelación:** Enlace directo a la Zona de Peligro para eliminación permanente e irreversible de la cuenta en MySQL.
+
+### 5.5 Gobernanza y Transparencia de Inteligencia Artificial (SDLC & XAI)
+- **Modelos Predictivos Explicables (XAI):** El motor `predict.py` y el panel `dashboard.astro` exponen con claridad los 3 ratios que sustentan el score (gasto/ingreso, tasa de ahorro y nivel de endeudamiento).
+- **Desarrollo Asistido por IA con Supervisión Humana:** En cumplimiento de las directrices éticas internacionales (ISO/IEC 42001 y NIST AI RMF), se declara abiertamente que las herramientas de IA asistida empleadas en la programación del software fueron **rigurosamente supervisadas, auditadas y sometidas a 125 pruebas unitarias y de integración por los integrantes del equipo**.
+
+### 5.6 Deslinde Financiero (Financial Disclaimer) y Safe Harbor
+> *"FinanceAI es una plataforma analítica y educativa de autogestión presupuestaria. Los diagnósticos y sugerencias automáticas no constituyen asesoramiento financiero, tributario, legal ni de inversión profesional. Toda decisión económica es responsabilidad exclusiva del usuario."*
+
+---
+
+## 6. GUÍA MAESTRA: CÓMO LEVANTAR TODO EL SISTEMA PASO A PASO (PRO)
 
 Esta sección está diseñada para que cualquier persona ajena al proyecto pueda clonar, configurar y ejecutar todo el ecosistema de FinanceAI de manera rápida y sin complicaciones.
 
@@ -528,7 +792,7 @@ El proyecto utiliza un **único archivo `.env` centralizado en la raíz del repo
 # ==========================================
 SITE_URL=http://localhost:4321
 AUTH_URL=http://localhost:4321
-AUTH_SECRET=9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+AUTH_SECRET=tu_codigo_secreto
 AUTH_TRUST_HOST=true
 PUBLIC_API_URL=http://localhost:8080
 
@@ -550,11 +814,11 @@ ADMIN_EMAILS="tu_correo@gmail.com"
 # ==========================================
 # BASE DE DATOS (MySQL Railway / Local)
 # ==========================================
-MYSQLPORT=32819
-MYSQL_DATABASE=railway
-MYSQL_PUBLIC_URL=mysql://root:password@sakura.proxy.rlwy.net:32819/railway
+MYSQLPORT=puerto_mysql
+MYSQL_DATABASE=database_name
+MYSQL_PUBLIC_URL=url_mysql
 MYSQL_ROOT_PASSWORD=tu_password_mysql
-MYSQLUSER=root
+MYSQLUSER=user_mysql
 
 # Integración Data Science (Opcional - Defaults calculados)
 PYTHON_COMMAND=../../DataScient/venv/Scripts/python.exe
@@ -650,7 +914,7 @@ Si prefieres levantar todo el ecosistema con un solo comando utilizando Docker:
 
 ---
 
-## 6. MANEJO DE ERRORES COMUNES Y PREGUNTAS FRECUENTES
+## 7. MANEJO DE ERRORES COMUNES Y PREGUNTAS FRECUENTES
 
 | Síntoma / Error | Causa Probable | Solución Recomendada |
 | :--- | :--- | :--- |

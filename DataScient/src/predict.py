@@ -548,8 +548,10 @@ def predict(input_json: str) -> str:
                 total_gastos = gasto_mensual_directo
                 resumen_gastos["Otros"] = gasto_mensual_directo
 
-            # Auto-cálculo de Deuda si no se ingresó o es 0
-            if nivel_endeudamiento == 0.0:
+            # Auto-cálculo y Clampeado Defensivo de Deuda [0.0, 100.0]
+            if nivel_endeudamiento < 0.0:
+                nivel_endeudamiento = 0.0
+            elif nivel_endeudamiento == 0.0:
                 if deuda_total > 0 and ingreso_mensual > 0:
                     nivel_endeudamiento = min(100.0, (deuda_total / ingreso_mensual) * 100.0)
                 else:
@@ -558,13 +560,24 @@ def predict(input_json: str) -> str:
                         nivel_endeudamiento = min(100.0, (gastos_fijos / ingreso_mensual) * 100.0)
                     else:
                         nivel_endeudamiento = 0.0
+            elif nivel_endeudamiento > 100.0:
+                nivel_endeudamiento = 100.0
+
             nivel_endeudamiento = round(nivel_endeudamiento, 1)
 
-            # Auto-cálculo de Frecuencia de Ahorro
+            # Auto-cálculo y Normalización de Frecuencia de Ahorro
             ahorro_estimado = max(0.0, ingreso_mensual - total_gastos)
             ratio_ahorro_ingreso = (ahorro_estimado / ingreso_mensual) if ingreso_mensual > 0 else 0.0
             
-            if not frecuencia_ahorro or frecuencia_ahorro in ["Media", "AUTO"]:
+            frecuencia_raw = _safe_str(data.get("frecuencia_ahorro") or data.get("frecuenciaAhorro"), "").lower()
+            if frecuencia_raw in ["alta", "diaria", "diario", "semanal", "frecuente", "constante", "muy alta"]:
+                frecuencia_ahorro = "Alta"
+            elif frecuencia_raw in ["media", "quincenal", "mensual", "regular", "moderada"]:
+                frecuencia_ahorro = "Media"
+            elif frecuencia_raw in ["baja", "ocasional", "anual", "rara vez", "nunca", "nula", "cero", "ninguna", "mal"]:
+                frecuencia_ahorro = "Baja"
+            else:
+                # Deducción automática por ratio de excedente real
                 if ratio_ahorro_ingreso >= 0.25:
                     frecuencia_ahorro = "Alta"
                 elif ratio_ahorro_ingreso >= 0.08:

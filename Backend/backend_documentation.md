@@ -282,7 +282,118 @@ Existen exactamente 13 endpoints operativos en el backend agrupados por controla
 ### 8.5 Análisis con Inteligencia Artificial (`AnalisisController`)
 | Método | Endpoint | Acceso | Request Payload | Códigos de Respuesta | Descripción |
 |---|---|---|---|---|---|
-| `POST` | `/api/v1/analisis-financiero` | Pública / `Bearer JWT` | `Map<String, Object>` | `200 OK` | Diagnóstico de salud financiera vía subproceso Python. |
+| `POST` | `/api/v1/analisis-financiero`<br/>*(alias: `/analisis-financiero`)* | Pública / `Bearer JWT` | `AnalisisRequest` (JSON) | `200 OK` | Diagnóstico de salud financiera, clasificación automática de gastos y recomendaciones objetivas con IA. |
+
+#### Casos de Uso de Prueba (Postman):
+
+**🟢 Opción A: Modo Automático Simplificado (Recomendado para Frontend & Apps)**
+*Solo envía ingresos y transacciones reales; la IA calcula endeudamiento, ahorro y clasifica los gastos.*
+```json
+// Request POST /api/v1/analisis-financiero
+{
+  "ingreso_mensual": 4500,
+  "transacciones": [
+    { "descripcion": "Supermercado", "valor": 420 },
+    { "descripcion": "Combustible", "valor": 300 },
+    { "descripcion": "Streaming", "valor": 40 }
+  ]
+}
+```
+
+```json
+// Response 200 OK
+{
+  "status": "success",
+  "score_financiero": 83,
+  "perfil_financiero": "Saludable",
+  "probabilidad": 0.92,
+  "ingreso_mensual": 4500.0,
+  "total_gastos": 760.0,
+  "ahorro_estimado": 3740.0,
+  "nivel_endeudamiento": 0.0,
+  "frecuencia_ahorro": "Alta",
+  "periodicidad": "mensual",
+  "moneda": "USD",
+  "resumen_gastos": {
+    "Alimentación": 420.0,
+    "Transporte": 300.0,
+    "Entretenimiento": 40.0
+  },
+  "transacciones_categorizadas": [
+    { "descripcion": "Supermercado", "valor": 420.0, "categoria": "Alimentación" },
+    { "descripcion": "Combustible", "valor": 300.0, "categoria": "Transporte" },
+    { "descripcion": "Streaming", "valor": 40.0, "categoria": "Entretenimiento" }
+  ],
+  "recomendaciones": [
+    "Tu salud financiera está en nivel Saludable (83/100). Tus finanzas muestran un equilibrio óptimo entre ingresos, gastos operativos y capacidad de ahorro.",
+    "Factor determinante: tu relación Gasto/Ingreso — estás destinando el 17% de tu ingreso a gastos corrientes, manteniendo un margen amplio de liquidez.",
+    "Mantén tu disciplina de presupuesto y destina al menos 5% adicional de tus excedentes a instrumentos de inversión o fondos de liquidez."
+  ]
+}
+```
+
+**🔵 Opción B: Modo Explícito con Parámetros Precalculados (Para Simulaciones e Integraciones Externas)**
+*Envía métricas crediticias preestablecidas (`nivel_endeudamiento` y `frecuencia_ahorro`).*
+```json
+// Request POST /api/v1/analisis-financiero
+{
+  "ingreso_mensual": 4500,
+  "nivel_endeudamiento": 25,
+  "frecuencia_ahorro": "Media",
+  "transacciones": [
+    { "descripcion": "Supermercado", "valor": 420 },
+    { "descripcion": "Combustible", "valor": 300 },
+    { "descripcion": "Streaming", "valor": 40 }
+  ]
+}
+```
+
+```json
+// Response 200 OK
+{
+  "status": "success",
+  "score_financiero": 83,
+  "perfil_financiero": "Saludable",
+  "probabilidad": 0.92,
+  "ingreso_mensual": 4500.0,
+  "total_gastos": 760.0,
+  "ahorro_estimado": 3740.0,
+  "nivel_endeudamiento": 25.0,
+  "frecuencia_ahorro": "Alta",
+  "periodicidad": "mensual",
+  "moneda": "USD",
+  "resumen_gastos": {
+    "Alimentación": 420.0,
+    "Transporte": 300.0,
+    "Entretenimiento": 40.0
+  },
+  "transacciones_categorizadas": [
+    { "descripcion": "Supermercado", "valor": 420.0, "categoria": "Alimentación" },
+    { "descripcion": "Combustible", "valor": 300.0, "categoria": "Transporte" },
+    { "descripcion": "Streaming", "valor": 40.0, "categoria": "Entretenimiento" }
+  ],
+  "recomendaciones": [
+    "Tu salud financiera está en nivel Saludable (83/100). Tus finanzas muestran un equilibrio óptimo entre ingresos, gastos operativos y capacidad de ahorro.",
+    "Factor determinante: tu nivel de endeudamiento — el 25% de tus ingresos está comprometido en obligaciones fijas o pasivos.",
+    "Considera amortizaciones anticipadas a capital en créditos de tasa variable para blindar tu patrimonio."
+  ]
+}
+```
+
+#### Catálogo de Frecuencias y Delimitación de Parámetros:
+- **`frecuencia_ahorro`:**
+  - *Alta:* `"Alta"`, `"Diaria"`, `"Semanal"`, `"Frecuente"`, `"Constante"` (33 pts).
+  - *Media:* `"Media"`, `"Quincenal"`, `"Mensual"`, `"Regular"` (16 pts).
+  - *Baja:* `"Baja"`, `"Ocasional"`, `"Anual"`, `"Nunca"`, `"Ninguna"` (0 pts).
+  - *Auto / Desconocido:* Calculada dinámicamente según ratio de ahorro real.
+- **`nivel_endeudamiento` ($0\%$ a $100\%$):**
+  - Si es $< 0\%$ (ej. $-25\%$): Normalizado a `0.0%`.
+  - Si es $> 100\%$ (ej. $150\%$, $500\%$): Clampeado a `100.0%` con alerta de sobreendeudamiento crítico.
+- **Manejo de Errores (`HTTP 400 Bad Request`):**
+  - Letras en campos numéricos (ej. `"ingreso_mensual": "mil"`): Error deserialización Jackson.
+  - Símbolos en valores (ej. `"valor": "$500"`): Error de tipo numérico.
+  - Números negativos en ingresos (ej. `-1500`): Error Bean Validation `@PositiveOrZero`.
+  - JSON malformado o con errores sintácticos.
 
 ### 8.6 Monitoreo y Disponibilidad (`HealthController`)
 | Método | Endpoint | Acceso | Request Payload | Códigos de Respuesta | Descripción |
@@ -306,3 +417,20 @@ cd Backend/financeia-backend
 
 - **Endpoint de Verificación:** `http://localhost:8080/api/v1/health`
 - **Interfaz Swagger UI:** `http://localhost:8080/swagger-ui.html`
+
+---
+
+## 10. Cumplimiento Legal y Privacidad en el Backend
+
+### 10.1 Soporte Técnico para Derechos ARCO (LFPDPPP & GDPR)
+1. **Derecho de Acceso (Portabilidad):**
+   - El endpoint `GET /api/v1/transactions` y `GET /api/v1/users/profile` proporcionan la totalidad de los datos estructurados del titular en formato JSON estándar.
+2. **Derecho de Rectificación:**
+   - El endpoint `PUT /api/v1/users/profile` permite modificar en tiempo real la divisa preferida (`monedaId`) y país del titular.
+3. **Derecho de Cancelación / Supresión ("Derecho al Olvido"):**
+   - El endpoint `DELETE /api/v1/users/profile` ejecuta una transacción `@Transactional` con purga atómica e irreversible en la base de datos MySQL, eliminando todas las transacciones, históricos de análisis y el registro del usuario con integridad referencial.
+
+### 10.2 Integración Segura de Google OAuth 2.0
+- El endpoint `POST /api/v1/auth/google-sync` valida los tokens emitidos por Google y crea o sincroniza la cuenta sin almacenar tokens de acceso externos invasivos.
+- Se cumple con la **Política de Datos de Usuario de los Servicios de la API de Google** y sus requisitos de Uso Limitado.
+

@@ -135,8 +135,175 @@ const { title } = Astro.props;
 		</script>
 
 		<Header />
-		<main class="flex-grow flex">
+		<main class="flex-grow flex flex-col">
 			<slot />
 		</main>
+
+		<!-- Footer Institucional FinanceAI -->
+		<footer class="mt-auto w-full border-t border-gray-200 dark:border-gray-800/80 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md transition-colors duration-300 font-inter">
+			<div class="max-w-7xl mx-auto px-6 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+				
+				<!-- Identidad Institucional y Copyright -->
+				<div class="flex flex-col items-center md:items-start text-center md:text-left gap-1.5">
+					<div class="flex items-center space-x-2">
+						<div class="flex space-x-1">
+							<div class="w-2 h-2 rounded-full bg-blue-600"></div>
+							<div class="w-2 h-2 rounded-full bg-red-500"></div>
+							<div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+						</div>
+						<span class="font-bold text-base tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
+					</div>
+					<p class="text-xs text-gray-500 dark:text-gray-400">
+						&copy; 2026 FinanceAI Inc. Todos los derechos reservados.
+					</p>
+					<p class="text-[11px] text-gray-400 dark:text-gray-500 max-w-sm">
+						Plataforma desarrollada bajo estándares de seguridad OWASP y gobernanza de privacidad en Latinoamérica.
+					</p>
+				</div>
+
+				<!-- Enlaces Legales y de Cumplimiento -->
+				<nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-gray-600 dark:text-gray-400" aria-label="Enlaces legales">
+					<a href="/terminos" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Términos de Servicio</a>
+					<a href="/privacidad" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Aviso de Privacidad</a>
+					<button type="button" class="btn-open-no-sale hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">No Venta de Datos</button>
+					<button type="button" class="btn-open-ai-ethics hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">Transparencia de IA</button>
+				</nav>
+
+				<!-- Badges de Certificación & Seguridad Técnica -->
+				<div class="flex items-center gap-2">
+					<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+						<svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+						SSL 256-Bit
+					</span>
+					<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+						<svg class="w-3 h-3 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+						IA Auditada
+					</span>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Modal Glassmorphic Global Legal -->
+		<div id="globalLegalModal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-gray-900/75 backdrop-blur-md animate-fade-in font-inter">
+			<div class="bg-white dark:bg-gray-900 w-full max-w-2xl mx-4 rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[85vh] flex flex-col">
+				<!-- Header Modal -->
+				<div class="flex justify-between items-center pb-4 border-b border-gray-100 dark:border-gray-800">
+					<div>
+						<h3 id="legalModalTitle" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-josefin">Documento Legal</h3>
+						<p class="text-xs text-gray-500 dark:text-gray-400">FinanceAI &bull; Marco de Cumplimiento Normativo</p>
+					</div>
+					<button id="btnCloseLegalModal" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-3xl font-bold w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none">&times;</button>
+				</div>
+
+				<!-- Contenido Escroleable -->
+				<div id="legalModalBody" class="py-4 space-y-4 text-xs text-gray-600 dark:text-gray-300 overflow-y-auto leading-relaxed pr-2">
+					<!-- Contenido inyectado dinámicamente -->
+				</div>
+
+				<!-- Footer Modal -->
+				<div class="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+					<a id="legalModalFullLink" href="/terminos" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+						Ver página completa &rarr;
+					</a>
+					<button id="btnDismissLegalModal" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition">
+						Entendido
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Script Global de Modales Legales -->
+		<script is:inline>
+			(function() {
+				const modal = document.getElementById('globalLegalModal');
+				const title = document.getElementById('legalModalTitle');
+				const body = document.getElementById('legalModalBody');
+				const fullLink = document.getElementById('legalModalFullLink');
+				const btnClose = document.getElementById('btnCloseLegalModal');
+				const btnDismiss = document.getElementById('btnDismissLegalModal');
+
+				const legalContents = {
+					terminos: {
+						title: "Términos y Condiciones de Uso",
+						url: "/terminos",
+						html: `
+							<p><strong>FinanceAI</strong> es una plataforma tecnológica orientada al registro ordenado de finanzas, analítica histórica y diagnósticos de salud financiera basados en la regla 50-30-20.</p>
+							<p><strong>Exclusión de la Ley Fintech:</strong> FinanceAI NO capta recursos del público, NO custodia fondos, NO es una Wallet y NO realiza transferencias de dinero.</p>
+							<p><strong>Disclaimer Financiero:</strong> Los scores y reportes NO constituyen asesoramiento financiero ni bursátil regulado. Toda decisión patrimonial es responsabilidad exclusiva del usuario.</p>
+							<p><strong>Autenticación con Google:</strong> El inicio de sesión con Google cumple estrictamente con los requisitos de Uso Limitado de las APIs de Google.</p>
+						`
+					},
+					privacidad: {
+						title: "Aviso de Privacidad Integral",
+						url: "/privacidad",
+						html: `
+							<p><strong>Cumplimiento LFPDPPP (INAI) & GDPR:</strong> FinanceAI trata tus datos personales y financieros exclusivamente para emitir tus diagnósticos y gestionar tu panel.</p>
+							<p><strong>Consentimiento Expreso:</strong> Al registrarte, consientes expresamente el tratamiento de tus datos financieros bajo cifrado de alto nivel.</p>
+							<p><strong>Cero Venta de Datos:</strong> NUNCA vendemos, alquilamos ni transferimos tus datos a terceros ni agencias de publicidad comercial.</p>
+							<p><strong>Derechos ARCO:</strong> Puedes ejercer en cualquier momento tus derechos de Acceso, Rectificación, Cancelación y Oposición directamente en tu perfil o vía <code>privacidad@financeai.app</code>.</p>
+						`
+					},
+					nosell: {
+						title: "Garantía de Cero Venta de Datos (CCPA / CPRA)",
+						url: "/privacidad",
+						html: `
+							<div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-900 dark:text-emerald-200 font-semibold mb-2">
+								Do Not Sell or Share My Personal Information
+							</div>
+							<p>En cumplimiento con la <em>California Consumer Privacy Act</em> (CCPA) y las leyes de privacidad mexicanas, FinanceAI garantiza que:</p>
+							<ul class="list-disc pl-5 space-y-1">
+								<li>No comercializamos tus datos con corredores de datos (*data brokers*).</li>
+								<li>No compartimos tu información transaccional con redes de publicidad programática ni aseguradoras.</li>
+								<li>Tus datos financieros son tratados con la más alta categoría de Sensibilidad (*Sensitive Personal Information*).</li>
+							</ul>
+						`
+					},
+					ai: {
+						title: "Transparencia y Gobernanza de Inteligencia Artificial",
+						url: "/terminos",
+						html: `
+							<p><strong>1. Diagnósticos con IA Explicable (XAI):</strong> El análisis de salud financiera procesa ratios adimensionales matemáticos ($R_{GI}, R_{Ahorro}, R_{Deuda}$) garantizando neutralidad multidivisa e interpretabilidad.</p>
+							<p><strong>2. Desarrollo Asistido por IA bajo Supervisión Humana:</strong> El código y la arquitectura del sistema fueron asistidos por herramientas de IA, pero <strong>auditados, validados y testeados exhaustivamente por ingenieros de software humanos calificados</strong>.</p>
+							<p><strong>3. Intervención Humana (GDPR Art. 22):</strong> Puedes solicitar la revisión humana de cualquier diagnóstico comunicándote a <code>soporte@financeai.app</code>.</p>
+						`
+					}
+				};
+
+				window.openLegalModal = function(type) {
+					const data = legalContents[type] || legalContents.terminos;
+					if (title) title.textContent = data.title;
+					if (body) body.innerHTML = data.html;
+					if (fullLink) {
+						fullLink.href = data.url;
+						fullLink.textContent = `Ver documento completo en ${data.url} \u2192`;
+					}
+					if (modal) modal.classList.remove('hidden');
+				};
+
+				window.closeLegalModal = function() {
+					if (modal) modal.classList.add('hidden');
+				};
+
+				btnClose?.addEventListener('click', window.closeLegalModal);
+				btnDismiss?.addEventListener('click', window.closeLegalModal);
+				modal?.addEventListener('click', (e) => {
+					if (e.target === modal) window.closeLegalModal();
+				});
+
+				// Event delegation para botones legales
+				document.addEventListener('click', (e) => {
+					const target = e.target;
+					if (target && target.closest('.btn-open-legal')) {
+						const btn = target.closest('.btn-open-legal');
+						const type = btn.getAttribute('data-legal') || 'terminos';
+						window.openLegalModal(type);
+					} else if (target && target.closest('.btn-open-no-sale')) {
+						window.openLegalModal('nosell');
+					} else if (target && target.closest('.btn-open-ai-ethics')) {
+						window.openLegalModal('ai');
+					}
+				});
+			})();
+		</script>
 	</body>
 </html>

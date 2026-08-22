@@ -33,9 +33,11 @@ Esto permite que:
 | Ruta | Archivo Astro | Tipo de Renderizado | Guardias de Acceso | Propósito | Componentes Clave |
 | :--- | :--- | :---: | :---: | :--- | :--- |
 | `/` | `index.astro` | SSR / Redirección | Condicional | Punto de entrada. Redirige a `/dashboard` si hay sesión o a `/login`. | `Layout` |
-| `/login` | `login.astro` | SSR + Hidratación Cliente | Público | Autenticación de usuario: Login, Registro, Google OAuth2 y Recuperación de contraseña en 3 pasos. | `Layout`, Formularios de Auth, Modales de Recuperación |
-| `/dashboard` | `dashboard.astro` | SSR + Scripts de Cliente | Protegido (Token JWT) | Captura de ingresos/gastos (diario, semanal, mensual), cálculo de salud financiera y recomendaciones de IA. | `Layout`, Velocímetro de Score, Tarjetas KPI, Formulario de Movimientos |
+| `/login` | `login.astro` | SSR + Hidratación Cliente | Público | Autenticación de usuario: Login, Registro con consentimiento LFPDPPP, Google OAuth2 y Recuperación de contraseña en 3 pasos. | `Layout`, Formularios de Auth, Modales de Recuperación |
+| `/dashboard` | `dashboard.astro` | SSR + Scripts de Cliente | Protegido (Token JWT) | Captura de ingresos/gastos (diario, semanal, mensual), cálculo de salud financiera con IA explicable (XAI) y disclaimer financiero. | `Layout`, Velocímetro de Score, Tarjetas KPI, Formulario de Movimientos |
 | `/historial` | `historial.astro` | SSR + Scripts de Cliente | Protegido (Token JWT) | Visualización analítica histórica, gráfica multi-línea con picos, selector de mes y conversor multidivisa en tiempo real. | `Layout`, Gráfica de Línea Chart.js, Donut Chart, Tabla de Transacciones, Modal de Borrado |
+| `/terminos` | `terminos.astro` | SSR Estático | Público | Términos y Condiciones Generales de Uso, delimitación Ley Fintech, gobernanza de IA y Google OAuth2. | `Layout`, Contenido Legal, Botón Imprimir PDF |
+| `/privacidad` | `privacidad.astro` | SSR Estático | Público | Aviso de Privacidad Integral conforme a LFPDPPP (INAI), GDPR, CCPA (Do Not Sell) y Google API Policy. | `Layout`, Contenido Legal, Botón Imprimir PDF |
 | `/logout` | `logout.astro` | SSR | Público | Pantalla de confirmación y cierre seguro de sesión con difuminado de fondo. | `Layout`, Modal Centrado de Logout |
 
 ---
@@ -216,3 +218,25 @@ npm run build
 # 4. Iniciar servidor compilado
 node ./dist/server/entry.mjs
 ```
+
+---
+
+## 10. Cumplimiento Legal, Privacidad y Derechos ARCO en el Frontend
+
+El frontend implementa los siguientes componentes y flujos para garantizar la máxima transparencia y cumplimiento normativo:
+
+### 10.1 Páginas Legales Públicas Dedicadas
+- **`/terminos` (`terminos.astro`):** Términos de Servicio oficiales con delimitación ante la Ley Fintech (sin captación de fondos), deslinde de asesoría de inversiones, declaración de autenticación con Google bajo Requisitos de Uso Limitado y botón para exportar o imprimir en PDF.
+- **`/privacidad` (`privacidad.astro`):** Aviso de Privacidad Integral conforme a la LFPDPPP (INAI), GDPR y CCPA con garantía expresa *"Do Not Sell or Share My Personal Information"*.
+
+### 10.2 Componentes Globales de Cumplimiento
+- **Footer Institucional (`Layout.astro`):** Enlaces directos a Términos, Privacidad, botón emergente de *No Venta de Datos* y *Transparencia de IA*, junto con badges de seguridad `SSL 256-Bit` e `IA Auditada`.
+- **Modal Glassmorphic Universal (`#globalLegalModal`):** Permite abrir y consultar cualquier cláusula legal desde cualquier vista sin abandonar el flujo de trabajo actual.
+- **Consentimiento en Registro (`login.astro`):** Checkbox obligatorio no premarcado que valida el consentimiento expreso para el tratamiento de datos patrimoniales conforme al Art. 8 de la LFPDPPP.
+- **Gestión de Derechos ARCO en Perfil (`Header.astro`):**
+  - *Acceso:* Botón para generar y descargar inmediatamente el archivo `expediente_datos_financeai_[TIMESTAMP].json`.
+  - *Rectificación:* Acceso guiado para modificación de moneda base y perfil.
+  - *Oposición:* Switch interactivo con persistencia local para limitar el uso de datos en estadísticas globales.
+  - *Cancelación:* Enlace directo a la Zona de Peligro para eliminación permanente e irreversible de la cuenta en MySQL.
+- **Explicabilidad y Descargo Financiero (`dashboard.astro`):** Badge oficial `Motor DS-08: IA Explicable (XAI)` y banner institucional de descargo de responsabilidad financiera.
+

@@ -114,6 +114,35 @@ flowchart TD
   - *Ahorro & Deuda (20%):* Reservas líquidas y amortización de créditos.
 - **Motor de Explicabilidad en 3 Capas (DS-08):** Diagnóstico sintético, causa principal ponderada y acciones recomendadas personalizadas.
 - **Matriz Heurística de Respaldo:** Reglas determinísticas basadas en la metodología 50-30-20 ante indisponibilidad del proceso Python o división por cero.
+- **Ejemplos de Casos de Uso (`POST /api/v1/analisis-financiero`):**
+  - **Opción A (Automática / Sin fricción):** `{"ingreso_mensual": 4500, "transacciones": [{"descripcion": "Supermercado", "valor": 420}, {"descripcion": "Combustible", "valor": 300}, {"descripcion": "Streaming", "valor": 40}]}` ➔ La IA deduce que el endeudamiento es 0% y la frecuencia de ahorro es Alta.
+  - **Opción B (Explícita / Parámetros forzados):** `{"ingreso_mensual": 4500, "nivel_endeudamiento": 25, "frecuencia_ahorro": "Media", "transacciones": [...]}` ➔ La IA pondera el 25% de deuda para generar advertencias específicas de amortización.
+- **Validación y Robustez de Parámetros:**
+  - *Frecuencia de ahorro:* Acepta `"Alta"` (semanal/diaria), `"Media"` (quincenal/mensual), `"Baja"` (anual/nunca) o auto-cálculo.
+  - *Nivel de endeudamiento ($0-100\%$):* Valores $<0\%$ se normalizan a $0.0\%$; valores $>100\%$ (ej. $150\%$) se clampean a $100.0\%$ con alerta crítica de endeudamiento.
+  - *Manejo de errores:* Entradas no numéricas (letras o caracteres de moneda como `"$500"`) y números negativos en ingresos son rechazados con `HTTP 400 Bad Request`.
+
+---
+
+### 2.4 Cumplimiento Normativo, Privacidad y Gobernanza de IA
+- **Marco Legal Mexicano (LFPDPPP & INAI):**
+  - Consentimiento expreso en el formulario de registro (`login.astro`) para datos financieros y patrimoniales (Art. 8).
+  - Delimitación expresa ante la Ley Fintech (sin captación ni custodia) y LMV (sin asesoría de inversión fiduciaria).
+- **Normativa Internacional (GDPR & CCPA/CPRA):**
+  - Garantía expresa *"Do Not Sell or Share My Personal Information"*: Prohibición absoluta de venta o compartición de datos con corredores de datos (*data brokers*) o redes de publicidad.
+  - Art. 22 GDPR: Derecho a la explicabilidad algorítmica y revisión humana (*Human-in-the-loop*).
+  - Art. 17 GDPR: Derecho al Olvido y purga atómica de datos en MySQL (`DELETE /api/v1/users/profile`).
+- **Política de Datos de Usuario de Google OAuth2:**
+  - El acceso mediante Google Sign-In se apega irrestrictamente a la *Política de Datos de Usuario de los Servicios de la API de Google* y sus requisitos de Uso Limitado. No se leen correos, archivos de Google Drive ni datos de pago de Google.
+- **Módulo de Derechos ARCO en Perfil (`Header.astro`):**
+  - **Acceso:** Exportación y descarga directa en el navegador de un archivo `.JSON` estructurado con todo el expediente financiero del usuario.
+  - **Rectificación:** Modificación instantánea de perfil y divisa base.
+  - **Oposición:** Switch interactivo con persistencia local para limitar el uso de datos en estadísticas globales.
+  - **Cancelación:** Enlace directo a la Zona de Peligro para eliminación permanente de la cuenta.
+- **Gobernanza de Inteligencia Artificial (ISO/IEC 42001 & NIST AI RMF):**
+  - Declaración transparente de desarrollo asistido por IA bajo estricta supervisión, auditoría y pruebas por ingenieros de software humanos.
+- **Deslinde Financiero (Financial Disclaimer):**
+  - Banner en `dashboard.astro` aclarando que FinanceAI es una herramienta educativa y que los diagnósticos no constituyen asesoría financiera vinculante.
 
 ---
 

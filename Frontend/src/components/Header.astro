@@ -157,6 +157,62 @@ const googleEmail = session?.user?.email || '';
                 Guardar Cambios
             </button>
 
+            <!-- Sección: Privacidad y Derechos ARCO (LFPDPPP & GDPR) -->
+            <div class="pt-5 border-t border-gray-100 dark:border-gray-800 space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <h5 class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white font-josefin flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Privacidad y Derechos ARCO
+                    </h5>
+                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-md">
+                        Gobernanza Activa
+                    </span>
+                </div>
+                
+                <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    Como titular de tus datos personales, puedes ejercer tus derechos de Acceso, Rectificación, Cancelación y Oposición:
+                </p>
+
+                <!-- Grid de Acciones ARCO -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    <!-- 1. Acceso: Descargar Copia de Datos -->
+                    <button type="button" id="btnArcoExportData" class="flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/70 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200/80 dark:border-gray-700/80 text-left transition group cursor-pointer">
+                        <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        </div>
+                        <div>
+                            <strong class="text-xs font-semibold text-gray-900 dark:text-white block">Derecho de Acceso</strong>
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400">Descargar expediente (.JSON)</span>
+                        </div>
+                    </button>
+
+                    <!-- 2. Rectificación: Actualizar Perfil -->
+                    <button type="button" id="btnArcoRectify" class="flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/70 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200/80 dark:border-gray-700/80 text-left transition group cursor-pointer">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        </div>
+                        <div>
+                            <strong class="text-xs font-semibold text-gray-900 dark:text-white block">Rectificación</strong>
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400">Modificar datos y moneda</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- 3. Oposición: Toggle de Procesamiento Agregado -->
+                <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200/60 dark:border-gray-700/60 flex items-center justify-between">
+                    <div class="pr-3">
+                        <strong class="text-xs font-semibold text-gray-900 dark:text-white block">Derecho de Oposición</strong>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-snug">Limitar procesamiento analítico estadístico agregado.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                        <input type="checkbox" id="toggleArcoOpposition" class="sr-only peer" checked />
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+            </div>
+
             <!-- Danger Zone: Eliminar Cuenta (Letra más grande y legible) -->
             <div class="pt-5 border-t border-red-100 dark:border-red-900/30">
                 <h5 class="text-sm sm:text-base font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
@@ -164,9 +220,9 @@ const googleEmail = session?.user?.email || '';
                     ZONA DE PELIGRO
                 </h5>
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-3.5 leading-relaxed">
-                    Eliminar tu cuenta borrará todos tus datos financieros, transacciones, registros y configuraciones de forma permanente e irreversible.
+                    Eliminar tu cuenta borrará todos tus datos financieros, transacciones, registros y configuraciones de forma permanente e irreversible de la base de datos (Derecho de Cancelación).
                 </p>
-                <button id="btnOpenDeleteAccountModal" class="px-4 py-2.5 text-xs sm:text-sm font-bold text-red-600 hover:text-white bg-red-50 dark:bg-red-900/20 hover:bg-red-600 border border-red-200 dark:border-red-800 rounded-xl transition-colors shadow-sm">
+                <button id="btnOpenDeleteAccountModal" class="px-4 py-2.5 text-xs sm:text-sm font-bold text-red-600 hover:text-white bg-red-50 dark:bg-red-900/20 hover:bg-red-600 border border-red-200 dark:border-red-800 rounded-xl transition-colors shadow-sm cursor-pointer">
                     Eliminar mi cuenta
                 </button>
             </div>
@@ -366,6 +422,80 @@ const googleEmail = session?.user?.email || '';
         window.showToast('¡Guardado!', 'Preferencias de perfil y moneda actualizadas con éxito.', '💾');
         setTimeout(() => { window.location.reload(); }, 900);
     });
+
+    // ─── Gestión de Derechos ARCO (LFPDPPP / GDPR) ───
+    
+    // 1. Derecho de Acceso: Descargar Expediente de Datos en JSON
+    document.getElementById('btnArcoExportData')?.addEventListener('click', async () => {
+        const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+        const preferredCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+        const currentToken = localStorage.getItem('financeai_token');
+        
+        let transacciones = [];
+        if (currentToken) {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/transactions`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                if (res.ok) {
+                    transacciones = await res.json();
+                }
+            } catch (_) {}
+        }
+
+        const expedienteARCO = {
+            titulo: "Expediente de Datos Personales y Financieros - FinanceAI",
+            marcoLegal: "Cumplimiento con Artículos 22 al 35 de la LFPDPPP (México) y Artículos 15 al 20 del GDPR (UE)",
+            fechaGeneracion: new Date().toISOString(),
+            titular: {
+                id: cachedUser.id || "N/A",
+                nombre: cachedUser.name || googleName || "Usuario FinanceAI",
+                correo: cachedUser.email || googleEmail || "N/A",
+                monedaBase: preferredCurrency
+            },
+            derechoAccesoEjercido: true,
+            totalTransaccionesRegistradas: Array.isArray(transacciones) ? transacciones.length : 0,
+            registrosFinancieros: transacciones,
+            garantiaNoVentaDatos: "FinanceAI certifica que estos datos no han sido vendidos ni compartidos con fines comerciales."
+        };
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(expedienteARCO, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `expediente_datos_financeai_${Date.now()}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+
+        window.showToast('Derecho de Acceso', 'Tu expediente de datos personales ha sido descargado en formato .JSON.', '📥');
+    });
+
+    // 2. Derecho de Rectificación: Enfocar formulario
+    document.getElementById('btnArcoRectify')?.addEventListener('click', () => {
+        const select = document.getElementById('profileCurrencySelect');
+        if (select) {
+            select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            select.focus();
+            window.showToast('Rectificación', 'Puedes modificar tu divisa base o preferencias arriba.', '✏️');
+        }
+    });
+
+    // 3. Derecho de Oposición: Toggle de procesamiento analítico
+    const toggleArcoOpposition = document.getElementById('toggleArcoOpposition');
+    if (toggleArcoOpposition) {
+        const savedOpp = localStorage.getItem('financeai_arco_opposition');
+        if (savedOpp !== null) {
+            toggleArcoOpposition.checked = savedOpp === 'true';
+        }
+        toggleArcoOpposition.addEventListener('change', () => {
+            localStorage.setItem('financeai_arco_opposition', toggleArcoOpposition.checked);
+            if (toggleArcoOpposition.checked) {
+                window.showToast('Derecho de Oposición', 'Has limitado el procesamiento de datos para estadísticas globales.', '🛡️');
+            } else {
+                window.showToast('Procesamiento Permitido', 'Has habilitado el procesamiento de métricas agregadas anónimas.', '📊');
+            }
+        });
+    }
 
     // Eliminar Cuenta
     const deleteAccountConfirmModal = document.getElementById('deleteAccountConfirmModal');
