@@ -583,6 +583,8 @@ Ubicación del código fuente: `C:\Java\G9-LATAM-Team-77\Frontend`
 | `/login` | `login.astro` | SSR / Client Hydration | Público | Inicio de sesión, registro interactivo, OAuth2 Google y recuperación. |
 | `/dashboard` | `dashboard.astro` | SSR + Client Scripts | **Protegido (Token)** | Registro de movimientos (diario/semanal/mensual), velocímetro de Score y análisis de IA. |
 | `/historial` | `historial.astro` | SSR + Client Scripts | **Protegido (Token)** | Visualización temporal con picos, filtros de mes/rango, conversor de divisas y exportación Excel. |
+| `/terminos` | `terminos.astro` | SSR / Client Hydration | Público / Dinámico | Términos de Servicio, exclusión Ley Fintech, LMV y 10 pilares OWASP. Navegación contextual automática. |
+| `/privacidad` | `privacidad.astro` | SSR / Client Hydration | Público / Dinámico | Aviso de Privacidad Integral conforme a LFPDPPP, GDPR y CCPA Do Not Sell. Navegación contextual automática. |
 | `/logout` | `logout.astro` | SSR | Público | Pantalla de cierre de sesión centrada con fondo difuminado y confirmación. |
 
 ### 4.2 Sistema de Diseño, Tipografía y Regla Anti-Emojis
@@ -702,6 +704,11 @@ Mientras los formularios y datos prohíben emojis para preservar la higiene de d
 | 📡 | **Fallo de Conexión** | Global | Error de red o indisponibilidad temporal del servidor backend. |
 | 🗑️ | **Historial Eliminado** | `/historial` | Vaciado y reseteo completo de las transacciones del usuario. |
 
+### 4.8 Navegación Contextual Reactiva en Vistas Legales
+Las páginas `/terminos` y `/privacidad` implementan detección reactiva de sesión (`localStorage('financeai_token')`):
+- **Usuario Autenticado:** El botón de navegación superior se adapta automáticamente mostrando `← Volver al Dashboard` con enlace a `/dashboard`.
+- **Usuario Público / Sin Sesión:** El botón se presenta como `← Volver a Inicio de Sesión` con enlace a `/login`.
+
 ---
 
 ## 5. MARCO DE CUMPLIMIENTO LEGAL, PRIVACIDAD Y GOBERNANZA DE IA
@@ -763,6 +770,84 @@ Ubicado en el modal de perfil de usuario (`Header.astro`), el sistema ofrece mec
 
 ### 5.6 Deslinde Financiero (Financial Disclaimer) y Safe Harbor
 > *"FinanceAI es una plataforma analítica y educativa de autogestión presupuestaria. Los diagnósticos y sugerencias automáticas no constituyen asesoramiento financiero, tributario, legal ni de inversión profesional. Toda decisión económica es responsabilidad exclusiva del usuario."*
+
+### 5.7 Matriz de Justificación Técnica: Seguridad OWASP Top 10 y Gobernanza en Latinoamérica
+
+Para respaldar técnicamente cualquier declaración institucional o auditoría de seguridad, la plataforma sustenta sus afirmaciones en implementaciones directas en el código:
+
+#### A. Evidencias de Cumplimiento OWASP Top 10
+| Estándar OWASP | Implementación Técnica en FinanceAI | Archivos Fuente de Respaldo |
+| :--- | :--- | :--- |
+| **A01: Broken Access Control** | • Autenticación Stateless JWT por request.<br/>• Aislamiento estricto de transacciones por `userId`.<br/>• Purga atómica de cuenta en cascada con `@Transactional` (`DELETE /profile`). | [`JwtAuthenticationFilter.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/security/JwtAuthenticationFilter.java)<br/>[`UserService.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/service/UserService.java) |
+| **A02: Cryptographic Failures** | • Hashing unidireccional de contraseñas con **BCrypt** (salt dinámico).<br/>• Firmas criptográficas HMAC-SHA256 para JWT con secretos protegidos en `.env`.<br/>• Tokens temporales OTP de recuperación con caducidad forzada de 15 minutos. | [`SecurityConfig.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/config/SecurityConfig.java)<br/>[`JwtService.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/security/JwtService.java) |
+| **A03: Injection (SQL & CLI)** | • **Cero Inyección SQL:** Spring Data JPA / Hibernate con Prepared Statements y Flyway migrations.<br/>• **Cero Inyección de Comandos:** Invocación de `predict.py` con `ProcessBuilder` pasando argumentos estructurados y JSON por `stdin` (sin shells abiertas). | [`TransactionRepository.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/repository/TransactionRepository.java)<br/>[`DataScienceService.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/service/DataScienceService.java) |
+| **A04: Insecure Design** | • Política de Alta Seguridad en Contraseñas: 5 reglas de complejidad obligatorias y bloqueo de emojis.<br/>• Clampeado y normalización defensiva de datos ($0-100\%$, `_safe_float`, `_safe_str`). | [`AuthService.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/service/AuthService.java)<br/>[`predict.py`](file:///C:/Java/G9-LATAM-Team-77/DataScient/src/predict.py) |
+| **A05: Security Misconfiguration** | • Centralización de credenciales (`DATABASE_URL`, `JWT_SECRET`) en un único archivo `.env` en la raíz, protegido por `.gitignore`. | `.env` / `.gitignore` |
+| **A06: Vulnerable Components** | • Uso de versiones oficiales LTS vigentes y actualizadas (Java 17 LTS, Spring Boot 3, Astro 5) sin paquetes vulnerables ni deprecados. | `pom.xml` / `package.json` |
+| **A07: Authentication Failures** | • Sincronización segura de Google OAuth 2.0 (`/google-sync`) emitiendo JWT propio sin almacenar tokens de acceso externos. | [`AuthController.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/controllers/AuthController.java) |
+| **A08: Software & Data Integrity** | • Validación estricta con Spring Bean Validation (`@PositiveOrZero`, `@NotBlank`) y Jackson, retornando `HTTP 400 Bad Request` ante entradas maliciosas o corruptas. | [`AnalisisRequest.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/dto/analisis/AnalisisRequest.java) |
+| **A09: Logging & Monitoring** | • Endpoint de disponibilidad (`/api/v1/health`), logging estructurado SLF4J y trazabilidad transaccional en `historial_analisis`. | [`HealthController.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/controllers/HealthController.java) |
+| **A10: Server-Side Request Forgery (SSRF)** | • Arquitectura de red cerrada que impide al usuario ingresar URLs externas o realizar llamadas HTTP no autenticadas desde el servidor. | [`DataScienceService.java`](file:///C:/Java/G9-LATAM-Team-77/Backend/financeia-backend/src/main/java/com/financeia/financeia_backend/service/DataScienceService.java) |
+
+#### B. Evidencias de Gobernanza de Privacidad en Latinoamérica
+1. **Consentimiento Expreso para Datos Patrimoniales (Art. 8 LFPDPPP):** Casilla obligatoria no premarcada en `login.astro` antes de persistir cualquier registro.
+2. **Garantía "Do Not Sell" (CCPA / LFPDPPP):** Cláusula contractual y técnica que prohíbe la comercialización o transferencia de datos financieros a corredores de datos (*data brokers*) o redes publicitarias.
+3. **Módulo Operativo de Derechos ARCO en Frontend (`Header.astro`):**
+   - **Acceso:** Descarga inmediata de `expediente_datos_financeai_[TIMESTAMP].json`.
+   - **Rectificación:** Modificación instantánea de perfil y divisa base.
+   - **Oposición:** Switch local para excluir datos de estadísticas agregadas.
+   - **Cancelación:** Purga total y en cascada de la cuenta en MySQL.
+4. **Delimitación de Responsabilidad (Ley Fintech y LMV):** Exclusión explícita de captación de recursos, custodia o intermediación bursátil vinculante.
+
+### 5.8 Directorio Oficial de Leyes, Regulaciones y Estándares de Referencia
+
+Para garantizar la máxima transparencia, auditabilidad y rigor técnico, a continuación se presentan los enlaces oficiales a los marcos regulatorios y estándares internacionales en los que se fundamenta FinanceAI:
+
+| Marco / Estándar | Organismo Emisor | Enlace Oficial de Consulta |
+| :--- | :--- | :--- |
+| **OWASP Top 10 (2021/2026)** | Open Web Application Security Project (OWASP) | [https://owasp.org/Top10/](https://owasp.org/Top10/) |
+| **LFPDPPP (Datos Personales en México)** | Cámara de Diputados del H. Congreso de la Unión | [https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf) |
+| **INAI (Autoridad Garante de Privacidad en México)** | Instituto Nacional de Transparencia (INAI) | [https://home.inai.org.mx/](https://home.inai.org.mx/) |
+| **Ley Fintech (LRITF - Regulación Fintech México)** | Diario Oficial de la Federación / Cámara de Diputados | [https://www.diputados.gob.mx/LeyesBiblio/pdf/LRITF.pdf](https://www.diputados.gob.mx/LeyesBiblio/pdf/LRITF.pdf) |
+| **Ley del Mercado de Valores (LMV)** | Cámara de Diputados del H. Congreso de la Unión | [https://www.diputados.gob.mx/LeyesBiblio/pdf/LMV.pdf](https://www.diputados.gob.mx/LeyesBiblio/pdf/LMV.pdf) |
+| **Ley Federal de Protección al Consumidor** | PROFECO / Cámara de Diputados | [https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPC.pdf](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPC.pdf) |
+| **GDPR (Reglamento General de Protección de Datos UE)** | Parlamento Europeo y Consejo de la Unión Europea | [https://eur-lex.europa.eu/eli/reg/2016/679/oj](https://eur-lex.europa.eu/eli/reg/2016/679/oj) |
+| **CCPA / CPRA (California Consumer Privacy Act)** | California Department of Justice / Office of the Attorney General | [https://oag.ca.gov/privacy/ccpa](https://oag.ca.gov/privacy/ccpa) |
+| **Google API Services User Data Policy** | Google Developers Identity | [https://developers.google.com/terms/api-services-user-data-policy](https://developers.google.com/terms/api-services-user-data-policy) |
+| **EU Artificial Intelligence Act (EU AI Act)** | EUR-Lex / Unión Europea | [https://eur-lex.europa.eu/eli/reg/2024/1689/oj](https://eur-lex.europa.eu/eli/reg/2024/1689/oj) |
+| **ISO/IEC 42001 (Artificial Intelligence Management System)** | International Organization for Standardization (ISO) | [https://www.iso.org/standard/81230.html](https://www.iso.org/standard/81230.html) |
+| **NIST AI Risk Management Framework (AI RMF 1.0)** | National Institute of Standards and Technology (NIST) | [https://www.nist.gov/itl/ai-risk-management-framework](https://www.nist.gov/itl/ai-risk-management-framework) |
+
+### 5.9 Arquitectura de Diseño 100% Responsivo y Auditoría Multi-Dispositivo
+
+Para asegurar una experiencia de usuario de nivel institucional y fluida en cualquier pantalla, FinanceAI implementa un sistema de diseño responsivo móvil-primero (*Mobile-First Responsive Architecture*) auditado para todos los factores de forma:
+
+| Breakpoint / Dispositivo | Rango de Resolución | Adaptaciones Clave en la Plataforma |
+| :--- | :--- | :--- |
+| **Móviles Ultra-Compactos** | `320px - 380px` (iPhone SE, Galaxy A, plegables) | Header minimalista, notificaciones toast con auto-ancho seguro (`left-4 right-4`), formularios apilados y filas de transacciones en cuadrícula adaptativa de 12 columnas. |
+| **Móviles Estándar & Plus** | `390px - 480px` (iPhone 14/15/16, Galaxy S23/S24, Pixel 8) | Tarjetas KPI en 2 columnas, velocímetro circular fluido (`w-28 h-28 sm:w-32 sm:h-32`) y modales con espaciado ergonómico táctil. |
+| **Tablets & Plegables** | `640px - 820px` (iPad Mini, iPad Air, Surface Pro) | Navegación `mainNav` integrada, selector desplegable de meses con popover inteligente (`w-64 sm:w-72`) y tabla de transacciones con barra de scroll asistida. |
+| **Laptops & Escritorio Pro** | `1024px - 1920px+` (MacBook, FHD, 2K, 4K) | Disposición ejecutiva en dos columnas (5/7 en Dashboard y 4/8 en Historial), gráficas multi-línea expandidas y efectos de desenfoque *glassmorphic*. |
+
+### 5.10 Arquitectura de Cierre de Sesión OAuth, Auditoría Web y Estándares de IA
+
+FinanceAI implementa una infraestructura de sesión resiliente y optimización técnica para indexadores y agentes de IA:
+
+1. **Purgado Atómico de Sesión en el Servidor (`POST/GET /api/auth/logout`):**
+   - El endpoint del servidor ejecuta la eliminación forzada en cabeceras HTTP de todas las cookies emitidas por `@auth/core` y `auth-astro` (`authjs.session-token`, `__Secure-authjs.session-token`, `authjs.csrf-token`, etc.) con `Max-Age=0` y `Path=/`.
+   - Limpieza defensiva del almacenamiento cliente (`localStorage.clear()` y `sessionStorage.clear()`).
+   - La vista `/login` procesa el parámetro `?logged_out=true` para prevenir bucles de redirección hacia `/dashboard`.
+2. **Auditoría de Jerarquía Semántica y Accesibilidad:**
+   - **Regla Estricta H1:** Exactamente 1 único elemento `<h1>` semántico por vista.
+   - **Accesibilidad Total de Imágenes:** Atributo `alt` descriptivo en el 100% de los elementos `<img>`.
+3. **Metadatos, OpenGraph e Indexación:**
+   - Tag canónico dinámico `<link rel="canonical">` y meta descripción en todas las páginas.
+   - Tarjetas sociales Open Graph (`og:image`, `og:title`, `og:description`, `og:url`) y Twitter Cards.
+   - Directorio de rastreo abierto a modelos de IA en `public/robots.txt` (GPTBot, ClaudeBot, PerplexityBot, Google-Extended).
+   - Documento de especificación de arquitectura y motor DS-08 en `public/llms.txt`.
+   - Mapa de sitio estructurado en `public/sitemap.xml`.
+   - Favicon oficial de alta resolución ubicado en **`Frontend/public/favicon.svg`**.
+   - Desactivación de sourcemaps en producción (`vite.build.sourcemap = false`).
 
 ---
 

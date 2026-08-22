@@ -12,6 +12,9 @@ export default defineConfig({
   }),
   vite: {
     envDir: '../',
+    build: {
+      sourcemap: false
+    },
     plugins: [tailwindcss()]
   },
   integrations: [auth()]

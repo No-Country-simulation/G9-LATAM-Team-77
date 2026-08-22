@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Tailwind v4: dark mode via class on <html> */
-@custom-variant dark (&:where(.dark, .dark *));
+@variant dark (&:where(.dark, .dark *));
 
 /* Base font */
 :root {

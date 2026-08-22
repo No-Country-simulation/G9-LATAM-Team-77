@@ -39,6 +39,13 @@ export default defineConfig({
     })
   ],
   secret: process.env.AUTH_SECRET || import.meta.env.AUTH_SECRET || process.env.JWT_SECRET,
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return `${baseUrl}/dashboard`;
+    }
+  },
   pages: {
     signOut: '/logout'
   }

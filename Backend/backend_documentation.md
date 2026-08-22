@@ -422,7 +422,7 @@ cd Backend/financeia-backend
 
 ## 10. Cumplimiento Legal y Privacidad en el Backend
 
-### 10.1 Soporte Técnico para Derechos ARCO (LFPDPPP & GDPR)
+### 10.1 Soporte Técnico para Derechos ARCO ([LFPDPPP](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf) & [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj))
 1. **Derecho de Acceso (Portabilidad):**
    - El endpoint `GET /api/v1/transactions` y `GET /api/v1/users/profile` proporcionan la totalidad de los datos estructurados del titular en formato JSON estándar.
 2. **Derecho de Rectificación:**
@@ -432,5 +432,22 @@ cd Backend/financeia-backend
 
 ### 10.2 Integración Segura de Google OAuth 2.0
 - El endpoint `POST /api/v1/auth/google-sync` valida los tokens emitidos por Google y crea o sincroniza la cuenta sin almacenar tokens de acceso externos invasivos.
-- Se cumple con la **Política de Datos de Usuario de los Servicios de la API de Google** y sus requisitos de Uso Limitado.
+- Se cumple con la [Política de Datos de Usuario de los Servicios de la API de Google](https://developers.google.com/terms/api-services-user-data-policy) y sus requisitos de Uso Limitado.
+
+### 10.3 Matriz de Verificación de Seguridad [OWASP Top 10](https://owasp.org/Top10/) en el Backend
+| Vector OWASP | Implementación y Respaldo en Backend |
+| :--- | :--- |
+| **[A01: Broken Access Control](https://owasp.org/Top10/A01_2021-Broken_Access_Control/)** | Stateless JWT en `JwtAuthenticationFilter`, aislamiento por `userId` en JPA y borrado atómico `@Transactional` en `UserService.deleteAccountPermanently`. |
+| **[A02: Cryptographic Failures](https://owasp.org/Top10/A02_2021-Cryptographic_Failures/)** | Hashing con `BCryptPasswordEncoder` (salt dinámico), firmas HMAC-SHA256 y tokens OTP de recuperación con vida útil de 15 minutos. |
+| **[A03: Injection (SQL & CLI)](https://owasp.org/Top10/A03_2021-Injection/)** | Zero SQL Injection mediante Spring Data JPA con Prepared Statements y orquestación de Python con `ProcessBuilder` pasando argumentos/stdin sin shells. |
+| **[A04: Insecure Design](https://owasp.org/Top10/A04_2021-Insecure_Design/)** | Validación de 5 reglas de complejidad de contraseñas (`AuthService.validatePasswordStrength`) y sanitización en Python. |
+| **[A05: Security Misconfiguration](https://owasp.org/Top10/A05_2021-Security_Misconfiguration/)** | Credenciales de base de datos y secretos JWT centralizados en archivo `.env` en la raíz protegido por `.gitignore`. |
+| **[A06: Vulnerable Components](https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/)** | Stack actualizado con versiones LTS oficiales (Java 17 LTS, Spring Boot 3, Flyway 10) sin dependencias deprecadas ni vulnerables. |
+| **[A07: Authentication Failures](https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/)** | Sincronización Google OAuth 2.0 segura con emisión de credenciales propias. |
+| **[A08: Software & Data Integrity](https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/)** | Bean Validation estricto con Jackson (`@PositiveOrZero`, `@NotBlank`), retornando `HTTP 400 Bad Request` ante datos maliciosos. |
+| **[A09: Logging & Monitoring](https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/)** | Endpoint de disponibilidad `GET /api/v1/health`, logging estructurado con SLF4J y trazabilidad en tabla `historial_analisis`. |
+| **[A10: Server-Side Request Forgery](https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/)** | Arquitectura interna cerrada sin consumo de URLs externas arbitrarias no autorizadas. |
+
+
+
 

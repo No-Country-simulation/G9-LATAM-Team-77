@@ -3,8 +3,10 @@ import { API_URL } from '../lib/api';
 import { getSession } from 'auth-astro/server';
 
 const session = await getSession(Astro.request);
+const hasServerSession = !!session;
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
+const isAuthPage = currentPath === 'login' || currentPath === 'logout';
 const isLogoutPage = currentPath === 'logout';
 
 const googleImage = session?.user?.image || '';
@@ -12,21 +14,21 @@ const googleName = session?.user?.name || '';
 const googleEmail = session?.user?.email || '';
 ---
 
-<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300 font-inter">
-    <div class="flex items-center space-x-8">
+<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300 font-inter">
+    <div class="flex items-center space-x-3 sm:space-x-8">
         <!-- Logo -->
-        <a href="/" class="flex items-center space-x-2.5 group">
+        <a href="/" class="flex items-center space-x-2 group">
             <div class="flex space-x-1 group-hover:scale-105 transition-transform">
                 <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
             </div>
-            <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
+            <span class="font-bold text-lg sm:text-xl tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
         </a>
 
-        <!-- Main Nav (Oculto en pantalla de Logout) -->
-        {!isLogoutPage && (
-            <nav id="mainNav" class="hidden space-x-6 text-sm font-medium font-inter">
+        <!-- Main Nav (Oculto solo en Login y Logout) -->
+        {!isAuthPage && (
+            <nav id="mainNav" class="flex items-center space-x-3 sm:space-x-6 text-xs sm:text-sm font-medium font-inter">
                 <a href="/dashboard"
                     class={`pb-1 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
                     Dashboard
@@ -41,19 +43,18 @@ const googleEmail = session?.user?.email || '';
 
     <!-- Right Controls -->
     {!isLogoutPage && (
-        <div class="flex items-center space-x-3.5">
+        <div class="flex items-center space-x-2 sm:space-x-3.5">
             
-
             <!-- Backend Health Indicator -->
-            <div id="backendIndicator" class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full">
+            <div id="backendIndicator" class="hidden xs:flex sm:flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
                 <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                <span id="backendStatusText">Backend...</span>
+                <span id="backendStatusText" class="hidden sm:inline">Backend...</span>
             </div>
 
             <!-- Dark mode toggle -->
-            <button id="themeToggle"
+            <button type="button" id="themeToggle"
                 aria-label="Cambiar tema"
-                class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+                class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 cursor-pointer">
                 <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
                 </svg>
@@ -62,42 +63,44 @@ const googleEmail = session?.user?.email || '';
                 </svg>
             </button>
 
-            <!-- User Profile Avatar Button -->
-            <div id="userProfileSection" class="hidden relative">
-                <button id="btnOpenProfileModal" class="flex items-center gap-2 p-0.5 rounded-full ring-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none" title="Mi Perfil y Ajustes">
-                    <img id="navUserAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm" />
-                </button>
-            </div>
+            <!-- User Profile Avatar Button & Auth Button -->
+            {!isAuthPage && (
+                <div id="userProfileSection" class="relative flex items-center">
+                    <button id="btnOpenProfileModal" onclick="window.openProfileModal && window.openProfileModal()" class="flex items-center gap-2 p-0.5 rounded-full ring-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none cursor-pointer" title="Mi Perfil y Ajustes">
+                        <img id="navUserAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Avatar de usuario" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm" />
+                    </button>
+                </div>
 
-            <!-- Auth Button (Abre Modal Centrado) -->
-            <button type="button" id="authNavBtn"
-                class="hidden text-xs font-semibold px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-xl transition-colors">
-                Cerrar Sesión
-            </button>
+                <button type="button" id="authNavBtn"
+                    onclick="window.openLogoutModal && window.openLogoutModal()"
+                    class="text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-xl transition-colors cursor-pointer">
+                    Cerrar Sesión
+                </button>
+            )}
         </div>
     )}
 </header>
 
 <!-- Modal Centrado de Confirmación de Cierre de Sesión (Overlay Difuminado) -->
-<div id="headerLogoutModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-gray-900/70 backdrop-blur-xl animate-fade-in font-inter">
-    <div class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 sm:p-10 max-w-md w-full mx-4 border border-gray-200 dark:border-gray-800 text-center animate-scale-in">
-        <div class="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl flex items-center justify-center mb-5 shadow-inner border border-gray-200 dark:border-gray-700">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div id="headerLogoutModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-gray-900/70 backdrop-blur-xl animate-fade-in font-inter p-3 sm:p-4">
+    <div class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-10 max-w-md w-full border border-gray-200 dark:border-gray-800 text-center animate-scale-in">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl flex items-center justify-center mb-4 sm:mb-5 shadow-inner border border-gray-200 dark:border-gray-700">
+            <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
             </svg>
         </div>
         
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-2 font-josefin">¿Cerrar Sesión?</h2>
+        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-2 font-josefin">¿Cerrar Sesión?</h2>
         
-        <p class="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-6 leading-relaxed">
+        <p class="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-5 sm:mb-6 leading-relaxed">
             ¿Estás seguro de que deseas salir de tu cuenta? Tendrás que volver a iniciar sesión para acceder a tu panel.
         </p>
         
         <div class="space-y-2.5">
-            <button id="btnHeaderConfirmSignout" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md hover:shadow-lg text-xs sm:text-sm">
+            <button id="btnHeaderConfirmSignout" onclick="window.confirmHeaderSignout && window.confirmHeaderSignout()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 sm:py-3 px-4 rounded-xl transition shadow-md hover:shadow-lg text-xs sm:text-sm cursor-pointer">
                 Sí, salir de mi cuenta
             </button>
-            <button id="btnHeaderCancelSignout" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-2.5 px-4 rounded-xl transition text-xs sm:text-sm">
+            <button id="btnHeaderCancelSignout" onclick="window.closeLogoutModal && window.closeLogoutModal()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-2 sm:py-2.5 px-4 rounded-xl transition text-xs sm:text-sm cursor-pointer">
                 Cancelar
             </button>
         </div>
@@ -105,25 +108,25 @@ const googleEmail = session?.user?.email || '';
 </div>
 
 <!-- Modal de Perfil de Usuario y Ajustes (Con Cierre al Hacer Clic Afuera y Botón Grande) -->
-<div id="userProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/70 backdrop-blur-md animate-fade-in font-inter">
-    <div id="userProfileCard" class="bg-white dark:bg-gray-900 w-full max-w-lg mx-4 rounded-3xl p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[90vh] overflow-y-auto">
+<div id="userProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/70 backdrop-blur-md animate-fade-in font-inter p-3 sm:p-4">
+    <div id="userProfileCard" class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[90vh] overflow-y-auto">
         <!-- Modal Header -->
-        <div class="flex justify-between items-center pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div class="flex justify-between items-center pb-3 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
             <div>
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white font-josefin">Mi Perfil y Ajustes</h3>
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-josefin">Mi Perfil y Ajustes</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400">Personaliza tu cuenta y moneda predeterminada</p>
             </div>
             <!-- Botón de Cerrar Grande -->
-            <button id="btnCloseProfileModal" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-3xl font-bold w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none" title="Cerrar">&times;</button>
+            <button id="btnCloseProfileModal" onclick="window.closeProfileModal && window.closeProfileModal()" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl sm:text-3xl font-bold w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none cursor-pointer" title="Cerrar">&times;</button>
         </div>
 
-        <div class="py-6 space-y-6">
+        <div class="py-4 sm:py-6 space-y-4 sm:space-y-6">
             <!-- User Basic Info -->
-            <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
-                <img id="modalCurrentAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} class="w-16 h-16 rounded-full object-cover border-2 border-blue-500 shadow-md" />
-                <div>
-                    <h4 id="modalUserName" class="text-base font-bold text-gray-900 dark:text-white">{googleName || "Usuario FinanceAI"}</h4>
-                    <p id="modalUserEmail" class="text-xs text-gray-500 dark:text-gray-400">{googleEmail || "usuario@correo.com"}</p>
+            <div class="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
+                <img id="modalCurrentAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Foto de perfil actual" class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-500 shadow-md flex-shrink-0" />
+                <div class="min-w-0 flex-1">
+                    <h4 id="modalUserName" class="text-sm sm:text-base font-bold text-gray-900 dark:text-white truncate">{googleName || "Usuario FinanceAI"}</h4>
+                    <p id="modalUserEmail" class="text-xs text-gray-500 dark:text-gray-400 truncate">{googleEmail || "usuario@correo.com"}</p>
                     <span class="inline-block mt-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-md">Cuenta Activa</span>
                 </div>
             </div>
@@ -131,7 +134,7 @@ const googleEmail = session?.user?.email || '';
             <!-- Selector de 9 Avatares -->
             <div>
                 <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Selecciona tu Foto de Perfil (9 Avatares)</label>
-                <div class="grid grid-cols-5 gap-2.5 pt-1" id="avatarGrid">
+                <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-2.5 pt-1" id="avatarGrid">
                     <!-- Dynamic avatar grid -->
                 </div>
             </div>
@@ -242,19 +245,27 @@ const googleEmail = session?.user?.email || '';
         </p>
         
         <div class="space-y-2.5">
-            <button id="btnConfirmDeleteAccount" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition text-xs sm:text-sm">
+            <button id="btnConfirmDeleteAccount" onclick="window.confirmDeleteAccount && window.confirmDeleteAccount()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition text-xs sm:text-sm cursor-pointer">
                 Sí, eliminar definitivamente
             </button>
-            <button id="btnCancelDeleteAccount" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm">
+            <button id="btnCancelDeleteAccount" onclick="window.closeDeleteAccountModal && window.closeDeleteAccountModal()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm cursor-pointer">
                 Cancelar
             </button>
         </div>
     </div>
 </div>
 
-<script define:vars={{ API_URL, googleImage, googleName, googleEmail, isLogoutPage }}>
+<script define:vars={{ API_URL, hasServerSession, googleImage, googleName, googleEmail, isLogoutPage }}>
     // Theme toggle
-    document.getElementById('themeToggle')?.addEventListener('click', () => {
+    function updateThemeIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const sun = document.getElementById('iconSun');
+        const moon = document.getElementById('iconMoon');
+        if (sun) sun.style.display = isDark ? 'block' : 'none';
+        if (moon) moon.style.display = isDark ? 'none' : 'block';
+    }
+
+    window.toggleTheme = function() {
         const html = document.documentElement;
         if (html.classList.contains('dark')) {
             html.classList.remove('dark');
@@ -263,12 +274,10 @@ const googleEmail = session?.user?.email || '';
             html.classList.add('dark');
             localStorage.setItem('theme', 'dark');
         }
-    });
-
-    const token = localStorage.getItem('financeai_token');
-    const mainNav = document.getElementById('mainNav');
-    const userProfileSection = document.getElementById('userProfileSection');
-    const authNavBtn = document.getElementById('authNavBtn');
+        updateThemeIcons();
+    };
+    document.getElementById('themeToggle')?.addEventListener('click', window.toggleTheme);
+    updateThemeIcons();
 
     // 9 Avatares Predefinidos
     const predefinedAvatars = [
@@ -286,10 +295,150 @@ const googleEmail = session?.user?.email || '';
 
     let selectedAvatar = localStorage.getItem('financeai_avatar') || (googleImage || predefinedAvatars[0]);
 
-    if (token && !isLogoutPage) {
+    function renderAvatarGrid() {
+        const avatarGrid = document.getElementById('avatarGrid');
+        if (!avatarGrid) return;
+        avatarGrid.innerHTML = predefinedAvatars.map(av => `
+            <button type="button" class="avatar-option p-1 rounded-2xl border-2 transition-all cursor-pointer ${av === selectedAvatar ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 scale-105' : 'border-gray-200 dark:border-gray-700 hover:border-gray-400'}" data-avatar="${av}">
+                <img src="${av}" alt="Opción de avatar predefinido" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover" />
+            </button>
+        `).join('');
+
+        avatarGrid.querySelectorAll('.avatar-option').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                selectedAvatar = btn.getAttribute('data-avatar');
+                const modalCurAv = document.getElementById('modalCurrentAvatar');
+                if (modalCurAv) modalCurAv.src = selectedAvatar;
+                avatarGrid.querySelectorAll('.avatar-option').forEach(b => {
+                    b.className = `avatar-option p-1 rounded-2xl border-2 transition-all cursor-pointer ${b.getAttribute('data-avatar') === selectedAvatar ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 scale-105' : 'border-gray-200 dark:border-gray-700 hover:border-gray-400'}`;
+                });
+            });
+        });
+    }
+
+    // Modal Handlers
+    window.openProfileModal = function() {
+        const userProfileModal = document.getElementById('userProfileModal');
+        const cur = localStorage.getItem('financeai_preferred_currency') || 'USD';
+        const curSelect = document.getElementById('profileCurrencySelect');
+        if (curSelect) curSelect.value = cur;
+        
+        try {
+            const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+            const nameEl = document.getElementById('modalUserName');
+            const emailEl = document.getElementById('modalUserEmail');
+            if (cachedUser.name && nameEl) nameEl.textContent = cachedUser.name;
+            if (cachedUser.email && emailEl) emailEl.textContent = cachedUser.email;
+        } catch(e) {}
+        
+        renderAvatarGrid();
+        if (userProfileModal) userProfileModal.classList.remove('hidden');
+    };
+
+    window.closeProfileModal = function() {
+        document.getElementById('userProfileModal')?.classList.add('hidden');
+    };
+
+    window.openLogoutModal = function() {
+        document.getElementById('headerLogoutModal')?.classList.remove('hidden');
+    };
+
+    window.closeLogoutModal = function() {
+        document.getElementById('headerLogoutModal')?.classList.add('hidden');
+    };
+
+    window.confirmHeaderSignout = async function() {
+        const btn = document.getElementById('btnHeaderConfirmSignout');
+        if (btn) {
+            btn.textContent = 'Cerrando sesión...';
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+        }
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        try {
+            const { signOut } = await import("auth-astro/client");
+            await signOut({ redirect: false });
+        } catch (_) {}
+
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (_) {}
+
+        window.location.replace('/login');
+    };
+
+    window.openDeleteAccountModal = function() {
+        document.getElementById('deleteAccountConfirmModal')?.classList.remove('hidden');
+    };
+
+    window.closeDeleteAccountModal = function() {
+        document.getElementById('deleteAccountConfirmModal')?.classList.add('hidden');
+    };
+
+    window.confirmDeleteAccount = async function() {
+        const btn = document.getElementById('btnConfirmDeleteAccount');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Eliminando cuenta...';
+        }
+
+        const token = localStorage.getItem('financeai_token');
+        if (token) {
+            try {
+                await fetch(`${API_URL}/api/v1/users/profile`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (e) {
+                console.error("Error eliminando cuenta:", e);
+            }
+        }
+
+        localStorage.clear();
+        sessionStorage.clear();
+        if (window.showToast) {
+            window.showToast('Cuenta Eliminada', 'Tu cuenta y todos sus registros han sido eliminados de la base de datos.', '⚠️');
+        }
+
+        try {
+            const { signOut } = await import("auth-astro/client");
+            await signOut({ redirect: false });
+        } catch (_) {}
+
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (_) {}
+
+        setTimeout(() => { window.location.replace('/login'); }, 600);
+    };
+
+    const token = localStorage.getItem('financeai_token');
+    const isAuthenticated = !!token || hasServerSession;
+    const mainNav = document.getElementById('mainNav');
+    const userProfileSection = document.getElementById('userProfileSection');
+    const authNavBtn = document.getElementById('authNavBtn');
+
+    // Sincronizar datos de Google al almacenamiento local si aplica
+    if (hasServerSession && googleName) {
+        try {
+            const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+            if (!cachedUser.name) {
+                localStorage.setItem('financeai_user', JSON.stringify({
+                    name: googleName,
+                    email: googleEmail,
+                    image: googleImage
+                }));
+            }
+        } catch (e) {}
+    }
+
+    if (isAuthenticated && !isLogoutPage) {
         if (mainNav) {
             mainNav.classList.remove('hidden');
-            mainNav.classList.add('md:flex');
+            mainNav.classList.add('flex');
         }
         if (userProfileSection) {
             userProfileSection.classList.remove('hidden');
@@ -312,104 +461,30 @@ const googleEmail = session?.user?.email || '';
         }
     }
 
-    // Render Avatar Grid
-    const avatarGrid = document.getElementById('avatarGrid');
-    if (avatarGrid) {
-        avatarGrid.innerHTML = predefinedAvatars.map((av, idx) => `
-            <button type="button" class="avatar-option p-1 rounded-2xl border-2 transition-all ${av === selectedAvatar ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 scale-105' : 'border-gray-200 dark:border-gray-700 hover:border-gray-400'}" data-avatar="${av}">
-                <img src="${av}" class="w-12 h-12 rounded-xl object-cover" />
-            </button>
-        `).join('');
-
-        document.querySelectorAll('.avatar-option').forEach(btn => {
-            btn.addEventListener('click', () => {
-                selectedAvatar = btn.getAttribute('data-avatar');
-                document.getElementById('modalCurrentAvatar').src = selectedAvatar;
-                document.querySelectorAll('.avatar-option').forEach(b => {
-                    b.className = `avatar-option p-1 rounded-2xl border-2 transition-all ${b.getAttribute('data-avatar') === selectedAvatar ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 scale-105' : 'border-gray-200 dark:border-gray-700 hover:border-gray-400'}`;
-                });
-            });
-        });
-    }
-
     // Update Avatar Image in Nav
     const navUserAvatar = document.getElementById('navUserAvatar');
     if (navUserAvatar) {
         navUserAvatar.src = selectedAvatar;
     }
 
-    // Profile Modal Open / Close & Click Outside Listener
-    const userProfileModal = document.getElementById('userProfileModal');
-    document.getElementById('btnOpenProfileModal')?.addEventListener('click', () => {
-        const cur = localStorage.getItem('financeai_preferred_currency') || 'USD';
-        document.getElementById('profileCurrencySelect').value = cur;
-        
-        const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
-        if (cachedUser.name) document.getElementById('modalUserName').textContent = cachedUser.name;
-        if (cachedUser.email) document.getElementById('modalUserEmail').textContent = cachedUser.email;
-        
-        userProfileModal.classList.remove('hidden');
-    });
-
-    document.getElementById('btnCloseProfileModal')?.addEventListener('click', () => {
-        userProfileModal.classList.add('hidden');
-    });
-
-    // Cerrar al hacer clic fuera del borde del modal
-    userProfileModal?.addEventListener('click', (e) => {
-        if (e.target === userProfileModal) {
-            userProfileModal.classList.add('hidden');
-        }
-    });
-
-    // Logout Modal Overlay (Directo y centrado en pantalla)
-    const headerLogoutModal = document.getElementById('headerLogoutModal');
-    authNavBtn?.addEventListener('click', () => {
-        headerLogoutModal?.classList.remove('hidden');
-    });
-
-    document.getElementById('btnHeaderCancelSignout')?.addEventListener('click', () => {
-        headerLogoutModal?.classList.add('hidden');
-    });
-
-    headerLogoutModal?.addEventListener('click', (e) => {
-        if (e.target === headerLogoutModal) {
-            headerLogoutModal.classList.add('hidden');
-        }
-    });
-
-    document.getElementById('btnHeaderConfirmSignout')?.addEventListener('click', async () => {
-        const btn = document.getElementById('btnHeaderConfirmSignout');
-        if (btn) {
-            btn.textContent = 'Cerrando sesión...';
-            btn.classList.add('opacity-70', 'cursor-not-allowed');
-        }
-
-        localStorage.clear();
-        sessionStorage.clear();
-
-        try {
-            const { signOut } = await import("auth-astro/client");
-            await signOut({ callbackUrl: '/login' });
-        } catch (_) {
-            window.location.href = '/login';
-        }
-    });
+    renderAvatarGrid();
 
     // Guardar Ajustes de Perfil
     document.getElementById('btnSaveProfileSettings')?.addEventListener('click', async () => {
-        const currency = document.getElementById('profileCurrencySelect').value;
+        const curSelect = document.getElementById('profileCurrencySelect');
+        const currency = curSelect ? curSelect.value : 'USD';
         localStorage.setItem('financeai_preferred_currency', currency);
         localStorage.setItem('financeai_avatar', selectedAvatar);
         
         if (navUserAvatar) navUserAvatar.src = selectedAvatar;
 
-        if (token) {
+        const currentTok = localStorage.getItem('financeai_token');
+        if (currentTok) {
             const currencyToId = { 'CRC': 1, 'MXN': 2, 'USD': 3, 'EUR': 4, 'COP': 5, 'ARS': 6, 'CLP': 7, 'PEN': 8 };
             try {
                 await fetch(`${API_URL}/api/v1/users/profile`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentTok}` },
                     body: JSON.stringify({
                         paisId: 1,
                         monedaId: currencyToId[currency] || 1
@@ -418,8 +493,10 @@ const googleEmail = session?.user?.email || '';
             } catch (_) {}
         }
 
-        userProfileModal.classList.add('hidden');
-        window.showToast('¡Guardado!', 'Preferencias de perfil y moneda actualizadas con éxito.', '💾');
+        window.closeProfileModal();
+        if (window.showToast) {
+            window.showToast('¡Guardado!', 'Preferencias de perfil y moneda actualizadas con éxito.', '💾');
+        }
         setTimeout(() => { window.location.reload(); }, 900);
     });
 
@@ -467,7 +544,9 @@ const googleEmail = session?.user?.email || '';
         downloadAnchor.click();
         downloadAnchor.remove();
 
-        window.showToast('Derecho de Acceso', 'Tu expediente de datos personales ha sido descargado en formato .JSON.', '📥');
+        if (window.showToast) {
+            window.showToast('Derecho de Acceso', 'Tu expediente de datos personales ha sido descargado en formato .JSON.', '📥');
+        }
     });
 
     // 2. Derecho de Rectificación: Enfocar formulario
@@ -476,7 +555,9 @@ const googleEmail = session?.user?.email || '';
         if (select) {
             select.scrollIntoView({ behavior: 'smooth', block: 'center' });
             select.focus();
-            window.showToast('Rectificación', 'Puedes modificar tu divisa base o preferencias arriba.', '✏️');
+            if (window.showToast) {
+                window.showToast('Rectificación', 'Puedes modificar tu divisa base o preferencias arriba.', '✏️');
+            }
         }
     });
 
@@ -490,75 +571,42 @@ const googleEmail = session?.user?.email || '';
         toggleArcoOpposition.addEventListener('change', () => {
             localStorage.setItem('financeai_arco_opposition', toggleArcoOpposition.checked);
             if (toggleArcoOpposition.checked) {
-                window.showToast('Derecho de Oposición', 'Has limitado el procesamiento de datos para estadísticas globales.', '🛡️');
+                if (window.showToast) {
+                    window.showToast('Derecho de Oposición', 'Has limitado el procesamiento de datos para estadísticas globales.', '🛡️');
+                }
             } else {
-                window.showToast('Procesamiento Permitido', 'Has habilitado el procesamiento de métricas agregadas anónimas.', '📊');
+                if (window.showToast) {
+                    window.showToast('Procesamiento Permitido', 'Has habilitado el procesamiento de métricas agregadas anónimas.', '📊');
+                }
             }
         });
     }
 
-    // Eliminar Cuenta
-    const deleteAccountConfirmModal = document.getElementById('deleteAccountConfirmModal');
-    document.getElementById('btnOpenDeleteAccountModal')?.addEventListener('click', () => {
-        deleteAccountConfirmModal.classList.remove('hidden');
-    });
-
-    document.getElementById('btnCancelDeleteAccount')?.addEventListener('click', () => {
-        deleteAccountConfirmModal.classList.add('hidden');
-    });
-
-    deleteAccountConfirmModal?.addEventListener('click', (e) => {
-        if (e.target === deleteAccountConfirmModal) {
-            deleteAccountConfirmModal.classList.add('hidden');
-        }
-    });
-
-    document.getElementById('btnConfirmDeleteAccount')?.addEventListener('click', async () => {
-        const btn = document.getElementById('btnConfirmDeleteAccount');
-        btn.disabled = true;
-        btn.textContent = 'Eliminando cuenta...';
-
-        const token = localStorage.getItem('financeai_token');
-        if (token) {
-            try {
-                await fetch(`${API_URL}/api/v1/users/profile`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-            } catch (e) {
-                console.error("Error eliminando cuenta:", e);
-            }
-        }
-
-        localStorage.clear();
-        sessionStorage.clear();
-        window.showToast('Cuenta Eliminada', 'Tu cuenta y todos sus registros han sido eliminados de la base de datos.', '⚠️');
-
-        try {
-            const { signOut } = await import("auth-astro/client");
-            await signOut({ callbackUrl: '/login' });
-        } catch (_) {
-            setTimeout(() => { window.location.href = '/logout'; }, 800);
-        }
-    });
-
     // Health check polling
-    fetch(`${API_URL}/api/v1/health`)
-        .then(res => res.json())
-        .then(data => {
-            const dot = document.getElementById('backendDot');
-            const text = document.getElementById('backendStatusText');
-            if (dot && text && data.status === 'UP') {
-                dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-                text.textContent = 'Online';
-            }
-        })
-        .catch(() => {
-            const dot = document.getElementById('backendDot');
-            const text = document.getElementById('backendStatusText');
-            if (dot && text) {
-                dot.className = 'w-2 h-2 rounded-full bg-red-500';
-                text.textContent = 'Offline';
-            }
-        });
+    function checkBackendHealth() {
+        fetch(`${API_URL}/api/v1/health`)
+            .then(res => {
+                if (!res.ok) throw new Error('Backend HTTP error');
+                return res.json();
+            })
+            .then(data => {
+                const dot = document.getElementById('backendDot');
+                const text = document.getElementById('backendStatusText');
+                if (dot && text && (data.status === 'UP' || data.status === 'ONLINE' || data.service)) {
+                    dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                    text.textContent = 'Backend Online';
+                }
+            })
+            .catch(() => {
+                const dot = document.getElementById('backendDot');
+                const text = document.getElementById('backendStatusText');
+                if (dot && text) {
+                    dot.className = 'w-2 h-2 rounded-full bg-red-500';
+                    text.textContent = 'Backend Offline';
+                }
+            });
+    }
+
+    checkBackendHealth();
+    setInterval(checkBackendHealth, 15000);
 </script>

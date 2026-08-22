@@ -4,23 +4,49 @@ import Header from '../components/Header.astro';
 
 interface Props {
 	title: string;
+	description?: string;
+	ogImage?: string;
+	canonicalURL?: string;
 }
 
-const { title } = Astro.props;
+const {
+	title,
+	description = "FinanceAI — Plataforma inteligente de diagnóstico, optimización y salud financiera personal impulsada por IA explicable.",
+	ogImage = "/og-image.svg",
+	canonicalURL = Astro.url.href
+} = Astro.props;
+
+const siteOrigin = Astro.site ? Astro.site.toString().replace(/\/$/, '') : Astro.url.origin;
+const fullOgImageUrl = `${siteOrigin}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
 ---
 
 <!doctype html>
 <html lang="es">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="FinanceAI - Asistente Inteligente de Salud Financiera" />
+		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="canonical" href={canonicalURL} />
+
+		<!-- OpenGraph / Facebook / LinkedIn / WhatsApp -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={fullOgImageUrl} />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:url" content={canonicalURL} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={fullOgImageUrl} />
 
 		<!-- Ciberseguridad: Meta tags de protección OWASP en el cliente -->
-		<meta http-equiv="X-Content-Type-Options" content="nosniff" />
-		<meta http-equiv="X-Frame-Options" content="DENY" />
-		<meta http-equiv="X-XSS-Protection" content="1; mode=block" />
 		<meta name="referrer" content="strict-origin-when-cross-origin" />
 		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* http://127.0.0.1:* https:;" />
 
@@ -68,26 +94,25 @@ const { title } = Astro.props;
 			(function() {
 				try {
 					const saved = localStorage.getItem('theme');
-					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-					if (saved === 'dark' || (!saved && prefersDark)) {
+					if (saved === 'light') {
+						document.documentElement.classList.remove('dark');
+					} else {
 						document.documentElement.classList.add('dark');
 					}
-				} catch (e) {
-					console.warn('Proteccion de almacenamiento activada');
-				}
+				} catch (e) {}
 			})();
 		</script>
 	</head>
 	<body class="bg-gray-50 dark:bg-gray-950 min-h-screen font-sans text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300 antialiased selection:bg-blue-600 selection:text-white">
-		<!-- Toast Notification Global en Esquina Superior Derecha -->
-		<div id="globalToast" class="fixed top-5 right-5 z-[300] hidden max-w-sm w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-blue-200 dark:border-blue-900/50 shadow-2xl rounded-2xl p-4 transition-all duration-300 transform translate-y-[-20px] opacity-0 font-inter">
-			<div class="flex items-start gap-3">
-				<div id="globalToastIcon" class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl flex-shrink-0 border border-blue-100 dark:border-blue-900/40">
+		<!-- Toast Notification Global con adaptación móvil -->
+		<div id="globalToast" class="fixed top-4 right-4 sm:top-5 sm:right-5 left-4 sm:left-auto z-[300] hidden max-w-sm w-auto sm:w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-blue-200 dark:border-blue-900/50 shadow-2xl rounded-2xl p-3.5 sm:p-4 transition-all duration-300 transform translate-y-[-20px] opacity-0 font-inter">
+			<div class="flex items-start gap-2.5 sm:gap-3">
+				<div id="globalToastIcon" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg sm:text-xl flex-shrink-0 border border-blue-100 dark:border-blue-900/40">
 					
 				</div>
 				<div class="flex-1 pr-2">
-					<h4 id="globalToastTitle" class="text-sm font-bold text-gray-900 dark:text-white font-josefin">Notificación</h4>
-					<p id="globalToastMessage" class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed"></p>
+					<h4 id="globalToastTitle" class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white font-josefin">Notificación</h4>
+					<p id="globalToastMessage" class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed"></p>
 				</div>
 				<button id="btnGlobalCloseToast" class="text-gray-400 hover:text-gray-600 dark:hover:text-white text-lg font-bold">&times;</button>
 			</div>
@@ -141,7 +166,7 @@ const { title } = Astro.props;
 
 		<!-- Footer Institucional FinanceAI -->
 		<footer class="mt-auto w-full border-t border-gray-200 dark:border-gray-800/80 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md transition-colors duration-300 font-inter">
-			<div class="max-w-7xl mx-auto px-6 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
 				
 				<!-- Identidad Institucional y Copyright -->
 				<div class="flex flex-col items-center md:items-start text-center md:text-left gap-1.5">
@@ -162,7 +187,7 @@ const { title } = Astro.props;
 				</div>
 
 				<!-- Enlaces Legales y de Cumplimiento -->
-				<nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-gray-600 dark:text-gray-400" aria-label="Enlaces legales">
+				<nav class="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-xs font-medium text-gray-600 dark:text-gray-400" aria-label="Enlaces legales">
 					<a href="/terminos" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Términos de Servicio</a>
 					<a href="/privacidad" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Aviso de Privacidad</a>
 					<button type="button" class="btn-open-no-sale hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">No Venta de Datos</button>
@@ -171,28 +196,28 @@ const { title } = Astro.props;
 
 				<!-- Badges de Certificación & Seguridad Técnica -->
 				<div class="flex items-center gap-2">
-					<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-						<svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-						SSL 256-Bit
-					</span>
-					<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+					<button type="button" class="btn-open-owasp inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition cursor-pointer" title="Ver evidencias de cumplimiento OWASP">
+						<svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+						OWASP Top 10
+					</button>
+					<button type="button" class="btn-open-ai-ethics inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition cursor-pointer" title="Ver gobernanza y auditoría de IA">
 						<svg class="w-3 h-3 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
 						IA Auditada
-					</span>
+					</button>
 				</div>
 			</div>
 		</footer>
 
 		<!-- Modal Glassmorphic Global Legal -->
-		<div id="globalLegalModal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-gray-900/75 backdrop-blur-md animate-fade-in font-inter">
-			<div class="bg-white dark:bg-gray-900 w-full max-w-2xl mx-4 rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[85vh] flex flex-col">
+		<div id="globalLegalModal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-gray-900/75 backdrop-blur-md animate-fade-in font-inter p-3 sm:p-4">
+			<div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[85vh] flex flex-col">
 				<!-- Header Modal -->
 				<div class="flex justify-between items-center pb-4 border-b border-gray-100 dark:border-gray-800">
 					<div>
 						<h3 id="legalModalTitle" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-josefin">Documento Legal</h3>
 						<p class="text-xs text-gray-500 dark:text-gray-400">FinanceAI &bull; Marco de Cumplimiento Normativo</p>
 					</div>
-					<button id="btnCloseLegalModal" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-3xl font-bold w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none">&times;</button>
+					<button id="btnCloseLegalModal" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl sm:text-3xl font-bold w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none">&times;</button>
 				</div>
 
 				<!-- Contenido Escroleable -->
@@ -240,7 +265,7 @@ const { title } = Astro.props;
 							<p><strong>Cumplimiento LFPDPPP (INAI) & GDPR:</strong> FinanceAI trata tus datos personales y financieros exclusivamente para emitir tus diagnósticos y gestionar tu panel.</p>
 							<p><strong>Consentimiento Expreso:</strong> Al registrarte, consientes expresamente el tratamiento de tus datos financieros bajo cifrado de alto nivel.</p>
 							<p><strong>Cero Venta de Datos:</strong> NUNCA vendemos, alquilamos ni transferimos tus datos a terceros ni agencias de publicidad comercial.</p>
-							<p><strong>Derechos ARCO:</strong> Puedes ejercer en cualquier momento tus derechos de Acceso, Rectificación, Cancelación y Oposición directamente en tu perfil o vía <code>privacidad@financeai.app</code>.</p>
+							<p><strong>Derechos ARCO:</strong> Puedes ejercer en cualquier momento tus derechos de Acceso, Rectificación, Cancelación y Oposición directamente desde el panel de perfil.</p>
 						`
 					},
 					nosell: {
@@ -250,11 +275,11 @@ const { title } = Astro.props;
 							<div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-900 dark:text-emerald-200 font-semibold mb-2">
 								Do Not Sell or Share My Personal Information
 							</div>
-							<p>En cumplimiento con la <em>California Consumer Privacy Act</em> (CCPA) y las leyes de privacidad mexicanas, FinanceAI garantiza que:</p>
+							<p>En cumplimiento con la <a href="https://oag.ca.gov/privacy/ccpa" target="_blank" rel="noopener noreferrer" class="underline font-semibold">California Consumer Privacy Act (CCPA / CPRA)</a> y las leyes mexicanas (<a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf" target="_blank" rel="noopener noreferrer" class="underline font-semibold">LFPDPPP</a>), FinanceAI garantiza que:</p>
 							<ul class="list-disc pl-5 space-y-1">
-								<li>No comercializamos tus datos con corredores de datos (*data brokers*).</li>
+								<li>No comercializamos tus datos con intermediarios ni corredores de datos (<em>data brokers</em>).</li>
 								<li>No compartimos tu información transaccional con redes de publicidad programática ni aseguradoras.</li>
-								<li>Tus datos financieros son tratados con la más alta categoría de Sensibilidad (*Sensitive Personal Information*).</li>
+								<li>Tus datos financieros son tratados con la más alta categoría de Sensibilidad (<em>Sensitive Personal Information</em>).</li>
 							</ul>
 						`
 					},
@@ -262,9 +287,28 @@ const { title } = Astro.props;
 						title: "Transparencia y Gobernanza de Inteligencia Artificial",
 						url: "/terminos",
 						html: `
-							<p><strong>1. Diagnósticos con IA Explicable (XAI):</strong> El análisis de salud financiera procesa ratios adimensionales matemáticos ($R_{GI}, R_{Ahorro}, R_{Deuda}$) garantizando neutralidad multidivisa e interpretabilidad.</p>
-							<p><strong>2. Desarrollo Asistido por IA bajo Supervisión Humana:</strong> El código y la arquitectura del sistema fueron asistidos por herramientas de IA, pero <strong>auditados, validados y testeados exhaustivamente por ingenieros de software humanos calificados</strong>.</p>
-							<p><strong>3. Intervención Humana (GDPR Art. 22):</strong> Puedes solicitar la revisión humana de cualquier diagnóstico comunicándote a <code>soporte@financeai.app</code>.</p>
+							<p><strong>1. Diagnósticos con IA Explicable (XAI):</strong> El análisis de salud financiera procesa 3 pilares clave (relación Gasto/Ingreso, Tasa de Ahorro y Nivel de Endeudamiento) conforme al <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener noreferrer" class="underline font-semibold">EU AI Act (Art. 50)</a> garantizando total neutralidad de divisa, transparencia e interpretabilidad.</p>
+							<p><strong>2. Desarrollo Asistido por IA con Supervisión Humana:</strong> Bajo los marcos éticos <a href="https://www.iso.org/standard/81230.html" target="_blank" rel="noopener noreferrer" class="underline font-semibold">ISO/IEC 42001</a> y <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer" class="underline font-semibold">NIST AI RMF</a>, las herramientas de IA empleadas en la creación de la plataforma fueron <strong>rigurosamente auditadas, supervisadas y probadas por los integrantes del equipo</strong> mediante 125 pruebas de integración.</p>
+							<p><strong>3. Explicabilidad Directa:</strong> Cada diagnóstico y recomendación que emite el sistema te explica con palabras simples y objetivas la causa de tu puntaje y los pasos prácticos para mejorar.</p>
+						`
+					},
+					owasp: {
+						title: "Evidencias Técnicas de Seguridad OWASP Top 10",
+						url: "/terminos",
+						html: `
+							<p class="mb-2">FinanceAI implementa controles verificables en su código fuente alineados con los <a href="https://owasp.org/Top10/" target="_blank" rel="noopener noreferrer" class="underline font-semibold">10 pilares oficiales del OWASP Top 10</a>:</p>
+							<ul class="list-disc pl-5 space-y-1 text-xs">
+								<li><strong><a href="https://owasp.org/Top10/A01_2021-Broken_Access_Control/" target="_blank" rel="noopener noreferrer" class="hover:underline">A01 Control de Acceso:</a></strong> Autenticación Stateless JWT por request, aislamiento estricto por <code>userId</code> y purga atómica de cuenta en cascada.</li>
+								<li><strong><a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/" target="_blank" rel="noopener noreferrer" class="hover:underline">A02 Fallas Criptográficas:</a></strong> Cifrado con <strong>BCrypt</strong> (salt dinámico), firmas HMAC-SHA256 y tokens OTP de 15 min.</li>
+								<li><strong><a href="https://owasp.org/Top10/A03_2021-Injection/" target="_blank" rel="noopener noreferrer" class="hover:underline">A03 Inyección (SQL & CLI):</a></strong> Zero SQLi (Spring Data JPA Prepared Statements) y Zero Command Injection (subprocesos sin shell vía <code>ProcessBuilder</code>).</li>
+								<li><strong><a href="https://owasp.org/Top10/A04_2021-Insecure_Design/" target="_blank" rel="noopener noreferrer" class="hover:underline">A04 Diseño Seguro:</a></strong> Validación de 5 reglas de contraseñas y clampeado defensivo de deuda (0-100%).</li>
+								<li><strong><a href="https://owasp.org/Top10/A05_2021-Security_Misconfiguration/" target="_blank" rel="noopener noreferrer" class="hover:underline">A05 Configuración Errónea:</a></strong> Secretos y credenciales protegidos en archivo único <code>.env</code> fuera de git.</li>
+								<li><strong><a href="https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/" target="_blank" rel="noopener noreferrer" class="hover:underline">A06 Componentes Seguros:</a></strong> Dependencias en versiones oficiales LTS actualizadas (Java 17 LTS, Spring Boot 3, Astro 5).</li>
+								<li><strong><a href="https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/" target="_blank" rel="noopener noreferrer" class="hover:underline">A07 Identificación:</a></strong> Integración segura con Google OAuth 2.0 y gestión de sesiones sin fuga de credenciales.</li>
+								<li><strong><a href="https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/" target="_blank" rel="noopener noreferrer" class="hover:underline">A08 Integridad de Software y Datos:</a></strong> Bean Validation estricto con Jackson y rechazo <code>HTTP 400 Bad Request</code> ante datos maliciosos.</li>
+								<li><strong><a href="https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/" target="_blank" rel="noopener noreferrer" class="hover:underline">A09 Registro y Monitoreo:</a></strong> Endpoint de disponibilidad <code>/health</code>, logging estructurado SLF4J y trazabilidad en <code>historial_analisis</code>.</li>
+								<li><strong><a href="https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/" target="_blank" rel="noopener noreferrer" class="hover:underline">A10 Protección SSRF:</a></strong> Arquitectura de red cerrada sin consumo de URLs externas arbitrarias no autorizadas.</li>
+							</ul>
 						`
 					}
 				};
@@ -301,6 +345,8 @@ const { title } = Astro.props;
 						window.openLegalModal('nosell');
 					} else if (target && target.closest('.btn-open-ai-ethics')) {
 						window.openLegalModal('ai');
+					} else if (target && target.closest('.btn-open-owasp')) {
+						window.openLegalModal('owasp');
 					}
 				});
 			})();

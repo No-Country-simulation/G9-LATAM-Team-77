@@ -9,10 +9,19 @@ if (session) {
 }
 ---
 
-<Layout title="Acceso | FinanceAI">
-	<!-- Protección de Ruta: Si ya tiene token, redirigir instantáneamente sin pintar pantalla -->
+<Layout title="Acceso | FinanceAI" description="Inicia sesión o regístrate en FinanceAI para gestionar y optimizar tu salud financiera con inteligencia artificial.">
+	<!-- Protección de Ruta: Limpiar parámetros de logout y prevenir volver atrás -->
 	<script is:inline>
 		(function() {
+			if (window.history && window.history.replaceState && window.location.search) {
+				window.history.replaceState(null, '', window.location.pathname);
+			}
+			const params = new URLSearchParams(window.location.search);
+			if (params.has('logged_out') || params.has('logout')) {
+				localStorage.clear();
+				sessionStorage.clear();
+				return;
+			}
 			if (localStorage.getItem('financeai_token')) {
 				window.location.replace('/dashboard');
 			}
@@ -35,52 +44,52 @@ if (session) {
 
 	<div class="min-h-[calc(100vh-73px)] flex flex-col lg:flex-row w-full bg-white dark:bg-gray-950 font-inter">
 		<!-- Left Panel (Dark Branding & Metrics) -->
-		<div class="lg:w-1/2 bg-[#0b132b] text-white p-10 sm:p-16 lg:p-20 flex flex-col justify-between relative overflow-hidden">
+		<div class="lg:w-1/2 bg-[#0b132b] text-white p-6 sm:p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden">
 			<!-- Glow backdrop -->
 			<div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
 			<div class="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
 			<!-- Top Dots -->
-			<div class="flex space-x-2.5 mb-12">
-				<div class="w-3 h-3 rounded-full bg-blue-500"></div>
-				<div class="w-3 h-3 rounded-full bg-red-500"></div>
-				<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+			<div class="flex space-x-2.5 mb-6 sm:mb-12">
+				<div class="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-blue-500"></div>
+				<div class="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-red-500"></div>
+				<div class="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-yellow-400"></div>
 			</div>
 
 			<!-- Center Content -->
-			<div class="my-auto py-8">
-				<h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6 font-josefin">
+			<div class="my-auto py-4 sm:py-8">
+				<h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-3 sm:mb-6 font-josefin">
 					Inteligencia<br/>financiera<br/>a tu medida.
 				</h1>
-				<p class="text-slate-300 text-lg sm:text-xl max-w-lg leading-relaxed font-normal">
+				<p class="text-slate-300 text-sm sm:text-xl max-w-lg leading-relaxed font-normal">
 					Analiza tus finanzas, clasifica tus gastos y toma decisiones estratégicas respaldadas por modelos de Machine Learning.
 				</p>
 			</div>
 			
 			<!-- Bottom Metrics -->
-			<div class="grid grid-cols-3 gap-6 pt-12 border-t border-slate-800/80">
+			<div class="grid grid-cols-3 gap-2 sm:gap-6 pt-6 sm:pt-12 border-t border-slate-800/80">
 				<div>
-					<div class="text-2xl sm:text-3xl font-bold tracking-tight text-white">$148K</div>
-					<div class="text-[11px] text-slate-400 font-semibold tracking-widest mt-1.5 uppercase">PORTAFOLIO</div>
+					<div class="text-lg sm:text-3xl font-bold tracking-tight text-white">$148K</div>
+					<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">PORTAFOLIO</div>
 				</div>
 				<div>
-					<div class="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-400">+18.4%</div>
-					<div class="text-[11px] text-slate-400 font-semibold tracking-widest mt-1.5 uppercase">RENDIMIENTO</div>
+					<div class="text-lg sm:text-3xl font-bold tracking-tight text-emerald-400">+18.4%</div>
+					<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">RENDIMIENTO</div>
 				</div>
 				<div>
-					<div class="text-2xl sm:text-3xl font-bold tracking-tight text-white">74/100</div>
-					<div class="text-[11px] text-slate-400 font-semibold tracking-widest mt-1.5 uppercase">SALUD FIN.</div>
+					<div class="text-lg sm:text-3xl font-bold tracking-tight text-white">74/100</div>
+					<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">SALUD FIN.</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- Right Panel (Auth Forms) -->
-		<div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-16 bg-white dark:bg-gray-950">
-			<div class="max-w-md w-full mx-auto space-y-6">
+		<div class="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-10 lg:p-16 bg-white dark:bg-gray-950">
+			<div class="max-w-md w-full mx-auto space-y-5 sm:space-y-6">
 				<!-- Header -->
 				<div class="text-left">
-					<h2 id="formTitle" class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-josefin">Bienvenido de nuevo</h2>
-					<p id="formSubtitle" class="text-sm text-gray-500 dark:text-gray-400 mt-1.5 font-inter">Accede a tu panel financiero con tu cuenta</p>
+					<h2 id="formTitle" class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-josefin">Bienvenido de nuevo</h2>
+					<p id="formSubtitle" class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 font-inter">Accede a tu panel financiero con tu cuenta</p>
 				</div>
 
 				<!-- Notification Alert -->
@@ -252,7 +261,7 @@ if (session) {
 						</div>
 					</div>
 
-					<button type="button" id="googleBtn" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold py-3 px-4 rounded-xl transition duration-200 text-sm shadow-sm font-inter">
+					<button type="button" id="googleBtn" onclick="window.loginWithGoogle && window.loginWithGoogle()" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold py-3 px-4 rounded-xl transition duration-200 text-sm shadow-sm font-inter cursor-pointer">
 						<svg class="w-5 h-5" viewBox="0 0 24 24">
 							<path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
 							<path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -398,15 +407,16 @@ if (session) {
 </Layout>
 
 <script>
-	document.getElementById('googleBtn')?.addEventListener('click', async () => {
+	window.loginWithGoogle = async function() {
 		try {
 			const { signIn } = await import("auth-astro/client");
-			signIn('google');
+			await signIn('google', { callbackUrl: '/dashboard' });
 		} catch (e) {
 			console.error("auth-astro no está disponible, usando fallback", e);
-			window.location.href = '/api/auth/signin/google';
+			window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard';
 		}
-	});
+	};
+	document.getElementById('googleBtn')?.addEventListener('click', window.loginWithGoogle);
 </script>
 
 <script define:vars={{ API_URL }}>

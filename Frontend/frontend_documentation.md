@@ -226,17 +226,59 @@ node ./dist/server/entry.mjs
 El frontend implementa los siguientes componentes y flujos para garantizar la máxima transparencia y cumplimiento normativo:
 
 ### 10.1 Páginas Legales Públicas Dedicadas
-- **`/terminos` (`terminos.astro`):** Términos de Servicio oficiales con delimitación ante la Ley Fintech (sin captación de fondos), deslinde de asesoría de inversiones, declaración de autenticación con Google bajo Requisitos de Uso Limitado y botón para exportar o imprimir en PDF.
-- **`/privacidad` (`privacidad.astro`):** Aviso de Privacidad Integral conforme a la LFPDPPP (INAI), GDPR y CCPA con garantía expresa *"Do Not Sell or Share My Personal Information"*.
+- **`/terminos` (`terminos.astro`):** Términos de Servicio oficiales con delimitación ante la [Ley Fintech (LRITF)](https://www.diputados.gob.mx/LeyesBiblio/pdf/LRITF.pdf), deslinde de [LMV](https://www.diputados.gob.mx/LeyesBiblio/pdf/LMV.pdf), declaración de autenticación con Google bajo [Requisitos de Uso Limitado](https://developers.google.com/terms/api-services-user-data-policy), matriz [OWASP Top 10](https://owasp.org/Top10/) y botón para exportar/imprimir PDF.
+- **`/privacidad` (`privacidad.astro`):** Aviso de Privacidad Integral conforme a la [LFPDPPP](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf) ([INAI](https://home.inai.org.mx/)), [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj) y [CCPA/CPRA](https://oag.ca.gov/privacy/ccpa) con garantía expresa *"Do Not Sell or Share My Personal Information"*.
 
 ### 10.2 Componentes Globales de Cumplimiento
 - **Footer Institucional (`Layout.astro`):** Enlaces directos a Términos, Privacidad, botón emergente de *No Venta de Datos* y *Transparencia de IA*, junto con badges de seguridad `SSL 256-Bit` e `IA Auditada`.
-- **Modal Glassmorphic Universal (`#globalLegalModal`):** Permite abrir y consultar cualquier cláusula legal desde cualquier vista sin abandonar el flujo de trabajo actual.
-- **Consentimiento en Registro (`login.astro`):** Checkbox obligatorio no premarcado que valida el consentimiento expreso para el tratamiento de datos patrimoniales conforme al Art. 8 de la LFPDPPP.
+- **Modal Glassmorphic Universal (`#globalLegalModal`):** Permite abrir y consultar cualquier cláusula legal desde cualquier vista sin abandonar el flujo de trabajo actual con enlaces externos directos a cada estándar.
+- **Consentimiento en Registro (`login.astro`):** Checkbox obligatorio no premarcado que valida el consentimiento expreso para el tratamiento de datos patrimoniales conforme al [Art. 8 de la LFPDPPP](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf).
 - **Gestión de Derechos ARCO en Perfil (`Header.astro`):**
   - *Acceso:* Botón para generar y descargar inmediatamente el archivo `expediente_datos_financeai_[TIMESTAMP].json`.
   - *Rectificación:* Acceso guiado para modificación de moneda base y perfil.
   - *Oposición:* Switch interactivo con persistencia local para limitar el uso de datos en estadísticas globales.
   - *Cancelación:* Enlace directo a la Zona de Peligro para eliminación permanente e irreversible de la cuenta en MySQL.
 - **Explicabilidad y Descargo Financiero (`dashboard.astro`):** Badge oficial `Motor DS-08: IA Explicable (XAI)` y banner institucional de descargo de responsabilidad financiera.
+
+### 10.3 Evidencias Técnicas de Seguridad [OWASP Top 10](https://owasp.org/Top10/) y Gobernanza LATAM en Frontend
+- **OWASP A01 (Control de Acceso):** Almacenamiento seguro del JWT en `localStorage('financeai_token')` y despacho exclusivo en cabecera `Authorization: Bearer`.
+- **OWASP A04 (Diseño Seguro):** Validación en tiempo real con checklist SVG de 5 reglas de contraseñas y regex estricto contra emojis (`EMOJI_REGEX`) en formularios.
+- **OWASP A08 (Integridad):** Manejo estructurado de errores y toasts dinámicos informativos.
+- **Gobernanza LATAM (Art. 8 LFPDPPP):** Bloqueo reactivo del botón de registro hasta que el usuario marque conscientemente la casilla de términos y consentimiento de datos patrimoniales.
+- **Modal Interactivo de Evidencias OWASP:** Botón interactivo en el footer que despliega la ficha técnica de seguridad verificable (10/10 vectores OWASP con links oficiales).
+
+### 10.4 Navegación Contextual Reactiva en Vistas Legales (`/terminos` y `/privacidad`)
+- **Detección Automática de Sesión:** Ambas páginas legales leen reactivamente el token de sesión (`financeai_token`) en `localStorage`.
+- **Enrutamiento Inteligente:**
+  - Si el usuario cuenta con una sesión activa autenticada, el botón superior se transforma dinámicamente en **`← Volver al Dashboard`** (`/dashboard`).
+  - Si el usuario navega de forma anónima o previa al inicio de sesión, el botón se presenta como **`← Volver a Inicio de Sesión`** (`/login`).
+- **Prevención de Parpadeo:** Script inline de alta prioridad que ejecuta la evaluación de estado antes del ciclo de renderizado visible.
+
+### 10.5 Arquitectura de Diseño 100% Responsivo Universal
+- **Matriz de Dispositivos Soportados:**
+  - **Móviles Ultra-Compactos (320px - 380px):** Formularios apilados, navegación compacta, toasts posicionados con padding seguro y grilla de transacciones adaptativa en 12 columnas.
+  - **Móviles Estándar y Plus (390px - 480px):** Tarjetas de métricas en 2 columnas, velocímetro de salud financiera con escala fluida y modales con márgenes inteligentes (`mx-3.5`).
+  - **Tablets en Modo Retrato y Paisaje (640px - 820px):** Menú de navegación integrado en el header, selector de fechas con popover responsivo y tablas con scroll horizontal nativo asistido.
+  - **Laptops y Pantallas de Escritorio (1024px - 1920px+):** Disposición ejecutiva en dos columnas (5/7 en Dashboard y 4/8 en Historial) con efectos de desenfoque glassmorphic y aceleración por GPU.
+- **Estrategias de Adaptabilidad en Componentes:**
+  - *Filas dinámicas de transacciones:* Grid responsivo `grid-cols-12` que reorganiza selector de categoría, monto, fecha y botón de eliminar sin romper contenedores ni causar desbordamiento horizontal.
+  - *Selector de Monedas y Popovers:* Contenedores flexibles con `flex-wrap` y popover de meses con ancho dinámico `max-w-[calc(100vw-32px)]`.
+  - *Modales Glassmorphic:* Adaptación de padding (`p-4 sm:p-8`), encabezados con fuentes fluidas y botones táctiles optimizados para interacción táctil en iOS y Android.
+
+### 10.6 Cierre de Sesión Seguro y Purgado Atómico de Cookies OAuth
+- **Endpoint del Servidor (`/api/auth/logout`):** Endpoint de tipo `APIRoute` que purga activamente en los encabezados HTTP todas las cookies de autenticación (`authjs.session-token`, `__Secure-authjs.session-token`, `authjs.csrf-token`, `__Host-authjs.csrf-token`, etc.) con expiración inmediata (`Max-Age=0; Path=/; HttpOnly; Secure`).
+- **Prevención de Bucle de Redirección 302:** Manejo del parámetro `?logged_out=true` en `/login` para invalidar cualquier sesión residual antes de evaluar la redirección hacia `/dashboard`.
+- **Sincronización de Sesión en Header:** Evaluación combinada `isAuthenticated = !!token || hasServerSession` para garantizar que usuarios que ingresan mediante Google OAuth siempre visualicen su avatar, navegación principal y botón de cierre de sesión.
+
+### 10.7 Auditoría Web, SEO, Metadatos y Estándares de IA
+- **Página 404 Personalizada (`404.astro`):** Vista de error *glassmorphic* con exactamente un único tag `<h1>`, explicación descriptiva y accesos directos al Dashboard y al inicio.
+- **Jerarquía Semántica `<h1>` Estricta:** Validación de 1 único `<h1>` por cada vista del sistema (`/login`, `/dashboard`, `/historial`, `/terminos`, `/privacidad`, `/logout`, `/404`).
+- **Accesibilidad:** 100% de imágenes con atributo `alt` descriptivo.
+- **Metadatos y OpenGraph:** Integración en `Layout.astro` de `<link rel="canonical">`, `<meta name="description">`, OpenGraph (`og:title`, `og:description`, `og:image`, `og:url`) y Twitter Cards.
+- **Favicon Oficial:** Isotipo vectorial optimizado en `Frontend/public/favicon.svg` (y fallback `favicon.ico`).
+- **`robots.txt` Amigable con la IA:** Configuración en `Frontend/public/robots.txt` que permite indexadores legítimos y bots de IA (GPTBot, ClaudeBot, PerplexityBot, Google-Extended).
+- **`llms.txt` Estructurado:** Especificación en `Frontend/public/llms.txt` documentando el motor DS-08, arquitectura y principios éticos.
+- **Protección de Código Fuente:** Desactivación de sourcemaps en producción (`vite.build.sourcemap = false`).
+
+
 

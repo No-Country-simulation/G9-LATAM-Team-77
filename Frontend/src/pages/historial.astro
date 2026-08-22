@@ -18,33 +18,35 @@ const OFFICIAL_RATES_TABLE = [
 ];
 ---
 
-<Layout title="Historial Financiero | FinanceAI">
+<Layout title="Historial Financiero | FinanceAI" description="Evolución temporal de transacciones, análisis de picos y fluctuaciones de flujo y conversor multidivisa en tiempo real.">
     <!-- Guardia de Protección de Ruta Seguro -->
     <script define:vars={{ hasServerSession }}>
         if (!hasServerSession && !localStorage.getItem('financeai_token')) {
             window.location.replace('/login');
         }
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted && !hasServerSession && !localStorage.getItem('financeai_token')) {
+                window.location.replace('/login');
+            }
+        });
     </script>
 
-    <!-- Chart.js CDN -->
-    <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <div class="w-full max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-6 font-inter">
+    <div class="w-full max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8 flex flex-col gap-4 sm:gap-6 font-inter">
         
         <!-- Header Section -->
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-josefin">Historial Financiero</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-josefin">Historial Financiero</h1>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Evolución temporal con picos, filtros de calendario por mes/rango y conversor multidivisa en vivo.</p>
             </div>
             
             <!-- Actions (Solo Excel y Borrar Historial) -->
-            <div class="flex items-center flex-wrap gap-2.5">
-                <button type="button" id="btnExportExcel" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer">
+            <div class="flex items-center flex-wrap gap-2 sm:gap-2.5">
+                <button type="button" id="btnExportExcel" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Exportar a Excel (.CSV)
                 </button>
-                <button type="button" id="btnOpenClearHistoryModal" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">
+                <button type="button" id="btnOpenClearHistoryModal" class="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 sm:py-2.5 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Borrar Historial
                 </button>
@@ -52,7 +54,7 @@ const OFFICIAL_RATES_TABLE = [
         </header>
 
         <!-- Barra de Conversión Rápida de Monedas y Tabla de Equivalencias -->
-        <section class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
+        <section class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
             
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div class="flex items-center gap-2.5">
@@ -121,50 +123,50 @@ const OFFICIAL_RATES_TABLE = [
         </section>
 
         <!-- KPI Summary Cards -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-3.5 sm:gap-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 </div>
                 <div>
-                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Ingresos</span>
-                    <h3 id="statTotalIngresos" class="text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
+                    <span class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Ingresos</span>
+                    <h3 id="statTotalIngresos" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+            <div class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-3.5 sm:gap-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
                 </div>
                 <div>
-                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Gastos</span>
-                    <h3 id="statTotalGastos" class="text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
+                    <span class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Gastos</span>
+                    <h3 id="statTotalGastos" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            <div class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-3.5 sm:gap-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                 </div>
                 <div>
-                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Balance Neto</span>
-                    <h3 id="statBalanceNeto" class="text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
+                    <span class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wider">Balance Neto</span>
+                    <h3 id="statBalanceNeto" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">$0</h3>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <div class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center gap-3.5 sm:gap-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 </div>
                 <div>
-                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Transacciones</span>
-                    <h3 id="statTotalTransacciones" class="text-2xl font-bold text-gray-900 dark:text-white">0</h3>
+                    <span class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wider">Transacciones</span>
+                    <h3 id="statTotalTransacciones" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">0</h3>
                 </div>
             </div>
         </section>
 
         <!-- FILTROS AVANZADOS DEL HISTÓRICO (Ubicado Arriba con Calendario Personalizado) -->
-        <section class="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
+        <section class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-3">
                 <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
@@ -173,13 +175,13 @@ const OFFICIAL_RATES_TABLE = [
                 <div class="flex items-center gap-3">
                     <button type="button" id="btnShowAllTxns" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                        Ver Todas las Transacciones Juntas
+                        Ver Todas
                     </button>
                     <button type="button" id="btnResetFilters" class="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white cursor-pointer">Restablecer</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3 text-xs">
                 
                 <!-- 1. Selector de Mes Personalizado Glassmorphic -->
                 <div class="relative">
@@ -187,12 +189,12 @@ const OFFICIAL_RATES_TABLE = [
                         Seleccionar Mes
                     </label>
                     <button type="button" id="btnCustomMonthTrigger" class="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-medium text-left focus:ring-2 focus:ring-blue-500 outline-none transition">
-                        <span id="customMonthDisplay">Todos los Meses</span>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span id="customMonthDisplay" class="truncate">Todos los Meses</span>
+                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </button>
 
                     <!-- Popover Desplegable de Meses (Modo Claro / Oscuro) -->
-                    <div id="customMonthDropdown" class="hidden absolute top-full left-0 mt-2 z-50 w-72 bg-white dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200 dark:border-gray-700 shadow-2xl rounded-2xl p-4 animate-scale-in">
+                    <div id="customMonthDropdown" class="hidden absolute top-full left-0 mt-2 z-50 w-64 sm:w-72 max-w-[calc(100vw-32px)] bg-white dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200 dark:border-gray-700 shadow-2xl rounded-2xl p-4 animate-scale-in">
                         <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-3">
                             <button type="button" id="btnPrevYear" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition">&lt;</button>
                             <span id="customYearLabel" class="font-bold text-sm text-gray-900 dark:text-white font-josefin">2026</span>
@@ -243,48 +245,48 @@ const OFFICIAL_RATES_TABLE = [
         </section>
 
         <!-- GRÁFICA MULTI-LÍNEA CON PICOS Y FLUCTUACIONES TEMPORALES -->
-        <section class="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
+        <section class="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
             <div class="border-b border-gray-100 dark:border-gray-800 pb-3">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white font-josefin flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
                     Evolución Comparativa y Fluctuación de Flujos
                 </h2>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Líneas de gastos, necesidades, estilo de vida e ingresos con picos y valles temporales.</p>
             </div>
 
             <!-- Canvas de la Gráfica de Picos -->
-            <div class="h-72 w-full relative">
+            <div class="h-60 sm:h-72 w-full relative">
                 <canvas id="multiLinePeaksChart"></canvas>
             </div>
         </section>
 
         <!-- Gráfica de Distribución por Categoría y Tabla de Transacciones -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
             
             <!-- Donut Categorías (4 Cols) -->
-            <div class="lg:col-span-4 bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+            <div class="lg:col-span-4 bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
                 <h3 class="text-sm font-bold text-gray-900 dark:text-white font-josefin mb-3">Distribución por Categorías</h3>
-                <div class="h-56 relative flex items-center justify-center">
+                <div class="h-48 sm:h-56 relative flex items-center justify-center">
                     <canvas id="categoryDonutChart"></canvas>
                 </div>
                 <div id="categoryLegend" class="mt-4 space-y-1.5 text-xs max-h-32 overflow-y-auto pr-1"></div>
             </div>
 
             <!-- Tabla de Transacciones (8 Cols) -->
-            <div class="lg:col-span-8 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
-                <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <div class="lg:col-span-8 bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+                <div class="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
                     <h3 class="text-sm font-bold text-gray-900 dark:text-white font-josefin">Movimientos Registrados</h3>
                     <span id="txFilteredCount" class="text-xs text-gray-500">Mostrando 0 transacciones</span>
                 </div>
 
                 <div class="overflow-x-auto flex-grow max-h-[380px] overflow-y-auto">
                     <table class="w-full text-left text-xs">
-                        <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-500 font-semibold border-b border-gray-100 dark:border-gray-800 sticky top-0">
+                        <thead class="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="p-3.5">Fecha</th>
-                                <th class="p-3.5">Descripción</th>
-                                <th class="p-3.5">Categoría</th>
-                                <th class="p-3.5 text-right">Monto</th>
+                                <th class="p-3.5 bg-gray-100 dark:bg-gray-900">Fecha</th>
+                                <th class="p-3.5 bg-gray-100 dark:bg-gray-900">Descripción</th>
+                                <th class="p-3.5 bg-gray-100 dark:bg-gray-900">Categoría</th>
+                                <th class="p-3.5 text-right bg-gray-100 dark:bg-gray-900">Monto</th>
                             </tr>
                         </thead>
                         <tbody id="txTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/60">
@@ -321,6 +323,11 @@ const OFFICIAL_RATES_TABLE = [
         </div>
     </div>
 </Layout>
+
+<script>
+    import Chart from 'chart.js/auto';
+    (window as any).Chart = Chart;
+</script>
 
 <script define:vars={{ API_URL }}>
     // Moneda base predeterminada en perfil

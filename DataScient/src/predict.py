@@ -731,6 +731,12 @@ def predict(input_json: str) -> str:
             for c in consejos_categorias:
                 recomendaciones_finales.append(c)
 
+            if total_gastos > ingreso_mensual and ingreso_mensual > 0:
+                deficit = total_gastos - ingreso_mensual
+                pct_deficit = round(((total_gastos / ingreso_mensual) * 100.0) - 100.0, 0)
+                if tasa_deuda_pct <= 0.0:
+                    recomendaciones_finales.append(f"Aviso de Endeudamiento vs Déficit: No registras pasivos crediticios fijos (0% de deuda formal), pero presentas un déficit operativo de {deficit:.2f} {moneda} (+{pct_deficit:.0f}% sobre tus ingresos) que se absorbe mediante fondos previos.")
+
             return json.dumps({
                 "status": "success",
                 "score_financiero": round(score_total, 0),

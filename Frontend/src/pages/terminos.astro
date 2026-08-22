@@ -2,41 +2,41 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Términos y Condiciones de Uso — FinanceAI">
-	<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto font-inter text-gray-800 dark:text-gray-200">
+<Layout title="Términos y Condiciones de Uso — FinanceAI" description="Términos y condiciones contractuales de uso de la plataforma FinanceAI. Descargo de responsabilidad financiera y gobernanza de IA.">
+	<div class="min-h-screen py-8 sm:py-12 px-3.5 sm:px-6 lg:px-8 max-w-5xl mx-auto font-inter text-gray-800 dark:text-gray-200">
 		
 		<!-- Encabezado Principal -->
-		<div class="text-center mb-12 animate-fade-in">
+		<div class="text-center mb-8 sm:mb-12 animate-fade-in">
 			<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 mb-4">
 				<svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
 				</svg>
 				<span>Documento Legal Oficial &bull; Versión 2026.1</span>
 			</div>
-			<h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white font-josefin tracking-tight">
+			<h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white font-josefin tracking-tight">
 				Términos y Condiciones de Uso
 			</h1>
-			<p class="mt-3 text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+			<p class="mt-2.5 sm:mt-3 text-xs sm:text-base text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
 				Contrato de adhesión vinculante aplicable a todos los usuarios de la plataforma FinanceAI.
 			</p>
-			<p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
+			<p class="mt-1 text-[11px] sm:text-xs text-gray-400 dark:text-gray-500">
 				<strong>Última actualización y entrada en vigor:</strong> 22 de agosto de 2026
 			</p>
 		</div>
 
 		<!-- Cuadro de Alerta Importante (Disclaimer Resumido) -->
-		<div class="p-5 sm:p-6 mb-10 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-3xl text-left shadow-sm">
-			<div class="flex items-start gap-4">
-				<div class="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+		<div class="p-4 sm:p-6 mb-8 sm:mb-10 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-2xl sm:rounded-3xl text-left shadow-sm">
+			<div class="flex items-start gap-3.5 sm:gap-4">
+				<div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 flex items-center justify-center flex-shrink-0 mt-0.5">
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
 					</svg>
 				</div>
 				<div class="space-y-1">
-					<h3 class="text-sm font-bold text-amber-900 dark:text-amber-200 font-josefin">
+					<h3 class="text-xs sm:text-sm font-bold text-amber-900 dark:text-amber-200 font-josefin">
 						Aviso Esencial de No Asesoramiento Financiero Regulado
 					</h3>
-					<p class="text-xs text-amber-800/90 dark:text-amber-300/80 leading-relaxed">
+					<p class="text-[11px] sm:text-xs text-amber-800/90 dark:text-amber-300/80 leading-relaxed">
 						FinanceAI es una plataforma tecnológica de software para la <strong>simulación, diagnóstico estadístico y educación en finanzas personales</strong>. No es una institución bancaria, no capta fondos del público y no emite recomendaciones de inversión fiduciaria ni asesoramiento fiscal o legal regulado.
 					</p>
 				</div>
@@ -44,21 +44,35 @@ import Layout from '../layouts/Layout.astro';
 		</div>
 
 		<!-- Botones de Acción Rápida -->
-		<div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-gray-200 dark:border-gray-800 text-xs">
-			<div class="flex items-center gap-2">
-				<a href="/login" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl transition font-semibold">
+		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 mb-6 sm:mb-8 border-b border-gray-200 dark:border-gray-800 text-xs">
+			<div class="flex flex-wrap items-center gap-2">
+				<a id="btnBackNavTerminos" href="/login" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl transition font-semibold">
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-					Volver a Inicio de Sesión
+					<span id="btnBackNavTextTerminos">Volver a Inicio de Sesión</span>
 				</a>
-				<a href="/privacidad" class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-xl transition font-semibold">
+				<a href="/privacidad" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-xl transition font-semibold">
 					Ver Aviso de Privacidad
 				</a>
 			</div>
-			<button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 text-gray-700 dark:text-gray-300 rounded-xl transition font-semibold shadow-sm">
+			<button type="button" onclick="window.print()" class="inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 text-gray-700 dark:text-gray-300 rounded-xl transition font-semibold shadow-sm">
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
 				Imprimir / Guardar PDF
 			</button>
 		</div>
+
+		<script is:inline>
+			(function() {
+				try {
+					const token = localStorage.getItem('financeai_token');
+					if (token) {
+						const btn = document.getElementById('btnBackNavTerminos');
+						const txt = document.getElementById('btnBackNavTextTerminos');
+						if (btn) btn.href = '/dashboard';
+						if (txt) txt.textContent = 'Volver al Dashboard';
+					}
+				} catch (e) {}
+			})();
+		</script>
 
 		<!-- Contenido Legal Detallado -->
 		<div class="space-y-10 text-left leading-relaxed text-sm">
@@ -90,10 +104,10 @@ import Layout from '../layouts/Layout.astro';
 					<strong>2.1. Alcance Exclusivamente Analítico y Educativo:</strong> FinanceAI proporciona un entorno tecnológico orientado al registro ordenado de ingresos y egresos, visualización analítica histórica, conversión multidivisa y diagnósticos orientativos de salud financiera basados en la metodología 50-30-20.
 				</p>
 				<p>
-					<strong>2.2. Exclusión Formal de la Ley Fintech (LRITF):</strong> FinanceAI <strong>NO es una Institución de Tecnología Financiera (ITF)</strong>, no es una plataforma de financiamiento colectivo (Crowdfunding), no es una institución de fondos de pago electrónico (Wallet digital) ni un modelo novedoso (Sandbox). La Plataforma <strong>no capta recursos financieros del público, no custodia fondos, no ejecuta transferencias bancarias y no emite dinero electrónico</strong>.
+					<strong>2.2. Exclusión Formal de la Ley Fintech:</strong> En apego a la <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LRITF.pdf" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">Ley para Regular las Instituciones de Tecnología Financiera (LRITF)</a>, FinanceAI <strong>NO es una Institución de Tecnología Financiera (ITF)</strong>, no es una plataforma de financiamiento colectivo (Crowdfunding), no es una institución de fondos de pago electrónico (Wallet digital) ni un modelo novedoso (Sandbox). La Plataforma <strong>no capta recursos financieros del público, no custodia fondos, no ejecuta transferencias bancarias y no emite dinero electrónico</strong>.
 				</p>
 				<p>
-					<strong>2.3. Exclusión de Asesoría en Inversiones (Ley del Mercado de Valores - Arts. 224 y 225):</strong> Los scores, gráficos y diagnósticos no representan asesoramiento financiero personalizado, bursátil, contable ni fiscal. Cualquier decisión patrimonial es adoptada bajo el criterio y riesgo exclusivo del Usuario.
+					<strong>2.3. Exclusión de Asesoría en Inversiones:</strong> Conforme a la <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LMV.pdf" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">Ley del Mercado de Valores (Arts. 224 y 225)</a>, los scores, gráficos y diagnósticos no representan asesoramiento financiero personalizado, bursátil, contable ni fiscal. Cualquier decisión patrimonial es adoptada bajo el criterio y riesgo exclusivo del Usuario.
 				</p>
 			</section>
 
@@ -124,10 +138,10 @@ import Layout from '../layouts/Layout.astro';
 					4. Declaración de Transparencia sobre Inteligencia Artificial (EU AI Act & NIST)
 				</h2>
 				<p>
-					<strong>4.1. Diagnósticos y Algoritmos de Machine Learning:</strong> El cálculo del score financiero (0 a 100) y la categorización automática se efectúan mediante modelos estadísticos y algoritmos de Machine Learning (Scikit-Learn). El Usuario tiene derecho a conocer los ratios que componen su resultado (gastos vs. ingresos, nivel de endeudamiento y tasa de ahorro).
+					<strong>4.1. Diagnósticos y Algoritmos de Machine Learning:</strong> El cálculo del score financiero (0 a 100) y la categorización automática se efectúan mediante modelos estadísticos y algoritmos de Machine Learning (Scikit-Learn). En concordancia con el <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">Reglamento de Inteligencia Artificial de la UE (EU AI Act Art. 50)</a>, el Usuario tiene derecho a conocer los ratios que componen su resultado (gastos vs. ingresos, nivel de endeudamiento y tasa de ahorro).
 				</p>
 				<p>
-					<strong>4.2. Desarrollo Asistido por IA bajo Supervisión Humana:</strong> En cumplimiento de los estándares internacionales de ingeniería ética (ISO/IEC 42001), se declara de forma transparente que durante el ciclo de vida del software se utilizaron herramientas de desarrollo asistidas por IA. <strong>Todo el código, arquitectura y seguridad han sido rigurosamente auditados, testeados (125 pruebas de integración) y validados por ingenieros de software humanos calificados</strong>.
+					<strong>4.2. Desarrollo Asistido por IA bajo Supervisión Humana:</strong> En cumplimiento de los marcos internacionales de gobernanza ética <a href="https://www.iso.org/standard/81230.html" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">ISO/IEC 42001</a> y <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">NIST AI RMF 1.0</a>, se declara de forma transparente que durante el ciclo de vida del software se utilizaron herramientas de desarrollo asistidas por IA. <strong>Todo el código, arquitectura y seguridad han sido rigurosamente auditados, testeados (125 pruebas de integración) y validados por los integrantes del equipo</strong>.
 				</p>
 			</section>
 
@@ -137,7 +151,7 @@ import Layout from '../layouts/Layout.astro';
 					5. Garantía Expresa de Cero Comercialización de Datos (Do Not Sell)
 				</h2>
 				<p>
-					FinanceAI establece una <strong>garantía expresa e irrevocable de no venta de datos</strong>:
+					En concordancia con la <a href="https://oag.ca.gov/privacy/ccpa" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">California Consumer Privacy Act (CCPA / CPRA)</a>, FinanceAI establece una <strong>garantía expresa e irrevocable de no venta de datos</strong>:
 				</p>
 				<div class="p-4 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl">
 					<p class="text-xs text-emerald-900 dark:text-emerald-200 font-semibold leading-relaxed">
@@ -165,24 +179,134 @@ import Layout from '../layouts/Layout.astro';
 					7. Ley Aplicable, PROFECO y Jurisdicción
 				</h2>
 				<p>
-					Los presentes Términos se rigen por las leyes federales de los <strong>Estados Unidos Mexicanos</strong> (Código de Comercio, Código Civil Federal y Ley Federal de Protección al Consumidor).
+					Los presentes Términos se rigen por las leyes federales de los <strong>Estados Unidos Mexicanos</strong> (Código de Comercio, Código Civil Federal y <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPC.pdf" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">Ley Federal de Protección al Consumidor</a>).
 				</p>
 				<p>
-					Para la resolución de cualquier discrepancia, las partes se someten a la vía conciliatoria ante la <strong>Procuraduría Federal del Consumidor (PROFECO)</strong> y a la jurisdicción de los tribunales competentes de la Ciudad de México, renunciando a cualquier otro fuero que pudiera corresponderles por razón de sus domicilios presentes o futuros.
+					Para la resolución de cualquier discrepancia, las partes se someten a la vía conciliatoria ante la <a href="https://www.profeco.gob.mx/" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">Procuraduría Federal del Consumidor (PROFECO)</a> y a la jurisdicción de los tribunales competentes de la Ciudad de México, renunciando a cualquier otro fuero que pudiera corresponderles por razón de sus domicilios presentes o futuros.
 				</p>
 			</section>
 
-			<!-- Canales de Contacto Oficial -->
-			<section class="p-6 bg-gray-50 dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 space-y-2">
-				<h3 class="text-base font-bold text-gray-900 dark:text-white font-josefin">
-					Canales de Contacto y Dudas Legales
-				</h3>
-				<p class="text-xs text-gray-600 dark:text-gray-400">
-					Para consultas relacionadas con estos Términos y Condiciones o el funcionamiento de la plataforma:
-				</p>
-				<p class="text-xs font-semibold text-blue-600 dark:text-blue-400">
-					Correo electrónico de soporte: <a href="mailto:soporte@financeai.app" class="underline">soporte@financeai.app</a> &bull; Privacidad: <a href="mailto:privacidad@financeai.app" class="underline">privacidad@financeai.app</a>
-				</p>
+			<!-- Cláusula 8: Respaldo Técnico de Seguridad OWASP y Privacidad -->
+			<section class="space-y-4 p-6 bg-gray-50 dark:bg-gray-900/60 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm">
+				<div class="flex items-center gap-2.5 pb-2 border-b border-gray-200 dark:border-gray-800">
+					<div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+					</div>
+					<div>
+						<h2 class="text-base font-bold text-gray-900 dark:text-white font-josefin">
+							8. Declaración de Cumplimiento Técnico <a href="https://owasp.org/Top10/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 underline hover:opacity-80">OWASP Top 10</a> y Gobernanza LATAM
+						</h2>
+						<p class="text-xs text-gray-500 dark:text-gray-400">
+							Evidencias técnicas y arquitectónicas verificables en el código fuente de la plataforma.
+						</p>
+					</div>
+				</div>
+
+				<!-- Bloque 1: OWASP Top 10 en Grid de 2 Columnas -->
+				<div class="space-y-2.5 pt-1">
+					<div class="flex items-center justify-between">
+						<h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-josefin flex items-center gap-1.5">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+							Estándares Oficiales de Ciberseguridad <a href="https://owasp.org/Top10/" target="_blank" rel="noopener noreferrer" class="underline">OWASP Top 10</a> (10 de 10)
+						</h3>
+						<a href="https://owasp.org/Top10/" target="_blank" rel="noopener noreferrer" class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+							Ver estándar oficial OWASP &rarr;
+						</a>
+					</div>
+					
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A01</span>
+							<a href="https://owasp.org/Top10/A01_2021-Broken_Access_Control/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Control de Acceso:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Autenticación Stateless JWT por request, aislamiento de transacciones por <code>userId</code> y purga atómica de cuenta.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A02</span>
+							<a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Fallas Criptográficas:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Cifrado de contraseñas con <strong>BCrypt</strong> (salt dinámico), firmas HMAC-SHA256 y tokens OTP de 15 min.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A03</span>
+							<a href="https://owasp.org/Top10/A03_2021-Injection/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Inyección (SQL & CLI):</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Zero SQLi mediante JPA Prepared Statements y subprocesos estructurados vía <code>ProcessBuilder</code> (sin shells).</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A04</span>
+							<a href="https://owasp.org/Top10/A04_2021-Insecure_Design/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Diseño Seguro:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Validación de 5 reglas de contraseñas, bloqueo de emojis y clampeado defensivo de endeudamiento (0-100%).</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A05</span>
+							<a href="https://owasp.org/Top10/A05_2021-Security_Misconfiguration/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Configuración de Seguridad:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Centralización de secretos y credenciales en archivo único <code>.env</code> fuera de control de versiones.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A06</span>
+							<a href="https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Componentes Seguros:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Stack actualizado sobre versiones oficiales LTS vigentes (Java 17 LTS, Spring Boot 3, Astro 5).</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A07</span>
+							<a href="https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Identificación y Autenticación:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Google OAuth 2.0 seguro con emisión de credenciales propias sin exposición de tokens de terceros.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A08</span>
+							<a href="https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Integridad de Software y Datos:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Bean Validation estricto con Jackson y rechazo <code>HTTP 400 Bad Request</code> ante tipos de datos inválidos.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A09</span>
+							<a href="https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Registro y Monitoreo:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Endpoint de disponibilidad <code>/health</code>, logging SLF4J y trazabilidad en tabla <code>historial_analisis</code>.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<span class="inline-block px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-[10px] mr-1">A10</span>
+							<a href="https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/" target="_blank" rel="noopener noreferrer" class="text-gray-900 dark:text-white font-bold hover:text-blue-600 underline">Protección contra SSRF:</a>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">Arquitectura de red cerrada que bloquea la ejecución de peticiones HTTP externas no autorizadas.</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Bloque 2: Gobernanza LATAM en Cards Limpias -->
+				<div class="space-y-2.5 pt-2 border-t border-gray-200 dark:border-gray-800">
+					<h3 class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-josefin flex items-center gap-1.5">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+						Gobernanza de Privacidad y Cumplimiento Normativo
+					</h3>
+					
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf" target="_blank" rel="noopener noreferrer" class="text-emerald-700 dark:text-emerald-400 font-bold block mb-1 hover:underline">
+								Consentimiento Art. 8 LFPDPPP &rarr;
+							</a>
+							<p class="text-gray-600 dark:text-gray-400">Casilla obligatoria no premarcada para datos financieros antes de cualquier persistencia.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<a href="https://oag.ca.gov/privacy/ccpa" target="_blank" rel="noopener noreferrer" class="text-emerald-700 dark:text-emerald-400 font-bold block mb-1 hover:underline">
+								Garantía "Do Not Sell" &rarr;
+							</a>
+							<p class="text-gray-600 dark:text-gray-400">Prohibición contractual de venta o cesión de datos a corredores (data brokers) o redes publicitarias.</p>
+						</div>
+
+						<div class="p-3 bg-white dark:bg-gray-950/50 rounded-xl border border-gray-200/80 dark:border-gray-800">
+							<a href="https://home.inai.org.mx/" target="_blank" rel="noopener noreferrer" class="text-emerald-700 dark:text-emerald-400 font-bold block mb-1 hover:underline">
+								Autoservicio Derechos ARCO &rarr;
+							</a>
+							<p class="text-gray-600 dark:text-gray-400">Descarga directa de expediente en <code>.JSON</code>, oposición y purga permanente de cuenta en MySQL.</p>
+						</div>
+					</div>
+				</div>
 			</section>
 
 		</div>

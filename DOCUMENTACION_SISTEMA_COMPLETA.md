@@ -80,6 +80,7 @@ flowchart TD
     - ❌ *Errores de autenticación o código OTP inválido*
     - 📡 *Fallo de conexión o indisponibilidad de backend*
     - 🗑️ *Vaciado y eliminación completa de historial de transacciones*
+- **Navegación Contextual Reactiva en Vistas Legales (`/terminos` y `/privacidad`):** Detección en tiempo real de sesión en `localStorage` para adaptar el botón superior entre `← Volver al Dashboard` (usuarios logueados) y `← Volver a Inicio de Sesión` (usuarios públicos).
 - **Flujo Seguro de Recuperación de Contraseña (3 Pasos):**
   - **Paso 1 (Solicitud):** Envío de correo a `POST /api/v1/auth/forgot-password` para recibir token temporal JWT firmado con expiración de 15 minutos + envío simultáneo de código OTP vía Nodemailer.
   - **Paso 2 (Validación OTP):** Comprobación en cliente del código de 6 dígitos.
@@ -125,22 +126,33 @@ flowchart TD
 ---
 
 ### 2.4 Cumplimiento Normativo, Privacidad y Gobernanza de IA
-- **Marco Legal Mexicano (LFPDPPP & INAI):**
+- **Marco Legal Mexicano ([LFPDPPP](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf) & [INAI](https://home.inai.org.mx/)):**
   - Consentimiento expreso en el formulario de registro (`login.astro`) para datos financieros y patrimoniales (Art. 8).
-  - Delimitación expresa ante la Ley Fintech (sin captación ni custodia) y LMV (sin asesoría de inversión fiduciaria).
-- **Normativa Internacional (GDPR & CCPA/CPRA):**
+  - Delimitación expresa ante la [Ley Fintech (LRITF)](https://www.diputados.gob.mx/LeyesBiblio/pdf/LRITF.pdf) (sin captación ni custodia) y [LMV](https://www.diputados.gob.mx/LeyesBiblio/pdf/LMV.pdf) (sin asesoría de inversión fiduciaria).
+- **Normativa Internacional ([GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj) & [CCPA/CPRA](https://oag.ca.gov/privacy/ccpa)):**
   - Garantía expresa *"Do Not Sell or Share My Personal Information"*: Prohibición absoluta de venta o compartición de datos con corredores de datos (*data brokers*) o redes de publicidad.
   - Art. 22 GDPR: Derecho a la explicabilidad algorítmica y revisión humana (*Human-in-the-loop*).
   - Art. 17 GDPR: Derecho al Olvido y purga atómica de datos en MySQL (`DELETE /api/v1/users/profile`).
 - **Política de Datos de Usuario de Google OAuth2:**
-  - El acceso mediante Google Sign-In se apega irrestrictamente a la *Política de Datos de Usuario de los Servicios de la API de Google* y sus requisitos de Uso Limitado. No se leen correos, archivos de Google Drive ni datos de pago de Google.
+  - El acceso mediante Google Sign-In se apega irrestrictamente a la [Política de Datos de Usuario de los Servicios de la API de Google](https://developers.google.com/terms/api-services-user-data-policy) y sus requisitos de Uso Limitado. No se leen correos, archivos de Google Drive ni datos de pago de Google.
 - **Módulo de Derechos ARCO en Perfil (`Header.astro`):**
   - **Acceso:** Exportación y descarga directa en el navegador de un archivo `.JSON` estructurado con todo el expediente financiero del usuario.
   - **Rectificación:** Modificación instantánea de perfil y divisa base.
   - **Oposición:** Switch interactivo con persistencia local para limitar el uso de datos en estadísticas globales.
   - **Cancelación:** Enlace directo a la Zona de Peligro para eliminación permanente de la cuenta.
-- **Gobernanza de Inteligencia Artificial (ISO/IEC 42001 & NIST AI RMF):**
-  - Declaración transparente de desarrollo asistido por IA bajo estricta supervisión, auditoría y pruebas por ingenieros de software humanos.
+- **Gobernanza de Inteligencia Artificial ([ISO/IEC 42001](https://www.iso.org/standard/81230.html) & [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)):**
+  - Declaración transparente de desarrollo asistido por IA bajo estricta supervisión, auditoría y pruebas por los integrantes del equipo.
+- **Evidencias Técnicas de Seguridad [OWASP Top 10](https://owasp.org/Top10/) (10 de 10):**
+  - *A01 Control de Acceso:* Token JWT por petición y aislamiento por `userId`.
+  - *A02 Criptografía:* Hashing **BCrypt**, firmas HMAC-SHA256 y tokens OTP temporales (15 min).
+  - *A03 Inyección:* Zero SQLi (Spring Data JPA Prepared Statements) y Zero Command Injection (`ProcessBuilder` estructurado).
+  - *A04 Diseño Inseguro:* Validación de 5 reglas de complejidad de contraseñas y clampeado defensivo de deuda ($0-100\%$).
+  - *A05 Configuración:* Credenciales centralizadas en `.env` fuera de control de versiones.
+  - *A06 Componentes Seguros:* Versiones oficiales LTS actualizadas (Java 17 LTS, Spring Boot 3, Astro 5).
+  - *A07 Autenticación:* Google OAuth 2.0 seguro sin exposición de tokens de terceros.
+  - *A08 Integridad:* Bean Validation estricto con Jackson y respuesta `HTTP 400 Bad Request` ante datos maliciosos.
+  - *A09 Registro y Monitoreo:* Endpoint de salud `/health` y logging transaccional en base de datos.
+  - *A10 Protección SSRF:* Arquitectura de red cerrada sin consumo de URLs externas arbitrarias.
 - **Deslinde Financiero (Financial Disclaimer):**
   - Banner en `dashboard.astro` aclarando que FinanceAI es una herramienta educativa y que los diagnósticos no constituyen asesoría financiera vinculante.
 
