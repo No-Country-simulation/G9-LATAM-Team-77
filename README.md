@@ -70,4 +70,4 @@ Usa el inicializador unificado que preparará las bases de datos y lanzará los 
 
 ## Licencia y Equipo
 Construido con dedicación por el **G9-LATAM-Team-77**.
-*Fernando (Frontend) · Justin (Backend) · Jonathan (DevOps/DS)*
+
