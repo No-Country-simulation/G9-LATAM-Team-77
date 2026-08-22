@@ -8,11 +8,13 @@ import com.financeia.financeia_backend.entity.Moneda;
 import com.financeia.financeia_backend.entity.Pais;
 import com.financeia.financeia_backend.entity.Role;
 import com.financeia.financeia_backend.entity.User;
+import com.financeia.financeia_backend.exception.ApiException;
 import com.financeia.financeia_backend.repository.MonedaRepository;
 import com.financeia.financeia_backend.repository.PaisRepository;
 import com.financeia.financeia_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,14 +29,14 @@ public class AuthService {
     public RegistroResponse register(RegistroRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("El correo ya está registrado");
+            throw new ApiException(HttpStatus.CONFLICT, "El correo ya está registrado");
         }
 
         Pais pais = paisRepository.findById(request.paisId())
-                .orElseThrow(() -> new RuntimeException("País no encontrado"));
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "País no encontrado"));
 
         Moneda moneda = monedaRepository.findById(request.monedaId())
-                .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Moneda no encontrada"));
 
         User user = new User();
 
@@ -56,10 +58,10 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new RuntimeException("Credenciales inválidas");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
         }
 
         String token = jwtService.generateToken(user.getEmail());

@@ -2,9 +2,13 @@ package com.financeia.financeia_backend.controllers;
 
 import com.financeia.financeia_backend.dto.auth.LoginRequest;
 import com.financeia.financeia_backend.dto.auth.LoginResponse;
+import com.financeia.financeia_backend.dto.auth.ForgotPasswordRequest;
+import com.financeia.financeia_backend.dto.auth.MessageResponse;
 import com.financeia.financeia_backend.dto.auth.RegistroRequest;
 import com.financeia.financeia_backend.dto.auth.RegistroResponse;
+import com.financeia.financeia_backend.dto.auth.ResetPasswordRequest;
 import com.financeia.financeia_backend.service.AuthService;
+import com.financeia.financeia_backend.service.PasswordResetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -21,12 +25,15 @@ class AuthControllerTest {
     @Mock
     private AuthService authService;
 
+    @Mock
+    private PasswordResetService passwordResetService;
+
     private AuthController authController;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        authController = new AuthController(authService);
+        authController = new AuthController(authService, passwordResetService);
     }
 
 
@@ -90,6 +97,30 @@ class AuthControllerTest {
         assertEquals(1L, result.getBody().userId());
         assertEquals("Juan", result.getBody().nombre());
         assertEquals("juan@gmail.com", result.getBody().email());
+    }
+
+    @Test
+    void deberiaSolicitarRecuperacionConRespuestaGenerica() {
+        ForgotPasswordRequest request = new ForgotPasswordRequest("ana@test.com");
+        MessageResponse response = new MessageResponse(PasswordResetService.FORGOT_PASSWORD_RESPONSE);
+        when(passwordResetService.requestPasswordReset(request)).thenReturn(response);
+
+        ResponseEntity<MessageResponse> result = authController.forgotPassword(request);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(PasswordResetService.FORGOT_PASSWORD_RESPONSE, result.getBody().message());
+    }
+
+    @Test
+    void deberiaRestablecerConToken() {
+        ResetPasswordRequest request = new ResetPasswordRequest("token-seguro", "NuevaClave#2026");
+        MessageResponse response = new MessageResponse(PasswordResetService.RESET_PASSWORD_RESPONSE);
+        when(passwordResetService.resetPassword(request)).thenReturn(response);
+
+        ResponseEntity<MessageResponse> result = authController.resetPassword(request);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(PasswordResetService.RESET_PASSWORD_RESPONSE, result.getBody().message());
     }
 
 

@@ -1,0 +1,498 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+
+let backendStatus = "Desconectado";
+try {
+    const response = await fetch("http://localhost:8080/api/v1/health");
+    if (response.ok) {
+        const data = await response.json();
+        backendStatus = data.status === "UP" ? "Conectado al Backend" : "Error";
+    }
+} catch (e) {
+    backendStatus = "Backend offline";
+}
+---
+
+<Layout title="Dashboard | FinanceAl">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" is:inline></script>
+
+    <div class="w-full max-w-7xl mx-auto p-6 md:p-8">
+
+        <!-- Page header -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard de AnÃ¡lisis</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Prueba interactiva del modelo de Inteligencia Artificial.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                 PANEL IZQUIERDO â€” Formulario
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm flex flex-col h-full transition-colors duration-300">
+                <h2 class="text-xl font-bold mb-5 text-gray-900 dark:text-white">Datos del Cliente</h2>
+
+                <form id="analisisForm" class="flex flex-col flex-grow gap-6">
+
+                    <!-- Fila 1: Ingreso + moneda, Endeudamiento, Frecuencia -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <!-- Ingreso + selector de moneda -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wide">Ingreso Mensual</label>
+                            <div class="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-blue-500">
+                                <select id="moneda"
+                                    class="px-2 py-2 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-700 focus:outline-none cursor-pointer">
+                                    <option value="USD">USD</option>
+                                    <option value="MXN">MXN</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="ARS">ARS</option>
+                                    <option value="COP">COP</option>
+                                    <option value="CLP">CLP</option>
+                                    <option value="BRL">BRL</option>
+                                    <option value="PEN">PEN</option>
+                                    <option value="GTQ">GTQ</option>
+                                    <option value="BOB">BOB</option>
+                                </select>
+                                <input type="number" id="ingreso" value="4500"
+                                    class="w-full px-3 py-2 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none"
+                                    placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        <!-- Endeudamiento -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wide">Endeudamiento (%)</label>
+                            <input type="number" id="deuda" value="25" min="0" max="100"
+                                class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                        </div>
+
+                        <!-- Frecuencia Ahorro -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wide">Frecuencia Ahorro</label>
+                            <select id="ahorro"
+                                class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="Alta">Alta</option>
+                                <option value="Media" selected>Media</option>
+                                <option value="Baja">Baja</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Transacciones -->
+                    <div>
+                        <h3 class="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-100 dark:border-gray-800 pb-2 uppercase tracking-wide">
+                            Ultimas Transacciones
+                        </h3>
+
+                        <div id="transaccionesContainer" class="space-y-2 mb-3"></div>
+
+                        <button type="button" id="btnAgregarTransaccion"
+                            class="w-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg py-2.5 text-xs font-semibold transition-colors duration-200 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Agregar transaccion
+                        </button>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" id="submitBtn"
+                        class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto flex items-center justify-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Ejecutar Analisis con IA
+                    </button>
+                </form>
+            </div>
+
+            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                 PANEL DERECHO â€” Resultados
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <div class="flex flex-col gap-4">
+
+                <!-- Salud Financiera -->
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm flex flex-col items-center transition-colors duration-300">
+                    <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Salud Financiera</h3>
+                    <div class="relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-gray-200 dark:border-gray-700 mb-4" id="circleScore">
+                        <div class="text-center">
+                            <span class="text-3xl font-bold text-gray-900 dark:text-white" id="scoreValue">--</span>
+                            <span class="text-[10px] text-gray-400 block -mt-1">/ 100</span>
+                        </div>
+                    </div>
+                    <div id="profileBadge"
+                        class="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-center px-4 py-1.5 rounded-md text-xs font-semibold">
+                        Sin analizar
+                    </div>
+                </div>
+
+                <!-- Analisis Detallado -->
+                <div id="resultadoFormateado"
+                    class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
+                    <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Analisis Detallado</h3>
+
+                    <!-- Mini cards -->
+                    <div class="grid grid-cols-2 gap-3 mb-4" id="resumenCards"></div>
+
+                    <!-- Recomendaciones -->
+                    <div id="recomendacionesBox" class="hidden">
+                        <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Recomendaciones</h4>
+                        <ul id="recomendacionesList" class="space-y-1.5"></ul>
+                    </div>
+
+                    <!-- Categorias detectadas -->
+                    <div id="categoriasBox" class="hidden mt-4">
+                        <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Categorias</h4>
+                        <div id="categoriasTags" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Grafica de barras -->
+                <div id="graficaBox"
+                    class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
+                    <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Distribucion de Gastos</h3>
+                    <div class="relative" style="height: 200px;">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- JSON colapsable -->
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 rounded-xl shadow-sm transition-colors duration-300">
+                    <button id="toggleJson"
+                        class="w-full flex items-center justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                        <span class="uppercase tracking-wide">Ver JSON completo</span>
+                        <svg id="toggleArrow" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="jsonWrapper" class="hidden mt-3">
+                        <pre id="jsonOutput"
+                            class="w-full bg-gray-950 dark:bg-black text-green-400 p-4 rounded-lg font-mono text-xs overflow-auto max-h-64 leading-relaxed">Esperando ejecucion...</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<script is:inline>
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Categorias
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const CATEGORIAS = [
+    { value: "Supermercado",    label: "Supermercado" },
+    { value: "Combustible",     label: "Combustible" },
+    { value: "Streaming",       label: "Streaming" },
+    { value: "Restaurante",     label: "Restaurante" },
+    { value: "Transporte",      label: "Transporte" },
+    { value: "Salud",           label: "Salud" },
+    { value: "Educacion",       label: "Educacion" },
+    { value: "Ropa",            label: "Ropa" },
+    { value: "Entretenimiento", label: "Entretenimiento" },
+    { value: "Servicios",       label: "Servicios" },
+    { value: "Viajes",          label: "Viajes" },
+    { value: "Otro",            label: "Otro" },
+];
+
+let transacciones = [];
+let contadorId = 0;
+let chartInstance = null;
+
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function getUsedCategorias(excludeId) {
+    return transacciones
+        .filter(t => t.id !== excludeId)
+        .map(t => t.categoria)
+        .filter(Boolean);
+}
+
+function buildOptions(selectedValue, excludeId) {
+    const used = getUsedCategorias(excludeId);
+    return CATEGORIAS.map(c => {
+        const isUsed = used.includes(c.value) && c.value !== selectedValue;
+        return `<option value="${c.value}"
+            ${c.value === selectedValue ? 'selected' : ''}
+            ${isUsed ? 'disabled' : ''}
+            style="${isUsed ? 'color:#9ca3af' : ''}">${c.label}${isUsed ? ' (seleccionada)' : ''}</option>`;
+    }).join('');
+}
+
+function refreshAllDropdowns() {
+    transacciones.forEach(t => {
+        const sel = document.getElementById(`cat_${t.id}`);
+        if (!sel) return;
+        const current = sel.value;
+        sel.innerHTML = `<option value="">-- Selecciona categoria --</option>` + buildOptions(current, t.id);
+    });
+}
+
+function createTransaccionRow(id, catValue, valValue) {
+    const row = document.createElement('div');
+    row.id = `row_${id}`;
+    row.className = 'flex items-center gap-2 tx-row-anim';
+    row.innerHTML = `
+        <select id="cat_${id}" data-id="${id}"
+            class="w-2/3 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer">
+            <option value="">-- Selecciona categoria --</option>
+            ${buildOptions(catValue, id)}
+        </select>
+        <input type="number" id="val_${id}" value="${valValue}"
+            class="w-1/3 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            placeholder="Valor" min="0" />
+        <button type="button" onclick="removeTransaccion(${id})"
+            class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition text-xl font-bold"
+            title="Eliminar transaccion">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    `;
+
+    row.querySelector(`#cat_${id}`).addEventListener('change', (e) => {
+        const entry = transacciones.find(t => t.id === id);
+        if (entry) entry.categoria = e.target.value;
+        refreshAllDropdowns();
+    });
+
+    return row;
+}
+
+function addTransaccion(catValue = '', valValue = '') {
+    const id = ++contadorId;
+    transacciones.push({ id, categoria: catValue });
+    document.getElementById('transaccionesContainer').appendChild(
+        createTransaccionRow(id, catValue, valValue)
+    );
+    refreshAllDropdowns();
+}
+
+window.removeTransaccion = function(id) {
+    transacciones = transacciones.filter(t => t.id !== id);
+    const row = document.getElementById(`row_${id}`);
+    if (row) { row.style.opacity = '0'; setTimeout(() => row.remove(), 150); }
+    setTimeout(refreshAllDropdowns, 160);
+};
+
+// Fila inicial
+addTransaccion('Supermercado', 420);
+
+document.getElementById('btnAgregarTransaccion').addEventListener('click', () => addTransaccion());
+
+// â”€â”€â”€ Toggle JSON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.getElementById('toggleJson').addEventListener('click', () => {
+    const w = document.getElementById('jsonWrapper');
+    const a = document.getElementById('toggleArrow');
+    w.classList.toggle('hidden');
+    a.style.transform = w.classList.contains('hidden') ? '' : 'rotate(180deg)';
+});
+
+// â”€â”€â”€ Grafica â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderBarChart(labels, valores) {
+    document.getElementById('graficaBox').classList.remove('hidden');
+    const ctx = document.getElementById('barChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const gridColor  = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+    const textColor  = isDark ? '#9ca3af' : '#6b7280';
+
+    const palette = ['#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#06b6d4','#84cc16'];
+
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Gasto',
+                data: valores,
+                backgroundColor: palette.slice(0, labels.length).map(c => c + 'bb'),
+                borderColor:     palette.slice(0, labels.length),
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: { label: ctx => ` $${ctx.parsed.y.toLocaleString()}` }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: gridColor },
+                    ticks: {
+                        callback: v => '$' + v.toLocaleString(),
+                        color: textColor,
+                        font: { size: 10 }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: textColor, font: { size: 10 } }
+                }
+            }
+        }
+    });
+}
+
+// â”€â”€â”€ Render resultado formateado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderResultado(data, moneda, txns) {
+    // JSON raw
+    document.getElementById('jsonOutput').innerText = JSON.stringify(data, null, 2);
+
+    // Score
+    const perfil = data.perfil_financiero || '';
+    const scoreMap = { 'Saludable': 88, 'En riesgo': 55, 'Critico': 30 };
+    const score = data.score_financiero ?? scoreMap[perfil] ?? 50;
+    document.getElementById('scoreValue').innerText = score;
+
+    const badge   = document.getElementById('profileBadge');
+    const circle  = document.getElementById('circleScore');
+    badge.innerText = perfil || 'Analizado';
+
+    if (perfil === 'Saludable') {
+        badge.className  = 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-center px-4 py-1.5 rounded-md text-xs font-semibold';
+        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-green-500 mb-4';
+    } else if (perfil === 'Critico') {
+        badge.className  = 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 text-center px-4 py-1.5 rounded-md text-xs font-semibold';
+        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-red-500 mb-4';
+    } else {
+        badge.className  = 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-400 text-center px-4 py-1.5 rounded-md text-xs font-semibold';
+        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-orange-500 mb-4';
+    }
+
+    // Panel
+    document.getElementById('resultadoFormateado').classList.remove('hidden');
+
+    // Mini cards
+    const items = [];
+    if (data.total_gastos    != null) items.push({ label:'Total Gastos',   value:`${moneda} ${Number(data.total_gastos).toLocaleString()}`,    color:'red' });
+    if (data.ahorro_estimado != null) items.push({ label:'Ahorro Est.',     value:`${moneda} ${Number(data.ahorro_estimado).toLocaleString()}`,  color:'green' });
+    if (data.nivel_endeudamiento != null) items.push({ label:'Endeudamiento', value:`${data.nivel_endeudamiento}%`,                             color:'orange' });
+    if (data.frecuencia_ahorro)           items.push({ label:'Frec. Ahorro',  value:data.frecuencia_ahorro,                                     color:'blue' });
+
+    const colorMap = {
+        red:    'bg-red-50    dark:bg-red-950    text-red-700    dark:text-red-400',
+        green:  'bg-green-50  dark:bg-green-950  text-green-700  dark:text-green-400',
+        orange: 'bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400',
+        blue:   'bg-blue-50   dark:bg-blue-950   text-blue-700   dark:text-blue-400',
+    };
+
+    document.getElementById('resumenCards').innerHTML = items.map(c => `
+        <div class="rounded-lg p-3 ${colorMap[c.color] || 'bg-gray-100 text-gray-700'}">
+            <p class="text-[10px] font-bold uppercase tracking-wide opacity-60">${c.label}</p>
+            <p class="text-base font-extrabold mt-0.5">${c.value}</p>
+        </div>
+    `).join('');
+
+    // Recomendaciones
+    const recsBox  = document.getElementById('recomendacionesBox');
+    const recsList = document.getElementById('recomendacionesList');
+    const recs = data.recomendaciones || data.recomendacion;
+    if (recs) {
+        const arr = Array.isArray(recs) ? recs : [recs];
+        recsList.innerHTML = arr.map(r => `
+            <li class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-950 rounded-lg px-3 py-2">
+                <span class="text-blue-500 mt-0.5 font-bold shrink-0">&#8594;</span>
+                <span>${r}</span>
+            </li>
+        `).join('');
+        recsBox.classList.remove('hidden');
+    } else {
+        recsBox.classList.add('hidden');
+    }
+
+    // Categorias tags
+    const catBox  = document.getElementById('categoriasBox');
+    const catTags = document.getElementById('categoriasTags');
+    const cats = data.categorias_detectadas || txns.map(t => t.descripcion);
+    if (cats && cats.length) {
+        const tc = ['bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300',
+                    'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300',
+                    'bg-pink-100 dark:bg-pink-950 text-pink-700 dark:text-pink-300',
+                    'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300',
+                    'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300',
+                    'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300'];
+        catTags.innerHTML = cats.map((c, i) =>
+            `<span class="text-[11px] font-semibold px-2.5 py-1 rounded-full ${tc[i % tc.length]}">${c}</span>`
+        ).join('');
+        catBox.classList.remove('hidden');
+    } else {
+        catBox.classList.add('hidden');
+    }
+
+    // Grafica
+    renderBarChart(txns.map(t => t.descripcion), txns.map(t => t.valor));
+}
+
+// â”€â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.getElementById('analisisForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const moneda = document.getElementById('moneda').value;
+    const txns = transacciones
+        .map(t => ({
+            descripcion: (document.getElementById(`cat_${t.id}`)?.value || '').trim(),
+            valor: parseFloat(document.getElementById(`val_${t.id}`)?.value) || 0
+        }))
+        .filter(t => t.descripcion !== '');
+
+    const payload = {
+        ingreso_mensual:      parseFloat(document.getElementById('ingreso').value),
+        nivel_endeudamiento:  parseFloat(document.getElementById('deuda').value),
+        frecuencia_ahorro:    document.getElementById('ahorro').value,
+        transacciones:        txns
+    };
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = `
+        <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        Analizando...`;
+
+    document.getElementById('jsonOutput').innerText = 'Analizando transacciones con IA...';
+
+    try {
+        const res = await fetch('http://localhost:8080/api/v1/analisis-financiero', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            renderResultado(await res.json(), moneda, txns);
+        } else {
+            document.getElementById('jsonOutput').innerText = `Error HTTP ${res.status}: ${await res.text()}`;
+        }
+    } catch (err) {
+        document.getElementById('jsonOutput').innerText = `Error de conexion con el backend.\n\n${err.message}`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Ejecutar Analisis con IA`;
+    }
+});
+</script>
+
+<style>
+@keyframes tx-fade-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.tx-row-anim { animation: tx-fade-in 0.2s ease; }
+select option[disabled] { color: #9ca3af; }
+</style>
+

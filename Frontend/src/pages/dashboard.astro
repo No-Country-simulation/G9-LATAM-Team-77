@@ -1,0 +1,725 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { API_URL } from '../lib/api';
+---
+
+<Layout title="Dashboard de Análisis | FinanceAI">
+    <div class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+
+        <!-- Encabezado -->
+        <section class="ui-enter relative mb-6 overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 px-6 py-7 text-white shadow-xl shadow-blue-950/15 sm:px-8 sm:py-9">
+            <div aria-hidden="true" class="absolute -right-16 -top-24 h-64 w-64 rounded-full border border-white/10 bg-blue-400/10 blur-2xl"></div>
+            <div class="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <div class="max-w-2xl">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-100"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Centro financiero</span>
+                    <h1 class="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Dashboard de análisis</h1>
+                    <p class="mt-2 max-w-xl text-sm leading-relaxed text-blue-100/80">Tus transacciones persistidas y el análisis de Data Science, reunidos en una vista clara y accionable.</p>
+                </div>
+                <a href="/historial" class="inline-flex w-fit items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-xs font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/15">
+                    Ver historial
+                    <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </a>
+            </div>
+        </section>
+
+        <section class="ui-enter ui-enter-delay-1 surface-card mb-6 rounded-3xl p-5 sm:p-6" aria-labelledby="summaryTitle">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 id="summaryTitle" class="text-lg font-bold text-gray-900 dark:text-white">Resumen de transacciones</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Calculado por el Backend con los movimientos de tu cuenta.</p>
+                </div>
+                <button id="retrySummary" type="button" class="hidden rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-950">Reintentar</button>
+            </div>
+            <p id="summaryStatus" aria-live="polite" class="mt-4 text-sm text-gray-500 dark:text-gray-400">Cargando resumen…</p>
+            <div id="summaryContent" class="mt-4 hidden">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div class="metric-tile soft-lift rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Ingresos del mes</p>
+                        <p id="summaryIncome" class="mt-1 text-xl font-extrabold">—</p>
+                    </div>
+                    <div class="metric-tile soft-lift rounded-2xl border border-red-100 bg-red-50 p-4 text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Gastos del mes</p>
+                        <p id="summaryExpenses" class="mt-1 text-xl font-extrabold">—</p>
+                    </div>
+                    <div class="metric-tile soft-lift rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-800 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-200">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Balance del mes</p>
+                        <p id="summaryBalance" class="mt-1 text-xl font-extrabold">—</p>
+                    </div>
+                </div>
+                <div class="mt-4 grid gap-4 lg:grid-cols-2">
+                    <div class="rounded-2xl border border-gray-100 bg-slate-50/60 p-4 dark:border-gray-800 dark:bg-slate-950/30">
+                        <p class="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Comparación</p>
+                        <p id="summaryVariation" class="mt-2 text-sm font-semibold text-gray-800 dark:text-gray-200"></p>
+                    </div>
+                    <div class="rounded-2xl border border-gray-100 bg-slate-50/60 p-4 dark:border-gray-800 dark:bg-slate-950/30">
+                        <p class="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Gastos por categoría</p>
+                        <div id="summaryCategories" class="mt-2 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="ui-enter ui-enter-delay-2 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+
+            <!-- ══════════════════════════════
+                 PANEL IZQUIERDO — Formulario
+            ══════════════════════════════ -->
+            <div class="surface-card rounded-3xl p-5 sm:p-7 lg:col-span-2">
+                <div class="mb-6 flex items-start gap-3 border-b border-slate-100 pb-5 dark:border-slate-800">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">
+                        <svg aria-hidden="true" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h3m-7 6h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    </span>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-gray-900 dark:text-white">Datos para el análisis</h2>
+                        <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">Completa tu panorama mensual y agrega las categorías que deseas evaluar.</p>
+                    </div>
+                </div>
+
+                <form id="analisisForm" class="space-y-6">
+
+                    <!-- Fila 1: Ingreso, Endeudamiento, Ahorro -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <!-- Ingreso mensual -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">
+                                Ingreso Mensual
+                            </label>
+                            <div class="flex">
+                                <select id="moneda"
+                                    class="bg-gray-50 dark:bg-gray-800 border border-r-0 border-gray-200 dark:border-gray-700 rounded-l-lg px-2.5 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer">
+                                    <option value="USD">USD</option>
+                                    <option value="MXN">MXN</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="CRC">CRC</option>
+                                    <option value="COP">COP</option>
+                                    <option value="HNL">HNL</option>
+                                </select>
+                                <input type="number" id="ingreso" value="4500" required min="1"
+                                    class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-r-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                            </div>
+                        </div>
+
+                        <!-- Nivel de endeudamiento -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">
+                                Endeudamiento (%)
+                            </label>
+                            <input type="number" id="deuda" value="25" required min="0" max="100"
+                                class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                        </div>
+
+                        <!-- Frecuencia de ahorro -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">
+                                Frecuencia Ahorro
+                            </label>
+                            <select id="ahorro"
+                                class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer">
+                                <option value="Alta">Alta</option>
+                                <option value="Media" selected>Media</option>
+                                <option value="Baja">Baja</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Fila 2: Transacciones dinamicas -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                                Ultimas Transacciones
+                            </label>
+                            <span class="text-[11px] text-gray-400" id="txCount">1 categoria añadida</span>
+                        </div>
+
+                        <div id="transaccionesContainer" class="space-y-2 mb-3"></div>
+
+                        <button type="button" id="btnAgregarTransaccion"
+                            class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-blue-300 py-3 text-xs font-bold text-blue-600 transition hover:border-blue-400 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950/50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Agregar transaccion
+                        </button>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" id="submitBtn"
+                        class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Ejecutar Analisis con IA
+                    </button>
+                </form>
+            </div>
+
+            <!-- ══════════════════════════════
+                 PANEL DERECHO — Resultados
+            ══════════════════════════════ -->
+            <div class="flex flex-col gap-5 lg:sticky lg:top-28">
+
+                <!-- Salud Financiera Card -->
+                <div class="surface-card soft-lift flex flex-col items-center rounded-3xl p-6">
+                    <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Salud Financiera</h3>
+                    <div class="relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-gray-200 dark:border-gray-700 mb-4 transition-all duration-300" id="circleScore">
+                        <div class="text-center">
+                            <span class="text-3xl font-black text-gray-900 dark:text-white" id="scoreValue">--</span>
+                            <span class="text-[10px] text-gray-400 font-semibold block -mt-1">/ 100</span>
+                        </div>
+                    </div>
+                    <div id="profileBadge"
+                        class="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide">
+                        Sin analizar
+                    </div>
+                </div>
+
+                <!-- Recomendaciones del Modelo de IA (CARD DESTACADA) -->
+                <div id="iaRecomendacionesCard"
+                    class="surface-card hidden rounded-3xl border-blue-200/80 p-6 dark:border-blue-900/60">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-900 dark:text-white">Recomendaciones de la IA</h3>
+                    </div>
+
+                    <div id="iaRecomendacionesContent" class="space-y-2.5"></div>
+                </div>
+
+                <!-- Analisis Detallado Card -->
+                <div id="resultadoFormateado"
+                    class="surface-card hidden rounded-3xl p-6">
+                    <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Resumen Financiero</h3>
+
+                    <!-- Mini cards -->
+                    <div class="grid grid-cols-2 gap-3 mb-4" id="resumenCards"></div>
+
+                    <!-- Categorias detectadas -->
+                    <div id="categoriasBox" class="hidden pt-2 border-t border-gray-100 dark:border-gray-800">
+                        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Categorías Analizadas</h4>
+                        <div id="categoriasTags" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Grafica de barras -->
+                <div id="graficaBox"
+                    class="surface-card hidden rounded-3xl p-6">
+                    <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Distribución de Gastos</h3>
+                    <div class="relative" style="height: 180px;">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- JSON colapsable -->
+                <div class="surface-card rounded-2xl p-4">
+                    <button id="toggleJson"
+                        class="w-full flex items-center justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                        <span class="uppercase tracking-wide">Ver JSON de Respuesta (API)</span>
+                        <svg id="toggleArrow" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="jsonWrapper" class="hidden mt-3">
+                        <pre id="jsonOutput"
+                            class="w-full bg-gray-950 dark:bg-black text-green-400 p-4 rounded-lg font-mono text-xs overflow-auto max-h-64 leading-relaxed">Esperando ejecución...</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<script define:vars={{ API_URL }}>
+// ─── Proteger Dashboard: Redirigir a /login si no ha iniciado sesión ───
+const authToken = localStorage.getItem('financeai_token');
+if (!authToken) {
+    window.location.replace('/login');
+}
+
+// ─────────────────────────────────────────────
+// Categorias
+// ─────────────────────────────────────────────
+const CATEGORIAS = [
+    { value: "Supermercado",    label: "Supermercado" },
+    { value: "Combustible",     label: "Combustible" },
+    { value: "Streaming",       label: "Streaming" },
+    { value: "Restaurante",     label: "Restaurante" },
+    { value: "Transporte",      label: "Transporte" },
+    { value: "Salud",           label: "Salud" },
+    { value: "Educacion",       label: "Educación" },
+    { value: "Ropa",            label: "Ropa" },
+    { value: "Entretenimiento", label: "Entretenimiento" },
+    { value: "Servicios",       label: "Servicios" },
+    { value: "Viajes",          label: "Viajes" },
+    { value: "Otro",            label: "Otro" },
+];
+
+let transacciones = [];
+let contadorId = 0;
+let chartInstance = null;
+
+const summaryFormatter = new Intl.NumberFormat('es-HN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
+function clearSessionAndRedirect() {
+    localStorage.removeItem('financeai_token');
+    localStorage.removeItem('financeai_user');
+    window.location.replace('/login');
+}
+
+async function loadDashboardSummary() {
+    const status = document.getElementById('summaryStatus');
+    const content = document.getElementById('summaryContent');
+    const retry = document.getElementById('retrySummary');
+    status.textContent = 'Cargando resumen…';
+    content.classList.add('hidden');
+    retry.classList.add('hidden');
+
+    try {
+        const response = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
+            headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
+        });
+        if (response.status === 401) {
+            clearSessionAndRedirect();
+            return;
+        }
+        if (!response.ok) {
+            throw new Error('summary-request');
+        }
+
+        const summary = await response.json();
+        document.getElementById('summaryIncome').textContent = summaryFormatter.format(Number(summary.ingresosMesActual) || 0);
+        document.getElementById('summaryExpenses').textContent = summaryFormatter.format(Number(summary.gastosMesActual) || 0);
+        document.getElementById('summaryBalance').textContent = summaryFormatter.format(Number(summary.balanceMesActual) || 0);
+
+        const variation = Number(summary.variacionGastos);
+        document.getElementById('summaryVariation').textContent = Number.isFinite(variation)
+            ? `Variación de gastos frente al mes anterior: ${variation.toFixed(2)}%`
+            : 'No hay comparación disponible con el mes anterior.';
+
+        const categories = summary.gastosPorCategoria && typeof summary.gastosPorCategoria === 'object'
+            ? Object.entries(summary.gastosPorCategoria)
+            : [];
+        const categoryContainer = document.getElementById('summaryCategories');
+        if (categories.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'text-sm text-gray-500 dark:text-gray-400';
+            empty.textContent = 'Aún no hay gastos registrados este mes.';
+            categoryContainer.replaceChildren(empty);
+        } else {
+            categoryContainer.replaceChildren(...categories.map(([category, amount]) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between gap-4 rounded-lg bg-white px-3 py-2 text-sm shadow-sm dark:bg-slate-900';
+                const name = document.createElement('span');
+                name.textContent = category;
+                const value = document.createElement('strong');
+                value.textContent = summaryFormatter.format(Number(amount) || 0);
+                row.append(name, value);
+                return row;
+            }));
+        }
+
+        status.textContent = categories.length === 0 && Number(summary.ingresosMesActual) === 0
+            ? 'Tu cuenta aún no tiene movimientos del mes actual.'
+            : 'Resumen actualizado con tus transacciones.';
+        content.classList.remove('hidden');
+    } catch {
+        status.textContent = 'No fue posible cargar el resumen de transacciones.';
+        retry.classList.remove('hidden');
+    }
+}
+
+document.getElementById('retrySummary').addEventListener('click', loadDashboardSummary);
+loadDashboardSummary();
+
+// ─── Helpers ───────────────────────────────
+function getUsedCategorias(excludeId) {
+    return transacciones
+        .filter(t => t.id !== excludeId)
+        .map(t => t.categoria)
+        .filter(Boolean);
+}
+
+function buildOptions(selectedValue, excludeId) {
+    const used = getUsedCategorias(excludeId);
+    return CATEGORIAS.map(c => {
+        const isUsed = used.includes(c.value) && c.value !== selectedValue;
+        return `<option value="${c.value}"
+            ${c.value === selectedValue ? 'selected' : ''}
+            ${isUsed ? 'disabled' : ''}
+            style="${isUsed ? 'color:#9ca3af' : ''}">${c.label}${isUsed ? ' (seleccionada)' : ''}</option>`;
+    }).join('');
+}
+
+function refreshAllDropdowns() {
+    transacciones.forEach(t => {
+        const sel = document.getElementById(`cat_${t.id}`);
+        if (!sel) return;
+        const current = sel.value;
+        sel.innerHTML = `<option value="">-- Selecciona categoría --</option>` + buildOptions(current, t.id);
+    });
+
+    const countEl = document.getElementById('txCount');
+    if (countEl) {
+        countEl.textContent = `${transacciones.length} transacción(es) agregada(s)`;
+    }
+}
+
+function createTransaccionRow(id, catValue, valValue) {
+    const row = document.createElement('div');
+    row.id = `row_${id}`;
+    row.className = 'tx-row-anim flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2 dark:border-slate-700 dark:bg-slate-950/40';
+    row.innerHTML = `
+        <select id="cat_${id}" data-id="${id}"
+            class="w-2/3 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer">
+            <option value="">-- Selecciona categoría --</option>
+            ${buildOptions(catValue, id)}
+        </select>
+        <input type="number" id="val_${id}" value="${valValue}"
+            class="w-1/3 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            placeholder="Valor" min="0" />
+        <button type="button" onclick="removeTransaccion(${id})"
+            class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition text-xl font-bold"
+            title="Eliminar transacción">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    `;
+
+    row.querySelector(`#cat_${id}`).addEventListener('change', (e) => {
+        const entry = transacciones.find(t => t.id === id);
+        if (entry) entry.categoria = e.target.value;
+        refreshAllDropdowns();
+    });
+
+    return row;
+}
+
+function addTransaccion(catValue = '', valValue = '') {
+    const id = ++contadorId;
+    transacciones.push({ id, categoria: catValue });
+    document.getElementById('transaccionesContainer').appendChild(
+        createTransaccionRow(id, catValue, valValue)
+    );
+    refreshAllDropdowns();
+}
+
+window.removeTransaccion = function(id) {
+    transacciones = transacciones.filter(t => t.id !== id);
+    const row = document.getElementById(`row_${id}`);
+    if (row) { row.style.opacity = '0'; setTimeout(() => row.remove(), 150); }
+    setTimeout(refreshAllDropdowns, 160);
+};
+
+// Filas iniciales por defecto
+addTransaccion('Transporte', 420);
+addTransaccion('Educacion', 500);
+
+document.getElementById('btnAgregarTransaccion').addEventListener('click', () => addTransaccion());
+
+// ─── Toggle JSON ───────────────────────────
+document.getElementById('toggleJson').addEventListener('click', () => {
+    const w = document.getElementById('jsonWrapper');
+    const a = document.getElementById('toggleArrow');
+    w.classList.toggle('hidden');
+    a.style.transform = w.classList.contains('hidden') ? '' : 'rotate(180deg)';
+});
+
+// ─── Chart.js ──────────────────────────────
+async function loadChartJs() {
+    if (window.Chart) return window.Chart;
+    return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        s.onload = () => resolve(window.Chart);
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+}
+
+async function renderBarChart(labels, values) {
+    if (!labels.length) return;
+    document.getElementById('graficaBox').classList.remove('hidden');
+
+    await loadChartJs();
+    const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isDark ? '#9ca3af' : '#6b7280';
+    const gridColor = isDark ? '#1f2937' : '#f3f4f6';
+
+    const colors = [
+        'rgba(59, 130, 246, 0.8)',
+        'rgba(147, 51, 234, 0.8)',
+        'rgba(236, 72, 153, 0.8)',
+        'rgba(245, 158, 11, 0.8)',
+        'rgba(16, 185, 129, 0.8)',
+        'rgba(6, 182, 212, 0.8)'
+    ];
+
+    const ctx = document.getElementById('barChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new window.Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` $${ctx.parsed.y.toLocaleString()}`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: gridColor },
+                    ticks: {
+                        callback: v => '$' + v.toLocaleString(),
+                        color: textColor,
+                        font: { size: 10 }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: textColor, font: { size: 10 } }
+                }
+            }
+        }
+    });
+}
+
+function createRecommendationNode(message, isAlert) {
+    const row = document.createElement('div');
+    row.className = isAlert
+        ? 'flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/50 dark:text-amber-200'
+        : 'flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/80 p-3 text-xs text-blue-950 dark:border-blue-800/60 dark:bg-blue-950/50 dark:text-blue-200';
+
+    const icon = document.createElement('span');
+    icon.className = isAlert ? 'shrink-0 text-sm text-amber-500' : 'shrink-0 text-sm text-blue-600 dark:text-blue-400';
+    icon.textContent = isAlert ? '⚠️' : '💡';
+
+    const text = document.createElement('div');
+    text.className = 'font-medium leading-relaxed';
+    text.textContent = String(message);
+    row.append(icon, text);
+    return row;
+}
+
+// ─── Render resultado formateado ───────────
+function renderResultado(data, moneda, txns) {
+    // JSON raw
+    document.getElementById('jsonOutput').innerText = JSON.stringify(data, null, 2);
+
+    // Score & Perfil
+    const score = (data.score !== undefined && data.score !== null) 
+        ? data.score 
+        : ((data.score_financiero !== undefined && data.score_financiero !== null) 
+            ? data.score_financiero 
+            : ((data.probabilidad !== undefined && data.probabilidad !== null)
+                ? Math.round(data.probabilidad * 100)
+                : (data.level === 'Excelente' ? 88 : (data.level === 'Medio' ? 60 : 50))));
+
+    const perfil = data.level 
+        ? data.level 
+        : (data.perfil_financiero 
+            ? data.perfil_financiero 
+            : (score >= 75 ? 'Excelente' : (score >= 50 ? 'Moderado' : 'En riesgo')));
+    
+    document.getElementById('scoreValue').innerText = score;
+
+    const badge = document.getElementById('profileBadge');
+    const circle = document.getElementById('circleScore');
+    badge.innerText = perfil;
+
+    if (score >= 75 || perfil === 'Excelente' || perfil === 'Saludable') {
+        badge.className  = 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border border-emerald-300 dark:border-emerald-800';
+        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-emerald-500 mb-4 shadow-sm';
+    } else if (score >= 45 || perfil === 'Moderado' || perfil === 'Medio') {
+        badge.className  = 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border border-amber-300 dark:border-amber-800';
+        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-amber-500 mb-4 shadow-sm';
+    } else {
+        badge.className  = 'bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-400 text-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide border border-red-300 dark:border-red-800';
+        circle.className = 'relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-red-500 mb-4 shadow-sm';
+    }
+
+    // ─── Render Recomendaciones y Alertas de IA ───
+    const recsCard = document.getElementById('iaRecomendacionesCard');
+    const recsContent = document.getElementById('iaRecomendacionesContent');
+
+    const rawRecs = data.recommendations || data.recomendaciones || data.recomendacion || [];
+    const recs = Array.isArray(rawRecs) ? rawRecs : [rawRecs];
+
+    const rawAlerts = data.alerts || data.alertas || [];
+    const alerts = Array.isArray(rawAlerts) ? rawAlerts : [rawAlerts];
+
+    const recommendationNodes = [];
+    alerts.forEach((alert) => recommendationNodes.push(createRecommendationNode(alert, true)));
+    recs.forEach((recommendation) => recommendationNodes.push(createRecommendationNode(recommendation, false)));
+
+    if (recommendationNodes.length > 0) {
+        recsContent.replaceChildren(...recommendationNodes);
+        recsCard.classList.remove('hidden');
+    } else {
+        recsContent.replaceChildren();
+        recsCard.classList.add('hidden');
+    }
+
+    // ─── Resumen Financiero ───
+    document.getElementById('resultadoFormateado').classList.remove('hidden');
+
+    const totalGastos = (data.total_gastos !== undefined && data.total_gastos !== null) 
+        ? data.total_gastos 
+        : txns.reduce((sum, t) => sum + (t.valor || 0), 0);
+
+    const ingreso = parseFloat(document.getElementById('ingreso').value) || 0;
+
+    const ahorroEst = (data.ahorro_estimado !== undefined && data.ahorro_estimado !== null) 
+        ? data.ahorro_estimado 
+        : Math.max(0, ingreso - totalGastos);
+
+    const nivelEndeudamiento = (data.nivel_endeudamiento !== undefined && data.nivel_endeudamiento !== null) 
+        ? data.nivel_endeudamiento 
+        : (parseFloat(document.getElementById('deuda').value) || 0);
+
+    const frecuenciaAhorro = data.frecuencia_ahorro 
+        ? data.frecuencia_ahorro 
+        : document.getElementById('ahorro').value;
+
+    const items = [
+        { label: 'Total Gastos',   value: `${moneda} ${Number(totalGastos).toLocaleString()}`, color: 'red' },
+        { label: 'Ahorro Est.',     value: `${moneda} ${Number(ahorroEst).toLocaleString()}`,   color: 'green' },
+        { label: 'Endeudamiento', value: `${nivelEndeudamiento}%`,                             color: 'orange' },
+        { label: 'Frec. Ahorro',  value: frecuenciaAhorro,                                     color: 'blue' }
+    ];
+
+    const colorMap = {
+        red:    'bg-red-50    dark:bg-red-950/60    text-red-700    dark:text-red-400    border border-red-100 dark:border-red-900/40',
+        green:  'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40',
+        orange: 'bg-amber-50  dark:bg-amber-950/60  text-amber-700  dark:text-amber-400  border border-amber-100 dark:border-amber-900/40',
+        blue:   'bg-blue-50   dark:bg-blue-950/60   text-blue-700   dark:text-blue-400   border border-blue-100 dark:border-blue-900/40',
+    };
+
+    document.getElementById('resumenCards').innerHTML = items.map(c => `
+        <div class="rounded-xl p-3 ${colorMap[c.color]}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-70">${c.label}</p>
+            <p class="text-base font-extrabold mt-0.5">${c.value}</p>
+        </div>
+    `).join('');
+
+    // Categorias tags
+    const catBox  = document.getElementById('categoriasBox');
+    const catTags = document.getElementById('categoriasTags');
+    const cats = data.categorias_detectadas || txns.map(t => t.descripcion);
+    if (cats && cats.length) {
+        const tc = ['bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300',
+                    'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300',
+                    'bg-pink-100 dark:bg-pink-950 text-pink-700 dark:text-pink-300',
+                    'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300',
+                    'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300',
+                    'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300'];
+        catTags.innerHTML = cats.map((c, i) =>
+            `<span class="text-[11px] font-semibold px-2.5 py-1 rounded-full ${tc[i % tc.length]}">${c}</span>`
+        ).join('');
+        catBox.classList.remove('hidden');
+    } else {
+        catBox.classList.add('hidden');
+    }
+
+    // Grafica
+    renderBarChart(txns.map(t => t.descripcion), txns.map(t => t.valor));
+}
+
+// ─── Submit ────────────────────────────────
+document.getElementById('analisisForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const moneda = document.getElementById('moneda').value;
+    const txns = transacciones
+        .map(t => ({
+            descripcion: (document.getElementById(`cat_${t.id}`)?.value || '').trim(),
+            valor: parseFloat(document.getElementById(`val_${t.id}`)?.value) || 0
+        }))
+        .filter(t => t.descripcion !== '');
+
+    const payload = {
+        ingreso_mensual:      parseFloat(document.getElementById('ingreso').value),
+        nivel_endeudamiento:  parseFloat(document.getElementById('deuda').value),
+        frecuencia_ahorro:    document.getElementById('ahorro').value,
+        transacciones:        txns
+    };
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = `
+        <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        Analizando con IA...`;
+
+    document.getElementById('jsonOutput').innerText = 'Analizando transacciones con IA...';
+
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+        };
+
+        const res = await fetch(`${API_URL}/api/v1/analisis-financiero`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) {
+            clearSessionAndRedirect();
+        } else if (res.ok) {
+            renderResultado(await res.json(), moneda, txns);
+        } else {
+            let errorMessage = 'El análisis no pudo completarse.';
+            try {
+                const errorData = await res.json();
+                if (typeof errorData.message === 'string') errorMessage = errorData.message;
+            } catch {
+                // El Backend no devolvió JSON; se conserva un mensaje seguro.
+            }
+            document.getElementById('jsonOutput').innerText = errorMessage;
+        }
+    } catch {
+        document.getElementById('jsonOutput').innerText = 'Error de conexión con el Backend.';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Ejecutar Analisis con IA`;
+    }
+});
+</script>
+
+<style>
+@keyframes tx-fade-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.tx-row-anim { animation: tx-fade-in 0.2s ease; }
+select option[disabled] { color: #9ca3af; }
+</style>

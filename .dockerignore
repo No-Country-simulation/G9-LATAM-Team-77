@@ -1,0 +1,16 @@
+.git
+.github
+.idea
+**/.idea
+**/node_modules
+**/dist
+**/target
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.astro
+**/.env
+**/.env.*
+DataScient
+financeai-frontend
+Frontend

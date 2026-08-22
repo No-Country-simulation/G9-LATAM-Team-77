@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="FinanceAI">
+    <main class="flex min-h-[calc(100vh-73px)] items-center justify-center bg-gray-50 p-8 text-center dark:bg-gray-950">
+        <div>
+            <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600 dark:border-blue-950 dark:border-t-blue-400"></div>
+            <p class="mt-4 text-sm font-medium text-gray-600 dark:text-gray-300">Abriendo FinanceAI…</p>
+        </div>
+    </main>
+</Layout>
+
+<script>
+    const destination = localStorage.getItem('financeai_token') ? '/dashboard' : '/login';
+    window.location.replace(destination);
+</script>

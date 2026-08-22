@@ -1,0 +1,346 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { API_URL } from '../lib/api';
+---
+
+<Layout title="Iniciar sesión | FinanceAI">
+    <main class="relative isolate min-h-[calc(100vh-65px)] w-full overflow-hidden px-4 py-8 sm:px-6 sm:py-12">
+        <div aria-hidden="true" class="pointer-events-none absolute -left-24 top-1/3 -z-10 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl"></div>
+        <div aria-hidden="true" class="pointer-events-none absolute -right-24 top-10 -z-10 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl"></div>
+        <div class="ui-enter surface-card mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] lg:min-h-[610px] lg:grid-cols-[0.95fr_1.05fr]">
+            <section class="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#071227] via-[#0b1938] to-[#102a5e] p-8 text-white sm:p-12">
+                <div aria-hidden="true" class="absolute -right-24 -top-20 h-64 w-64 rounded-full border border-white/10 bg-blue-400/10 blur-2xl"></div>
+                <div class="flex gap-2" aria-hidden="true">
+                    <span class="h-3 w-3 rounded-full bg-blue-500"></span>
+                    <span class="h-3 w-3 rounded-full bg-red-500"></span>
+                    <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
+                </div>
+                <div class="relative py-12 sm:py-16">
+                    <span class="inline-flex rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-200">Datos reales · decisiones claras</span>
+                    <h1 class="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">Inteligencia financiera a tu medida.</h1>
+                    <p class="mt-5 max-w-md text-sm leading-relaxed text-slate-300 sm:text-base">
+                        Registra tus movimientos y complementa tus datos reales con análisis financiero asistido.
+                    </p>
+                    <div class="mt-8 grid gap-3 text-xs font-semibold text-slate-200 sm:grid-cols-3 lg:grid-cols-1">
+                        <span class="flex items-center gap-2"><span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">✓</span> Dashboard conectado</span>
+                        <span class="flex items-center gap-2"><span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">✓</span> Análisis con IA</span>
+                        <span class="flex items-center gap-2"><span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">✓</span> Historial privado</span>
+                    </div>
+                </div>
+                <p class="relative flex items-center gap-2 text-[11px] text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Acceso protegido con correo, contraseña y JWT.</p>
+            </section>
+
+            <section class="flex items-center p-7 sm:p-12 lg:p-14">
+                <div class="mx-auto w-full max-w-md">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Tu espacio financiero</p>
+                    <h2 id="formTitle" class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Bienvenido de nuevo</h2>
+                    <p id="formSubtitle" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Accede a tu panel financiero.</p>
+
+                    <div id="alertBox" role="alert" aria-live="polite" class="mt-5 hidden rounded-xl p-3.5 text-sm"></div>
+
+                    <form id="authForm" class="mt-6 space-y-4" aria-label="Formulario de autenticación">
+                        <div id="registerFields" class="hidden space-y-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900/60 dark:bg-blue-950/20">
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    Nombre
+                                    <input id="nombre" type="text" autocomplete="given-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                </label>
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    Apellido
+                                    <input id="apellido" type="text" autocomplete="family-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                </label>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    País
+                                    <select id="paisId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <option value="">Cargando países…</option>
+                                    </select>
+                                </label>
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    Moneda
+                                    <select id="monedaId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <option value="">Cargando monedas…</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div id="catalogStatus" aria-live="polite" class="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:bg-blue-950/40 dark:text-blue-200">
+                                Cargando países y monedas…
+                            </div>
+                            <button id="retryCatalogs" type="button" class="hidden text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                                Reintentar carga de catálogos
+                            </button>
+                        </div>
+
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                            Correo electrónico
+                            <input id="email" type="email" required autocomplete="email" placeholder="tu@correo.com" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                        </label>
+
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                            Contraseña
+                            <input id="password" type="password" required autocomplete="current-password" minlength="6" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                        </label>
+
+                        <div id="forgotPasswordRow" class="text-right">
+                            <button id="forgotPasswordBtn" type="button" class="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                                ¿Olvidaste tu contraseña?
+                            </button>
+                        </div>
+
+                        <button id="submitBtn" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-700 hover:shadow-blue-600/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+                            Iniciar sesión
+                        </button>
+                    </form>
+
+                    <div id="forgotPanel" class="mt-6 hidden">
+                        <form id="forgotForm" class="space-y-4" aria-label="Recuperar contraseña">
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                Correo electrónico
+                                <input id="forgotEmail" type="email" required autocomplete="email" placeholder="tu@correo.com" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                            </label>
+                            <button id="forgotSubmitBtn" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+                                Enviar enlace de recuperación
+                            </button>
+                        </form>
+                        <button id="backToLoginBtn" type="button" class="mt-5 w-full text-center text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                            Volver al inicio de sesión
+                        </button>
+                    </div>
+
+                    <div id="modeToggle" class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <span id="toggleQuestion">¿Aún no tienes cuenta?</span>
+                        <button id="toggleModeBtn" type="button" class="ml-1 font-semibold text-blue-600 hover:underline dark:text-blue-400">Regístrate</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</Layout>
+
+<script define:vars={{ API_URL }}>
+    const TOKEN_KEY = 'financeai_token';
+    const USER_KEY = 'financeai_user';
+
+    if (localStorage.getItem(TOKEN_KEY)) {
+        window.location.replace('/dashboard');
+    }
+
+    const byId = (id) => document.getElementById(id);
+    const form = byId('authForm');
+    const submitButton = byId('submitBtn');
+    const alertBox = byId('alertBox');
+    const registerFields = byId('registerFields');
+    const countrySelect = byId('paisId');
+    const currencySelect = byId('monedaId');
+    const catalogStatus = byId('catalogStatus');
+    const retryCatalogs = byId('retryCatalogs');
+    const forgotPanel = byId('forgotPanel');
+    const forgotForm = byId('forgotForm');
+    const forgotSubmitButton = byId('forgotSubmitBtn');
+    const modeToggle = byId('modeToggle');
+    const forgotPasswordRow = byId('forgotPasswordRow');
+    let registerMode = false;
+    let catalogsReady = false;
+
+    function showAlert(message, error = true) {
+        alertBox.textContent = message;
+        alertBox.className = `mt-5 rounded-xl border p-3.5 text-sm ${error
+            ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200'
+            : 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200'}`;
+    }
+
+    function setSession(data) {
+        localStorage.setItem(TOKEN_KEY, data.token);
+        localStorage.setItem(USER_KEY, JSON.stringify(data));
+    }
+
+    function populateSelect(select, items, placeholder, labelFor) {
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = placeholder;
+        select.replaceChildren(placeholderOption);
+
+        items.forEach((item) => {
+            const option = document.createElement('option');
+            option.value = String(item.id);
+            option.textContent = labelFor(item);
+            select.appendChild(option);
+        });
+        select.disabled = false;
+    }
+
+    async function loadCatalogs() {
+        catalogsReady = false;
+        countrySelect.disabled = true;
+        currencySelect.disabled = true;
+        catalogStatus.textContent = 'Cargando países y monedas…';
+        catalogStatus.className = 'rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:bg-blue-950/40 dark:text-blue-200';
+        retryCatalogs.classList.add('hidden');
+
+        try {
+            const [countriesResponse, currenciesResponse] = await Promise.all([
+                fetch(`${API_URL}/api/v1/catalogos/paises`, { headers: { Accept: 'application/json' } }),
+                fetch(`${API_URL}/api/v1/catalogos/monedas`, { headers: { Accept: 'application/json' } }),
+            ]);
+
+            if (!countriesResponse.ok || !currenciesResponse.ok) {
+                throw new Error('catalog-response');
+            }
+
+            const [countries, currencies] = await Promise.all([
+                countriesResponse.json(),
+                currenciesResponse.json(),
+            ]);
+
+            if (!Array.isArray(countries) || !Array.isArray(currencies)) {
+                throw new Error('catalog-format');
+            }
+            if (countries.length === 0 || currencies.length === 0) {
+                catalogStatus.textContent = 'No hay países o monedas disponibles para completar el registro.';
+                catalogStatus.className = 'rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-200';
+                retryCatalogs.classList.remove('hidden');
+                return;
+            }
+
+            populateSelect(countrySelect, countries, 'Selecciona un país', (item) => `${item.nombre} (${item.codigo})`);
+            populateSelect(currencySelect, currencies, 'Selecciona una moneda', (item) => `${item.nombre} (${item.codigo}) · ${item.simbolo}`);
+            catalogsReady = true;
+            catalogStatus.textContent = 'Catálogos cargados. Selecciona el país y la moneda de tu cuenta.';
+            catalogStatus.className = 'rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200';
+        } catch {
+            catalogStatus.textContent = 'No fue posible cargar los catálogos. Verifica la conexión e inténtalo de nuevo.';
+            catalogStatus.className = 'rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800 dark:bg-red-950/40 dark:text-red-200';
+            retryCatalogs.classList.remove('hidden');
+        }
+    }
+
+    async function readJson(response) {
+        try {
+            return await response.json();
+        } catch {
+            return {};
+        }
+    }
+
+    async function login(email, password) {
+        const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+        const data = await readJson(response);
+        if (!response.ok || !data.token) {
+            throw new Error(data.message || 'Credenciales inválidas.');
+        }
+        setSession(data);
+    }
+
+    function setForgotMode(enabled) {
+        form.classList.toggle('hidden', enabled);
+        forgotPanel.classList.toggle('hidden', !enabled);
+        modeToggle.classList.toggle('hidden', enabled);
+        alertBox.classList.add('hidden');
+        byId('formTitle').textContent = enabled ? 'Recupera tu acceso' : 'Bienvenido de nuevo';
+        byId('formSubtitle').textContent = enabled
+            ? 'Te enviaremos un enlace seguro si el correo pertenece a una cuenta.'
+            : 'Accede a tu panel financiero.';
+        if (enabled) {
+            byId('forgotEmail').value = byId('email').value.trim();
+            byId('forgotEmail').focus();
+        }
+    }
+
+    byId('forgotPasswordBtn').addEventListener('click', () => setForgotMode(true));
+    byId('backToLoginBtn').addEventListener('click', () => setForgotMode(false));
+
+    forgotForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = byId('forgotEmail').value.trim();
+        forgotSubmitButton.disabled = true;
+        forgotSubmitButton.textContent = 'Enviando…';
+
+        try {
+            const response = await fetch(`${API_URL}/api/v1/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            const data = await readJson(response);
+            if (!response.ok) {
+                throw new Error(data.message || 'No fue posible procesar la solicitud. Inténtalo nuevamente.');
+            }
+            showAlert(data.message || 'Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.', false);
+            forgotForm.reset();
+        } catch (error) {
+            showAlert(error instanceof Error ? error.message : 'No fue posible procesar la solicitud. Inténtalo nuevamente.');
+        } finally {
+            forgotSubmitButton.disabled = false;
+            forgotSubmitButton.textContent = 'Enviar enlace de recuperación';
+        }
+    });
+
+    byId('toggleModeBtn').addEventListener('click', () => {
+        registerMode = !registerMode;
+        registerFields.classList.toggle('hidden', !registerMode);
+        byId('formTitle').textContent = registerMode ? 'Crea tu cuenta' : 'Bienvenido de nuevo';
+        byId('formSubtitle').textContent = registerMode ? 'Elige tus datos financieros sin asumir identificadores.' : 'Accede a tu panel financiero.';
+        byId('toggleQuestion').textContent = registerMode ? '¿Ya tienes cuenta?' : '¿Aún no tienes cuenta?';
+        byId('toggleModeBtn').textContent = registerMode ? 'Inicia sesión' : 'Regístrate';
+        submitButton.textContent = registerMode ? 'Crear cuenta' : 'Iniciar sesión';
+        forgotPasswordRow.classList.toggle('hidden', registerMode);
+        if (registerMode && !catalogsReady) loadCatalogs();
+    });
+
+    retryCatalogs.addEventListener('click', loadCatalogs);
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = byId('email').value.trim();
+        const password = byId('password').value;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Procesando…';
+
+        try {
+            if (registerMode) {
+                if (!catalogsReady || !countrySelect.value || !currencySelect.value) {
+                    throw new Error('Selecciona un país y una moneda válidos.');
+                }
+                const firstName = byId('nombre').value.trim();
+                const lastName = byId('apellido').value.trim();
+                if (!firstName || !lastName) {
+                    throw new Error('Ingresa tu nombre y apellido.');
+                }
+
+                const response = await fetch(`${API_URL}/api/v1/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify({
+                        nombre: `${firstName} ${lastName}`,
+                        email,
+                        password,
+                        paisId: Number(countrySelect.value),
+                        monedaId: Number(currencySelect.value),
+                    }),
+                });
+                const data = await readJson(response);
+                if (!response.ok) {
+                    throw new Error(data.message || 'No fue posible crear la cuenta.');
+                }
+                await login(email, password);
+                showAlert('Cuenta creada. Redirigiendo…', false);
+            } else {
+                await login(email, password);
+                showAlert('Sesión iniciada. Redirigiendo…', false);
+            }
+            window.setTimeout(() => window.location.replace('/dashboard'), 250);
+        } catch (error) {
+            showAlert(error instanceof Error ? error.message : 'No fue posible completar la solicitud.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = registerMode ? 'Crear cuenta' : 'Iniciar sesión';
+        }
+    });
+</script>
