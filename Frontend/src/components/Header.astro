@@ -363,7 +363,7 @@ const googleEmail = session?.user?.email || '';
         }
 
         userProfileModal.classList.add('hidden');
-        window.showToast('¡Guardado!', 'Preferencias de perfil y moneda actualizadas con éxito.', '👤');
+        window.showToast('¡Guardado!', 'Preferencias de perfil y moneda actualizadas con éxito.', '');
         setTimeout(() => { window.location.reload(); }, 900);
     });
 
@@ -402,7 +402,7 @@ const googleEmail = session?.user?.email || '';
 
         localStorage.clear();
         sessionStorage.clear();
-        window.showToast('Cuenta Eliminada', 'Tu cuenta y todos sus registros han sido eliminados de la base de datos.', '🗑️');
+        window.showToast('Cuenta Eliminada', 'Tu cuenta y todos sus registros han sido eliminados de la base de datos.', '');
 
         try {
             const { signOut } = await import("auth-astro/client");

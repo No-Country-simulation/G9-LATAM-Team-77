@@ -23,7 +23,7 @@ if (session) {
 	<div id="toastNotification" class="fixed top-5 right-5 z-[250] hidden max-w-sm w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-blue-200 dark:border-blue-900/50 shadow-2xl rounded-2xl p-4 transition-all duration-300 transform translate-y-[-20px] opacity-0 font-inter">
 		<div class="flex items-start gap-3">
 			<div id="toastIcon" class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl flex-shrink-0 border border-blue-100 dark:border-blue-900/40">
-				✉️
+				
 			</div>
 			<div class="flex-1 pr-2">
 				<h4 id="toastTitle" class="text-sm font-bold text-gray-900 dark:text-white font-josefin">¡Correo Enviado!</h4>
@@ -317,7 +317,7 @@ if (session) {
 	const EMOJI_REGEX = /(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u;
 
 	// Toast Notification Handler
-	function showToast(title, message, icon = "✉️") {
+	function showToast(title, message, icon = "") {
 		const toast = document.getElementById('toastNotification');
 		const toastTitle = document.getElementById('toastTitle');
 		const toastMessage = document.getElementById('toastMessage');
@@ -398,9 +398,9 @@ if (session) {
 		alertBox.classList.remove('hidden');
 
 		if (isError) {
-			window.showToast?.('Atención', msg, '⚠️');
+			window.showToast?.('Atención', msg, '');
 		} else {
-			window.showToast?.('¡Éxito!', msg, '✅');
+			window.showToast?.('¡Éxito!', msg, '');
 		}
 	}
 
@@ -444,7 +444,7 @@ if (session) {
 		const password = document.getElementById('password').value;
 
 		if (EMOJI_REGEX.test(email) || EMOJI_REGEX.test(password)) {
-			showAlert('⚠️ Por motivos de seguridad, no se permiten emojis.');
+			showAlert(' Por motivos de seguridad, no se permiten emojis.');
 			return;
 		}
 
@@ -455,7 +455,7 @@ if (session) {
 			const monedaId = parseInt(document.getElementById('monedaId').value);
 
 			if (EMOJI_REGEX.test(nombre) || EMOJI_REGEX.test(apellido)) {
-				showAlert('⚠️ No se permiten emojis en el nombre o apellido.');
+				showAlert(' No se permiten emojis en el nombre o apellido.');
 				return;
 			}
 
@@ -502,7 +502,7 @@ if (session) {
 			if (res.ok && data.token) {
 				localStorage.setItem('financeai_token', data.token);
 				localStorage.setItem('financeai_user', JSON.stringify(data));
-				showToast("¡Bienvenido!", "Accediendo a tu panel financiero...", "🚀");
+				showToast("¡Bienvenido!", "Accediendo a tu panel financiero...", "");
 				setTimeout(() => { window.location.replace('/dashboard'); }, 300);
 			} else {
 				const errorMsg = data.message || data.mensaje || data.error || 'Credenciales inválidas o correo no registrado.';
@@ -520,7 +520,7 @@ if (session) {
 	document.getElementById('btnConfirmVerification')?.addEventListener('click', async () => {
 		const enteredCode = document.getElementById('verifyCodeInput').value.trim();
 		if (enteredCode !== simulatedVerificationCode && enteredCode !== '123456') {
-			showToast("Código Incorrecto", "El código ingresado no coincide. Revisa tu correo.", "⚠️");
+			showToast("Código Incorrecto", "El código ingresado no coincide. Revisa tu correo.", "");
 			return;
 		}
 
@@ -538,7 +538,7 @@ if (session) {
 			const data = await res.json();
 			if (res.ok) {
 				document.getElementById('verifyModal').classList.add('hidden');
-				showToast("¡Cuenta Verificada!", "Iniciando sesión automáticamente...", "✅");
+				showToast("¡Cuenta Verificada!", "Iniciando sesión automáticamente...", "");
 				
 				setTimeout(async () => {
 					const loginRes = await fetch(`${API_URL}/api/v1/auth/login`, {
@@ -559,10 +559,10 @@ if (session) {
 					}
 				}, 500);
 			} else {
-				showToast("Error de Registro", data.message || data.mensaje || 'Error al registrar la cuenta.', "❌");
+				showToast("Error de Registro", data.message || data.mensaje || 'Error al registrar la cuenta.', "");
 			}
 		} catch (err) {
-			showToast("Error de Conexión", "No fue posible conectar con el servidor.", "❌");
+			showToast("Error de Conexión", "No fue posible conectar con el servidor.", "");
 		} finally {
 			btn.disabled = false;
 			btn.textContent = 'Confirmar y Activar Cuenta';
@@ -601,11 +601,11 @@ if (session) {
 	document.getElementById('btnSendRecoveryCode')?.addEventListener('click', () => {
 		const email = document.getElementById('recoveryEmail').value.trim();
 		if (!email) {
-			showToast("Atención", "Por favor ingresa tu correo electrónico.", "⚠️");
+			showToast("Atención", "Por favor ingresa tu correo electrónico.", "");
 			return;
 		}
 		if (EMOJI_REGEX.test(email)) {
-			showToast("Error", "No se permiten emojis en el correo.", "⚠️");
+			showToast("Error", "No se permiten emojis en el correo.", "");
 			return;
 		}
 
@@ -626,10 +626,10 @@ if (session) {
 	document.getElementById('btnValidateRecoveryCode')?.addEventListener('click', () => {
 		const code = document.getElementById('recoveryCode').value.trim();
 		if (code !== recoverySimulatedCode && code !== '654321') {
-			showToast("Código Inválido", "El código ingresado es incorrecto o expiró.", "❌");
+			showToast("Código Inválido", "El código ingresado es incorrecto o expiró.", "");
 			return;
 		}
-		showToast("Código Válido", "Por favor ingresa tu nueva contraseña.", "🔑");
+		showToast("Código Válido", "Por favor ingresa tu nueva contraseña.", "");
 		showRecoveryStep(3);
 	});
 
@@ -639,15 +639,15 @@ if (session) {
 		const p2 = document.getElementById('confirmRecoveryPassword').value;
 		
 		if (EMOJI_REGEX.test(p1) || EMOJI_REGEX.test(p2)) {
-			showToast("Error", "No se permiten emojis en la contraseña.", "⚠️");
+			showToast("Error", "No se permiten emojis en la contraseña.", "");
 			return;
 		}
 		if (!p1 || p1.length < 4) {
-			showToast("Atención", "La contraseña debe tener al menos 4 caracteres.", "⚠️");
+			showToast("Atención", "La contraseña debe tener al menos 4 caracteres.", "");
 			return;
 		}
 		if (p1 !== p2) {
-			showToast("Error", "Las contraseñas no coinciden.", "⚠️");
+			showToast("Error", "Las contraseñas no coinciden.", "");
 			return;
 		}
 
@@ -666,15 +666,15 @@ if (session) {
 			try { data = await res.json(); } catch (_) {}
 
 			if (res.ok) {
-				showToast("¡Éxito Total!", "Contraseña actualizada en la base de datos. Inicia sesión.", "✅");
+				showToast("¡Éxito Total!", "Contraseña actualizada en la base de datos. Inicia sesión.", "");
 				recoveryModal.classList.add('hidden');
 				document.getElementById('email').value = email;
 				document.getElementById('password').value = p1;
 			} else {
-				showToast("Error", data.message || "No se pudo actualizar la contraseña.", "❌");
+				showToast("Error", data.message || "No se pudo actualizar la contraseña.", "");
 			}
 		} catch (err) {
-			showToast("Error de Conexión", "No se pudo contactar con el backend.", "❌");
+			showToast("Error de Conexión", "No se pudo contactar con el backend.", "");
 		} finally {
 			btn.disabled = false;
 			btn.textContent = 'Guardar Nueva Contraseña';

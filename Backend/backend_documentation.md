@@ -1,16 +1,16 @@
-# Documentación del Backend - FinanceAI
+# FinanceAI Backend Documentation
 
-## 1. Diagrama de Arquitectura
+## 1. Architecture Overview
 ```mermaid
 graph TD
-    Client[Aplicación Cliente] -->|HTTP/REST| Controllers
+    Client[Client Application] -->|HTTP/REST| Controllers
     Controllers --> Services
     Services --> Repositories
-    Services --> ModeloAI[ModeloIntegrationService / Modelo IA]
-    Repositories --> DB[(Base de Datos Relacional)]
+    Services --> ModeloAI[ModeloIntegrationService / AI Model]
+    Repositories --> DB[(Relational Database - MySQL)]
 ```
 
-## 2. Diagrama de Clases
+## 2. Class Diagram
 ```mermaid
 classDiagram
     class Pais {
@@ -61,62 +61,98 @@ classDiagram
     HistorialAnalisis --> User
 ```
 
-## 3. Diccionario de Datos
-**paises**
-- `id` (BIGINT, PK)
-- `nombre` (VARCHAR, NOT NULL)
-- `codigo` (VARCHAR, NOT NULL)
+## 3. Database Schema (Data Dictionary)
+The database follows a relational model. Below is the detailed schema representation.
 
-**monedas**
-- `id` (BIGINT, PK)
-- `nombre` (VARCHAR, NOT NULL)
-- `codigo` (VARCHAR, NOT NULL)
-- `simbolo` (VARCHAR, NOT NULL)
+### Table: paises
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier for the country. |
+| nombre | VARCHAR | NOT NULL | Name of the country. |
+| codigo | VARCHAR | NOT NULL | ISO country code. |
 
-**usuarios**
-- `id` (BIGINT, PK)
-- `name` (VARCHAR, NOT NULL)
-- `email` (VARCHAR, NOT NULL, UNIQUE)
-- `password` (VARCHAR, NOT NULL)
-- `pais_id` (BIGINT, FK)
-- `moneda_id` (BIGINT, FK)
-- `role` (VARCHAR, NOT NULL)
+### Table: monedas
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier for the currency. |
+| nombre | VARCHAR | NOT NULL | Name of the currency. |
+| codigo | VARCHAR | NOT NULL | ISO currency code. |
+| simbolo | VARCHAR | NOT NULL | Symbol of the currency. |
 
-**transacciones**
-- `id` (BIGINT, PK)
-- `description` (VARCHAR, NOT NULL)
-- `amount` (DECIMAL(15,2), NOT NULL)
-- `category` (VARCHAR, NOT NULL)
-- `type` (VARCHAR, NOT NULL)
-- `date` (DATE, NOT NULL)
-- `usuario_id` (BIGINT, NOT NULL, FK)
+### Table: usuarios
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier for the user. |
+| name | VARCHAR | NOT NULL | Full name of the user. |
+| email | VARCHAR | NOT NULL, UNIQUE | User email address. |
+| password | VARCHAR | NOT NULL | Encrypted user password. |
+| pais_id | BIGINT | FOREIGN KEY | Reference to paises(id). |
+| moneda_id | BIGINT | FOREIGN KEY | Reference to monedas(id). |
+| role | VARCHAR | NOT NULL | User authorization role. |
 
-**historial_analisis**
-- `id` (BIGINT, PK)
-- `usuario_id` (BIGINT, NOT NULL, FK)
-- `fecha` (DATE, NOT NULL)
-- `ingreso_mensual` (DECIMAL(15, 2))
-- `nivel_endeudamiento` (DECIMAL(15, 2))
-- `frecuencia_ahorro` (VARCHAR(255))
-- `total_gastos` (DECIMAL(15, 2))
-- `ahorro_estimado` (DECIMAL(15, 2))
-- `score_financiero` (VARCHAR(255))
-- `resumen_categorias` (TEXT)
+### Table: transacciones
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique transaction identifier. |
+| description | VARCHAR | NOT NULL | Brief description of the transaction. |
+| amount | DECIMAL(15,2) | NOT NULL | Financial amount. |
+| category | VARCHAR | NOT NULL | Category classification. |
+| type | VARCHAR | NOT NULL | Enum: INCOME or EXPENSE. |
+| date | DATE | NOT NULL | Date of the transaction. |
+| usuario_id | BIGINT | FOREIGN KEY, NOT NULL | Reference to usuarios(id). |
 
-## 4. Matriz de Endpoints
+### Table: historial_analisis
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique analysis identifier. |
+| usuario_id | BIGINT | FOREIGN KEY, NOT NULL | Reference to usuarios(id). |
+| fecha | DATE | NOT NULL | Date the analysis was executed. |
+| ingreso_mensual | DECIMAL(15,2) | | Total monthly income. |
+| nivel_endeudamiento | DECIMAL(15,2) | | User debt ratio. |
+| frecuencia_ahorro | VARCHAR(255) | | Saving frequency descriptive string. |
+| total_gastos | DECIMAL(15,2) | | Total monthly expenses. |
+| ahorro_estimado | DECIMAL(15,2) | | Estimated possible savings. |
+| score_financiero | VARCHAR(255) | | Computed financial score. |
+| resumen_categorias | TEXT | | Breakdown of categories. |
 
-| Controlador | Método | Endpoint | Payload de Petición | Payload de Respuesta |
+
+## 4. REST Endpoints Matrix
+
+There are exactly 13 endpoints available in the system.
+
+### Analysis Endpoints (AnalisisController)
+| Method | Endpoint | Description | Request Payload | Response Payload |
 |---|---|---|---|---|
-| **AnalisisController** | POST | `/api/v1/analisis-financiero` | `Map<String, Object>` | `Map<String, Object>` O resultado completo de IA |
-| | POST | `/api/v1/analisis-financiero/retrain` | - | `Map<String, String>` |
-| | POST | `/api/v1/analisis-financiero/ia` | `Map<String, Object>` | `Map<String, Object>` (Resultado de IA) |
-| | POST | `/api/v1/analisis-financiero/clasificar` | `Map<String, Object>` (descripcion, valor) | `Map<String, String>` (categoria, descripcion) |
-| **AuthController** | POST | `/api/v1/auth/register` | `RegistroRequest` | `RegistroResponse` |
-| | POST | `/api/v1/auth/login` | `LoginRequest` | `LoginResponse` |
-| **DashboardController**| GET | `/api/v1/dashboard/summary` | - | `DashboardResponse` |
-| | GET | `/api/v1/dashboard/history` | - | `List<DashboardResponse>` |
-| **HealthController** | GET | `/api/v1/health` | - | `HealthResponse` |
-| **TransactionController** | POST | `/api/v1/transactions` | `TransactionRequest` | `TransactionResponse` |
-| | GET | `/api/v1/transactions` | - | `List<TransactionResponse>` |
-| **UserController** | GET | `/api/v1/users/profile` | - | `UserResponse` |
-| | PUT | `/api/v1/users/profile` | `UserUpdateRequest` | `UserResponse` |
+| POST | `/api/v1/analisis-financiero` | Standard financial analysis | `Map<String, Object>` | `Map<String, Object>` |
+| POST | `/api/v1/analisis-financiero/retrain` | Retrain AI model | N/A | `Map<String, String>` |
+| POST | `/api/v1/analisis-financiero/ia` | Execute specific AI routines | `Map<String, Object>` | `Map<String, Object>` |
+| POST | `/api/v1/analisis-financiero/clasificar` | Classify transactions via AI | `Map<String, Object>` | `Map<String, String>` |
+
+### Authentication Endpoints (AuthController)
+| Method | Endpoint | Description | Request Payload | Response Payload |
+|---|---|---|---|---|
+| POST | `/api/v1/auth/register` | Register new user account | `RegistroRequest` | `RegistroResponse` |
+| POST | `/api/v1/auth/login` | Authenticate user | `LoginRequest` | `LoginResponse` |
+
+### Dashboard Endpoints (DashboardController)
+| Method | Endpoint | Description | Request Payload | Response Payload |
+|---|---|---|---|---|
+| GET | `/api/v1/dashboard/summary` | Get summarized dashboard data | N/A | `DashboardResponse` |
+| GET | `/api/v1/dashboard/history` | Get historical dashboard data | N/A | `List<DashboardResponse>` |
+
+### Health Endpoints (HealthController)
+| Method | Endpoint | Description | Request Payload | Response Payload |
+|---|---|---|---|---|
+| GET | `/api/v1/health` | Service health check | N/A | `HealthResponse` |
+
+### Transaction Endpoints (TransactionController)
+| Method | Endpoint | Description | Request Payload | Response Payload |
+|---|---|---|---|---|
+| POST | `/api/v1/transactions` | Create a new transaction | `TransactionRequest` | `TransactionResponse` |
+| GET | `/api/v1/transactions` | Retrieve user transactions | N/A | `List<TransactionResponse>` |
+
+### User Endpoints (UserController)
+| Method | Endpoint | Description | Request Payload | Response Payload |
+|---|---|---|---|---|
+| GET | `/api/v1/users/profile` | Retrieve user profile | N/A | `UserResponse` |
+| PUT | `/api/v1/users/profile` | Update user profile | `UserUpdateRequest` | `UserResponse` |

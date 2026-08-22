@@ -1,10 +1,10 @@
-# 📘 DOCUMENTACIÓN DEFINITIVA DEL SISTEMA — FINANCEAI
+# DOCUMENTACIÓN DEFINITIVA DEL SISTEMA — FINANCEAI
 > **Plataforma Integral de Salud Financiera con Inteligencia Artificial, Arquitectura Multi-Moneda y Monitoreo en Tiempo Real.**  
 > *Versión Oficial Consolidada — G9-LATAM-Team-77*
 
 ---
 
-## 📑 TABLA DE CONTENIDOS GENERAL
+## TABLA DE CONTENIDOS GENERAL
 
 1. [Visión General y Arquitectura del Sistema](#1-visión-general-y-arquitectura-del-sistema)
 2. [Módulo de Data Science & Machine Learning](#2-módulo-de-data-science--machine-learning)
@@ -531,5 +531,3 @@ Si prefieres levantar todo el ecosistema con un solo comando utilizando Docker:
 | Caracteres extraños en Excel al exportar CSV | Falta de codificación UTF-8 con BOM. | Resuelto de fábrica: la función de exportación en `historial.astro` inyecta automáticamente el prefijo `\uFEFF`. |
 
 ---
-
-> 🚀 **FinanceAI — Sistema Listo para Producción y Evaluación Técnica.**

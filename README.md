@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 FinanceAI - Análisis Financiero Inteligente
+# FinanceAI - Análisis Financiero Inteligente
 
 [![Astro](https://img.shields.io/badge/Frontend-Astro_4.0-FF5D01?style=for-the-badge&logo=astro&logoColor=white)](https://astro.build/)
 [![Java Spring Boot](https://img.shields.io/badge/Backend-Spring_Boot_3-6DB33F?style=for-the-badge&logo=spring&logoColor=white)](https://spring.io/)
@@ -13,10 +13,10 @@
 
 ---
 
-## 🎯 Sobre el Proyecto (MVP)
+## Sobre el Proyecto (MVP)
 FinanceAI es una solución tecnológica desarrollada durante el Hackathon (Team-77) que permite a los usuarios registrar sus transacciones, obtener un perfil financiero y recibir recomendaciones personalizadas generadas por modelos de **Machine Learning**.
 
-### ✨ Características Principales
+### Características Principales
 - **Dashboard Interactivo:** Visualización clara de los patrones de gasto y métricas clave.
 - **Predicción de IA Sensible a Moneda:** El modelo en Python analiza y proyecta tu salud financiera adaptándose a la moneda que elijas.
 - **Arquitectura de Microservicios:** Módulos separados, robustos y fácilmente escalables (Frontend, Backend, y API de Datos).
@@ -24,7 +24,7 @@ FinanceAI es una solución tecnológica desarrollada durante el Hackathon (Team-
 
 ---
 
-## 🏗️ Arquitectura de la Solución
+## Arquitectura de la Solución
 
 El proyecto está dividido en tres módulos principales con responsabilidad única:
 
@@ -43,7 +43,7 @@ graph TD;
 
 ---
 
-## 🚀 Guía de Inicio Rápido (Desarrollo Local)
+## Guía de Inicio Rápido (Desarrollo Local)
 
 Para orquestar todo el ecosistema de manera inmediata, hemos provisto un *script* automatizado. 
 
@@ -62,12 +62,12 @@ Usa el inicializador unificado que preparará las bases de datos y lanzará los 
 
 > [!TIP]
 > **Rutas expuestas:**
-> - 🌐 **App Frontend:** `http://localhost:4321`
-> - ⚙️ **API Backend:** `http://localhost:8080/api/v1`
-> - 📊 **Documentación API:** `http://localhost:8080/swagger-ui.html`
+> -  **App Frontend:** `http://localhost:4321`
+> -  **API Backend:** `http://localhost:8080/api/v1`
+> -  **Documentación API:** `http://localhost:8080/swagger-ui.html`
 
 ---
 
-## 📄 Licencia y Equipo
+## Licencia y Equipo
 Construido con dedicación por el **G9-LATAM-Team-77**.
 *Fernando (Frontend) · Justin (Backend) · Jonathan (DevOps/DS)*

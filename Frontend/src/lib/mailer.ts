@@ -146,7 +146,7 @@ function createEmailTemplate(title: string, subtitle: string, code: string, mess
             </div>
             <div class="footer">
                 ${footerText}<br>
-                © 2026 FinanceAI Technologies. Todos los derechos reservados.
+                 2026 FinanceAI Technologies. Todos los derechos reservados.
             </div>
         </div>
     </body>
@@ -172,7 +172,7 @@ export async function sendVerificationEmail(toEmail: string, code: string, name?
     return transporter.sendMail({
         from: `"FinanceAI Seguridad" <${user}>`,
         to: toEmail,
-        subject: `🔐 Tu código de verificación FinanceAI: ${code}`,
+        subject: ` Tu código de verificación FinanceAI: ${code}`,
         html: html
     });
 }
@@ -194,7 +194,7 @@ export async function sendRecoveryEmail(toEmail: string, code: string) {
     return transporter.sendMail({
         from: `"FinanceAI Soporte" <${user}>`,
         to: toEmail,
-        subject: `🔑 Restablece tu contraseña - Código: ${code}`,
+        subject: ` Restablece tu contraseña - Código: ${code}`,
         html: html
     });
 }

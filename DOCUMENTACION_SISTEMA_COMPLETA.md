@@ -64,9 +64,9 @@ graph TD
   - **Componente Ahorro Real (33 pts máx):** Ahorro >=20% del ingreso (33 pts), 5-19% (16 pts), <5% (0 pts).
   - **Componente Endeudamiento (33 pts máx):** Deuda <=15% (33 pts), 16-35% (16 pts), >35% (0 pts).
   - **Semáforo:**
-    - 🟢 **70 - 100 pts:** Saludable
-    - ⚠️ **40 - 69 pts:** En riesgo
-    - 🚨 **0 - 39 pts:** Crítico
+    -  **70 - 100 pts:** Saludable
+    -  **40 - 69 pts:** En riesgo
+    -  **0 - 39 pts:** Crítico
 - **Independencia de Divisa:** Los modelos de Machine Learning y reglas operan sobre ratios adimensionales (`gastos / ingresos`, `ahorro / ingresos`), garantizando consistencia matemática idéntica sin importar la divisa utilizada.
 - **Matriz de 12 Categorías Oficiales (PR-02):**
   - *Necesidades Básicas (50%):* Vivienda, Alimentación, Transporte, Servicios, Salud y bienestar, Educación.
