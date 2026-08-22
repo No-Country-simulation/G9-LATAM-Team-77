@@ -677,6 +677,7 @@ const hasServerSession = !!session;
                         id: timestampBase,
                         description: `Ingreso del Período (${selectSubPeriod.options[selectSubPeriod.selectedIndex]?.text || ''})`,
                         amount: ingreso,
+                        originalCurrency: activeCurrency,
                         category: 'Ingresos',
                         type: 'INCOME',
                         date: currentMinDate
@@ -685,6 +686,7 @@ const hasServerSession = !!session;
                         id: timestampBase + idx + 1,
                         description: t.descripcion,
                         amount: t.monto,
+                        originalCurrency: activeCurrency,
                         category: t.descripcion,
                         type: 'EXPENSE',
                         date: t.fecha || currentMinDate

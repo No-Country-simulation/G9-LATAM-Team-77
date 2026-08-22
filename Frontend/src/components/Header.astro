@@ -5,13 +5,14 @@ import { getSession } from 'auth-astro/server';
 const session = await getSession(Astro.request);
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
+const isLogoutPage = currentPath === 'logout';
 
 const googleImage = session?.user?.image || '';
 const googleName = session?.user?.name || '';
 const googleEmail = session?.user?.email || '';
 ---
 
-<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
+<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300 font-inter">
     <div class="flex items-center space-x-8">
         <!-- Logo -->
         <a href="/" class="flex items-center space-x-2.5 group">
@@ -23,67 +24,100 @@ const googleEmail = session?.user?.email || '';
             <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
         </a>
 
-        <!-- Main Nav -->
-        <nav id="mainNav" class="hidden space-x-6 text-sm font-medium font-inter">
-            <a href="/dashboard"
-                class={`pb-1 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
-                Dashboard
-            </a>
-            <a href="/historial"
-                class={`pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
-                Historial
-            </a>
-        </nav>
+        <!-- Main Nav (Oculto en pantalla de Logout) -->
+        {!isLogoutPage && (
+            <nav id="mainNav" class="hidden space-x-6 text-sm font-medium font-inter">
+                <a href="/dashboard"
+                    class={`pb-1 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                    Dashboard
+                </a>
+                <a href="/historial"
+                    class={`pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                    Historial
+                </a>
+            </nav>
+        )}
     </div>
 
     <!-- Right Controls -->
-    <div class="flex items-center space-x-3.5">
-        <!-- Backend Health Indicator -->
-        <div id="backendIndicator" class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full font-inter">
-            <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span id="backendStatusText">Backend...</span>
-        </div>
+    {!isLogoutPage && (
+        <div class="flex items-center space-x-3.5">
+            
 
-        <!-- Dark mode toggle -->
-        <button id="themeToggle"
-            aria-label="Cambiar tema"
-            class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
-            <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-            </svg>
-            <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
-            </svg>
-        </button>
+            <!-- Backend Health Indicator -->
+            <div id="backendIndicator" class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full">
+                <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span id="backendStatusText">Backend...</span>
+            </div>
 
-        <!-- User Profile Avatar Button -->
-        <div id="userProfileSection" class="hidden relative">
-            <button id="btnOpenProfileModal" class="flex items-center gap-2 p-0.5 rounded-full ring-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none" title="Mi Perfil y Ajustes">
-                <img id="navUserAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm" />
+            <!-- Dark mode toggle -->
+            <button id="themeToggle"
+                aria-label="Cambiar tema"
+                class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+                <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                </svg>
+                <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+                </svg>
+            </button>
+
+            <!-- User Profile Avatar Button -->
+            <div id="userProfileSection" class="hidden relative">
+                <button id="btnOpenProfileModal" class="flex items-center gap-2 p-0.5 rounded-full ring-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none" title="Mi Perfil y Ajustes">
+                    <img id="navUserAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm" />
+                </button>
+            </div>
+
+            <!-- Auth Button (Abre Modal Centrado) -->
+            <button type="button" id="authNavBtn"
+                class="hidden text-xs font-semibold px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-xl transition-colors">
+                Cerrar Sesión
             </button>
         </div>
-
-        <!-- Auth Button (Sign out button fallback) -->
-        <a href="/logout" id="authNavBtn"
-            class="hidden text-xs font-semibold px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-xl transition-colors font-inter">
-            Cerrar Sesión
-        </a>
-    </div>
+    )}
 </header>
 
-<!-- Modal de Perfil de Usuario y Ajustes -->
-<div id="userProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/70 backdrop-blur-md">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-lg mx-4 rounded-3xl p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[90vh] overflow-y-auto">
+<!-- Modal Centrado de Confirmación de Cierre de Sesión (Overlay Difuminado) -->
+<div id="headerLogoutModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-gray-900/70 backdrop-blur-xl animate-fade-in font-inter">
+    <div class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 sm:p-10 max-w-md w-full mx-4 border border-gray-200 dark:border-gray-800 text-center animate-scale-in">
+        <div class="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl flex items-center justify-center mb-5 shadow-inner border border-gray-200 dark:border-gray-700">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+        </div>
+        
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-2 font-josefin">¿Cerrar Sesión?</h2>
+        
+        <p class="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-6 leading-relaxed">
+            ¿Estás seguro de que deseas salir de tu cuenta? Tendrás que volver a iniciar sesión para acceder a tu panel.
+        </p>
+        
+        <div class="space-y-2.5">
+            <button id="btnHeaderConfirmSignout" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md hover:shadow-lg text-xs sm:text-sm">
+                Sí, salir de mi cuenta
+            </button>
+            <button id="btnHeaderCancelSignout" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-2.5 px-4 rounded-xl transition text-xs sm:text-sm">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Perfil de Usuario y Ajustes (Con Cierre al Hacer Clic Afuera y Botón Grande) -->
+<div id="userProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/70 backdrop-blur-md animate-fade-in font-inter">
+    <div id="userProfileCard" class="bg-white dark:bg-gray-900 w-full max-w-lg mx-4 rounded-3xl p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[90vh] overflow-y-auto">
         <!-- Modal Header -->
         <div class="flex justify-between items-center pb-4 border-b border-gray-100 dark:border-gray-800">
             <div>
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white font-playfair">Mi Perfil y Ajustes</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400 font-inter">Personaliza tu cuenta y moneda predeterminada</p>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white font-josefin">Mi Perfil y Ajustes</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Personaliza tu cuenta y moneda predeterminada</p>
             </div>
-            <button id="btnCloseProfileModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-white text-xl font-bold">&times;</button>
+            <!-- Botón de Cerrar Grande -->
+            <button id="btnCloseProfileModal" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-3xl font-bold w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none" title="Cerrar">&times;</button>
         </div>
 
-        <div class="py-6 space-y-6 font-inter">
+        <div class="py-6 space-y-6">
             <!-- User Basic Info -->
             <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
                 <img id="modalCurrentAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} class="w-16 h-16 rounded-full object-cover border-2 border-blue-500 shadow-md" />
@@ -123,11 +157,16 @@ const googleEmail = session?.user?.email || '';
                 Guardar Cambios
             </button>
 
-            <!-- Danger Zone: Eliminar Cuenta -->
-            <div class="pt-4 border-t border-red-100 dark:border-red-900/30">
-                <h5 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1">Zona de Peligro</h5>
-                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-3">Eliminar tu cuenta borrará todos tus datos financieros, registros y configuraciones de forma irreversible.</p>
-                <button id="btnOpenDeleteAccountModal" class="px-4 py-2 text-xs font-semibold text-red-600 hover:text-white bg-red-50 dark:bg-red-900/20 hover:bg-red-600 border border-red-200 dark:border-red-800 rounded-xl transition-colors">
+            <!-- Danger Zone: Eliminar Cuenta (Letra más grande y legible) -->
+            <div class="pt-5 border-t border-red-100 dark:border-red-900/30">
+                <h5 class="text-sm sm:text-base font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    ZONA DE PELIGRO
+                </h5>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mb-3.5 leading-relaxed">
+                    Eliminar tu cuenta borrará todos tus datos financieros, transacciones, registros y configuraciones de forma permanente e irreversible.
+                </p>
+                <button id="btnOpenDeleteAccountModal" class="px-4 py-2.5 text-xs sm:text-sm font-bold text-red-600 hover:text-white bg-red-50 dark:bg-red-900/20 hover:bg-red-600 border border-red-200 dark:border-red-800 rounded-xl transition-colors shadow-sm">
                     Eliminar mi cuenta
                 </button>
             </div>
@@ -136,28 +175,28 @@ const googleEmail = session?.user?.email || '';
 </div>
 
 <!-- Modal Confirmación Eliminar Cuenta -->
-<div id="deleteAccountConfirmModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/80 backdrop-blur-md">
-    <div class="bg-white dark:bg-gray-900 max-w-sm w-full mx-4 rounded-3xl p-8 shadow-2xl border border-red-300 dark:border-red-800 text-center animate-scale-in font-inter">
-        <div class="w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mb-4 text-2xl">
-            ⚠️
+<div id="deleteAccountConfirmModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/80 backdrop-blur-md font-inter">
+    <div id="deleteAccountCard" class="bg-white dark:bg-gray-900 max-w-sm w-full mx-4 rounded-3xl p-8 shadow-2xl border border-red-300 dark:border-red-800 text-center animate-scale-in">
+        <div class="w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 dark:text-white font-playfair mb-2">¿Eliminar Cuenta Definitivamente?</h3>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white font-josefin mb-2">¿Eliminar Cuenta Definitivamente?</h3>
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
-            Esta acción es irreversible. Se eliminará tu acceso, historial y transacciones asociadas en el sistema.
+            Esta acción es irreversible. Se eliminará tu acceso, historial y transacciones asociadas en la base de datos.
         </p>
         
-        <div class="space-y-3">
-            <button id="btnConfirmDeleteAccount" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition text-sm">
+        <div class="space-y-2.5">
+            <button id="btnConfirmDeleteAccount" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition text-xs sm:text-sm">
                 Sí, eliminar definitivamente
             </button>
-            <button id="btnCancelDeleteAccount" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-sm">
+            <button id="btnCancelDeleteAccount" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm">
                 Cancelar
             </button>
         </div>
     </div>
 </div>
 
-<script define:vars={{ API_URL, googleImage, googleName, googleEmail }}>
+<script define:vars={{ API_URL, googleImage, googleName, googleEmail, isLogoutPage }}>
     // Theme toggle
     document.getElementById('themeToggle')?.addEventListener('click', () => {
         const html = document.documentElement;
@@ -191,7 +230,7 @@ const googleEmail = session?.user?.email || '';
 
     let selectedAvatar = localStorage.getItem('financeai_avatar') || (googleImage || predefinedAvatars[0]);
 
-    if (token) {
+    if (token && !isLogoutPage) {
         if (mainNav) {
             mainNav.classList.remove('hidden');
             mainNav.classList.add('md:flex');
@@ -201,6 +240,19 @@ const googleEmail = session?.user?.email || '';
         }
         if (authNavBtn) {
             authNavBtn.classList.remove('hidden');
+        }
+    }
+
+    // Ticker de tipo de cambio
+    const savedCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+    const rateTickerText = document.getElementById('rateTickerText');
+    if (rateTickerText) {
+        if (savedCurrency === 'USD') {
+            rateTickerText.textContent = `1 USD ≈ $18.25 MXN`;
+        } else {
+            const approximateRates = { 'MXN': 18.25, 'CRC': 515.0, 'EUR': 0.92, 'COP': 4050.0, 'ARS': 950.0, 'CLP': 930.0, 'PEN': 3.75 };
+            const rate = approximateRates[savedCurrency] || 1.0;
+            rateTickerText.textContent = `1 USD ≈ ${rate} ${savedCurrency}`;
         }
     }
 
@@ -230,12 +282,11 @@ const googleEmail = session?.user?.email || '';
         navUserAvatar.src = selectedAvatar;
     }
 
-    // Profile Modal Open / Close
+    // Profile Modal Open / Close & Click Outside Listener
     const userProfileModal = document.getElementById('userProfileModal');
     document.getElementById('btnOpenProfileModal')?.addEventListener('click', () => {
-        // Cargar moneda guardada
-        const savedCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
-        document.getElementById('profileCurrencySelect').value = savedCurrency;
+        const cur = localStorage.getItem('financeai_preferred_currency') || 'USD';
+        document.getElementById('profileCurrencySelect').value = cur;
         
         const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
         if (cachedUser.name) document.getElementById('modalUserName').textContent = cachedUser.name;
@@ -248,6 +299,47 @@ const googleEmail = session?.user?.email || '';
         userProfileModal.classList.add('hidden');
     });
 
+    // Cerrar al hacer clic fuera del borde del modal
+    userProfileModal?.addEventListener('click', (e) => {
+        if (e.target === userProfileModal) {
+            userProfileModal.classList.add('hidden');
+        }
+    });
+
+    // Logout Modal Overlay (Directo y centrado en pantalla)
+    const headerLogoutModal = document.getElementById('headerLogoutModal');
+    authNavBtn?.addEventListener('click', () => {
+        headerLogoutModal?.classList.remove('hidden');
+    });
+
+    document.getElementById('btnHeaderCancelSignout')?.addEventListener('click', () => {
+        headerLogoutModal?.classList.add('hidden');
+    });
+
+    headerLogoutModal?.addEventListener('click', (e) => {
+        if (e.target === headerLogoutModal) {
+            headerLogoutModal.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('btnHeaderConfirmSignout')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btnHeaderConfirmSignout');
+        if (btn) {
+            btn.textContent = 'Cerrando sesión...';
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+        }
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        try {
+            const { signOut } = await import("auth-astro/client");
+            await signOut({ callbackUrl: '/login' });
+        } catch (_) {
+            window.location.href = '/login';
+        }
+    });
+
     // Guardar Ajustes de Perfil
     document.getElementById('btnSaveProfileSettings')?.addEventListener('click', async () => {
         const currency = document.getElementById('profileCurrencySelect').value;
@@ -256,7 +348,6 @@ const googleEmail = session?.user?.email || '';
         
         if (navUserAvatar) navUserAvatar.src = selectedAvatar;
 
-        // Si tenemos token, intentamos actualizar en backend
         if (token) {
             const currencyToId = { 'CRC': 1, 'MXN': 2, 'USD': 3, 'EUR': 4, 'COP': 5, 'ARS': 6, 'CLP': 7, 'PEN': 8 };
             try {
@@ -284,6 +375,12 @@ const googleEmail = session?.user?.email || '';
 
     document.getElementById('btnCancelDeleteAccount')?.addEventListener('click', () => {
         deleteAccountConfirmModal.classList.add('hidden');
+    });
+
+    deleteAccountConfirmModal?.addEventListener('click', (e) => {
+        if (e.target === deleteAccountConfirmModal) {
+            deleteAccountConfirmModal.classList.add('hidden');
+        }
     });
 
     document.getElementById('btnConfirmDeleteAccount')?.addEventListener('click', async () => {
