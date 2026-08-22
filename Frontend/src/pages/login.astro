@@ -4,53 +4,63 @@ import { API_URL } from '../lib/api';
 ---
 
 <Layout title="Iniciar sesión | FinanceAI">
-    <main class="min-h-[calc(100vh-73px)] bg-gray-50 px-4 py-10 dark:bg-gray-950 sm:px-6">
-        <div class="mx-auto grid max-w-5xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900 lg:grid-cols-2">
-            <section class="flex flex-col justify-between bg-[#0b132b] p-8 text-white sm:p-12">
+    <main class="relative isolate min-h-[calc(100vh-65px)] w-full overflow-hidden px-4 py-8 sm:px-6 sm:py-12">
+        <div aria-hidden="true" class="pointer-events-none absolute -left-24 top-1/3 -z-10 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl"></div>
+        <div aria-hidden="true" class="pointer-events-none absolute -right-24 top-10 -z-10 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl"></div>
+        <div class="ui-enter surface-card mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] lg:min-h-[610px] lg:grid-cols-[0.95fr_1.05fr]">
+            <section class="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#071227] via-[#0b1938] to-[#102a5e] p-8 text-white sm:p-12">
+                <div aria-hidden="true" class="absolute -right-24 -top-20 h-64 w-64 rounded-full border border-white/10 bg-blue-400/10 blur-2xl"></div>
                 <div class="flex gap-2" aria-hidden="true">
                     <span class="h-3 w-3 rounded-full bg-blue-500"></span>
                     <span class="h-3 w-3 rounded-full bg-red-500"></span>
                     <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
                 </div>
-                <div class="py-16">
-                    <h1 class="text-4xl font-extrabold leading-tight sm:text-5xl">Inteligencia financiera a tu medida.</h1>
-                    <p class="mt-5 text-base leading-relaxed text-slate-300">
+                <div class="relative py-12 sm:py-16">
+                    <span class="inline-flex rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-200">Datos reales · decisiones claras</span>
+                    <h1 class="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">Inteligencia financiera a tu medida.</h1>
+                    <p class="mt-5 max-w-md text-sm leading-relaxed text-slate-300 sm:text-base">
                         Registra tus movimientos y complementa tus datos reales con análisis financiero asistido.
                     </p>
+                    <div class="mt-8 grid gap-3 text-xs font-semibold text-slate-200 sm:grid-cols-3 lg:grid-cols-1">
+                        <span class="flex items-center gap-2"><span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">✓</span> Dashboard conectado</span>
+                        <span class="flex items-center gap-2"><span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">✓</span> Análisis con IA</span>
+                        <span class="flex items-center gap-2"><span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">✓</span> Historial privado</span>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-400">Acceso oficial del MVP: correo, contraseña y JWT.</p>
+                <p class="relative flex items-center gap-2 text-[11px] text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Acceso protegido con correo, contraseña y JWT.</p>
             </section>
 
-            <section class="p-7 sm:p-12">
-                <div class="mx-auto max-w-md">
-                    <h2 id="formTitle" class="text-3xl font-bold text-gray-900 dark:text-white">Bienvenido de nuevo</h2>
+            <section class="flex items-center p-7 sm:p-12 lg:p-14">
+                <div class="mx-auto w-full max-w-md">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Tu espacio financiero</p>
+                    <h2 id="formTitle" class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Bienvenido de nuevo</h2>
                     <p id="formSubtitle" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Accede a tu panel financiero.</p>
 
                     <div id="alertBox" role="alert" aria-live="polite" class="mt-5 hidden rounded-xl p-3.5 text-sm"></div>
 
                     <form id="authForm" class="mt-6 space-y-4" aria-label="Formulario de autenticación">
-                        <div id="registerFields" class="hidden space-y-4">
+                        <div id="registerFields" class="hidden space-y-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900/60 dark:bg-blue-950/20">
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
                                     Nombre
-                                    <input id="nombre" type="text" autocomplete="given-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                    <input id="nombre" type="text" autocomplete="given-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
                                 </label>
                                 <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
                                     Apellido
-                                    <input id="apellido" type="text" autocomplete="family-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                    <input id="apellido" type="text" autocomplete="family-name" class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
                                 </label>
                             </div>
 
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
                                     País
-                                    <select id="paisId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                    <select id="paisId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
                                         <option value="">Cargando países…</option>
                                     </select>
                                 </label>
                                 <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
                                     Moneda
-                                    <select id="monedaId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                    <select id="monedaId" disabled class="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
                                         <option value="">Cargando monedas…</option>
                                     </select>
                                 </label>
@@ -66,12 +76,12 @@ import { API_URL } from '../lib/api';
 
                         <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
                             Correo electrónico
-                            <input id="email" type="email" required autocomplete="email" placeholder="tu@correo.com" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                            <input id="email" type="email" required autocomplete="email" placeholder="tu@correo.com" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
                         </label>
 
                         <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
                             Contraseña
-                            <input id="password" type="password" required autocomplete="current-password" minlength="6" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                            <input id="password" type="password" required autocomplete="current-password" minlength="6" class="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
                         </label>
 
                         <div id="forgotPasswordRow" class="text-right">
@@ -80,7 +90,7 @@ import { API_URL } from '../lib/api';
                             </button>
                         </div>
 
-                        <button id="submitBtn" type="submit" class="w-full rounded-xl bg-gray-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600 dark:hover:bg-blue-700">
+                        <button id="submitBtn" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-700 hover:shadow-blue-600/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
                             Iniciar sesión
                         </button>
                     </form>

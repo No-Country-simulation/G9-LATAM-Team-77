@@ -4,44 +4,54 @@ import { API_URL } from '../lib/api';
 ---
 
 <Layout title="Dashboard de Análisis | FinanceAI">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
         <!-- Encabezado -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard de Análisis</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tus transacciones persistidas y el análisis de Data Science, en un mismo lugar.</p>
-        </div>
+        <section class="ui-enter relative mb-6 overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 px-6 py-7 text-white shadow-xl shadow-blue-950/15 sm:px-8 sm:py-9">
+            <div aria-hidden="true" class="absolute -right-16 -top-24 h-64 w-64 rounded-full border border-white/10 bg-blue-400/10 blur-2xl"></div>
+            <div class="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <div class="max-w-2xl">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-100"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Centro financiero</span>
+                    <h1 class="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Dashboard de análisis</h1>
+                    <p class="mt-2 max-w-xl text-sm leading-relaxed text-blue-100/80">Tus transacciones persistidas y el análisis de Data Science, reunidos en una vista clara y accionable.</p>
+                </div>
+                <a href="/historial" class="inline-flex w-fit items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-xs font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/15">
+                    Ver historial
+                    <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </a>
+            </div>
+        </section>
 
-        <section class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900" aria-labelledby="summaryTitle">
+        <section class="ui-enter ui-enter-delay-1 surface-card mb-6 rounded-3xl p-5 sm:p-6" aria-labelledby="summaryTitle">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 id="summaryTitle" class="text-lg font-bold text-gray-900 dark:text-white">Resumen de transacciones</h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400">Calculado por el Backend con los movimientos de tu cuenta.</p>
                 </div>
-                <button id="retrySummary" type="button" class="hidden text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">Reintentar</button>
+                <button id="retrySummary" type="button" class="hidden rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-950">Reintentar</button>
             </div>
             <p id="summaryStatus" aria-live="polite" class="mt-4 text-sm text-gray-500 dark:text-gray-400">Cargando resumen…</p>
             <div id="summaryContent" class="mt-4 hidden">
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    <div class="rounded-xl bg-emerald-50 p-4 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
+                    <div class="metric-tile soft-lift rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
                         <p class="text-[10px] font-bold uppercase tracking-wider">Ingresos del mes</p>
                         <p id="summaryIncome" class="mt-1 text-xl font-extrabold">—</p>
                     </div>
-                    <div class="rounded-xl bg-red-50 p-4 text-red-800 dark:bg-red-950/40 dark:text-red-200">
+                    <div class="metric-tile soft-lift rounded-2xl border border-red-100 bg-red-50 p-4 text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
                         <p class="text-[10px] font-bold uppercase tracking-wider">Gastos del mes</p>
                         <p id="summaryExpenses" class="mt-1 text-xl font-extrabold">—</p>
                     </div>
-                    <div class="rounded-xl bg-blue-50 p-4 text-blue-800 dark:bg-blue-950/40 dark:text-blue-200">
+                    <div class="metric-tile soft-lift rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-800 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-200">
                         <p class="text-[10px] font-bold uppercase tracking-wider">Balance del mes</p>
                         <p id="summaryBalance" class="mt-1 text-xl font-extrabold">—</p>
                     </div>
                 </div>
                 <div class="mt-4 grid gap-4 lg:grid-cols-2">
-                    <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
+                    <div class="rounded-2xl border border-gray-100 bg-slate-50/60 p-4 dark:border-gray-800 dark:bg-slate-950/30">
                         <p class="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Comparación</p>
                         <p id="summaryVariation" class="mt-2 text-sm font-semibold text-gray-800 dark:text-gray-200"></p>
                     </div>
-                    <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
+                    <div class="rounded-2xl border border-gray-100 bg-slate-50/60 p-4 dark:border-gray-800 dark:bg-slate-950/30">
                         <p class="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Gastos por categoría</p>
                         <div id="summaryCategories" class="mt-2 space-y-2"></div>
                     </div>
@@ -49,13 +59,21 @@ import { API_URL } from '../lib/api';
             </div>
         </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div class="ui-enter ui-enter-delay-2 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
 
             <!-- ══════════════════════════════
                  PANEL IZQUIERDO — Formulario
             ══════════════════════════════ -->
-            <div class="lg:col-span-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300">
-                <h2 class="font-bold text-lg text-gray-900 dark:text-white mb-6">Datos del Cliente</h2>
+            <div class="surface-card rounded-3xl p-5 sm:p-7 lg:col-span-2">
+                <div class="mb-6 flex items-start gap-3 border-b border-slate-100 pb-5 dark:border-slate-800">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">
+                        <svg aria-hidden="true" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h3m-7 6h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    </span>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-gray-900 dark:text-white">Datos para el análisis</h2>
+                        <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">Completa tu panorama mensual y agrega las categorías que deseas evaluar.</p>
+                    </div>
+                </div>
 
                 <form id="analisisForm" class="space-y-6">
 
@@ -117,7 +135,7 @@ import { API_URL } from '../lib/api';
                         <div id="transaccionesContainer" class="space-y-2 mb-3"></div>
 
                         <button type="button" id="btnAgregarTransaccion"
-                            class="w-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg py-2.5 text-xs font-semibold transition-colors duration-200 flex items-center justify-center gap-2">
+                            class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-blue-300 py-3 text-xs font-bold text-blue-600 transition hover:border-blue-400 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950/50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -127,7 +145,7 @@ import { API_URL } from '../lib/api';
 
                     <!-- Submit -->
                     <button type="submit" id="submitBtn"
-                        class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 mt-auto flex items-center justify-center gap-2 text-sm shadow-sm">
+                        class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:from-blue-500 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
@@ -139,10 +157,10 @@ import { API_URL } from '../lib/api';
             <!-- ══════════════════════════════
                  PANEL DERECHO — Resultados
             ══════════════════════════════ -->
-            <div class="flex flex-col gap-5">
+            <div class="flex flex-col gap-5 lg:sticky lg:top-28">
 
                 <!-- Salud Financiera Card -->
-                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm flex flex-col items-center transition-colors duration-300">
+                <div class="surface-card soft-lift flex flex-col items-center rounded-3xl p-6">
                     <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Salud Financiera</h3>
                     <div class="relative w-32 h-32 flex items-center justify-center rounded-full border-[6px] border-gray-200 dark:border-gray-700 mb-4 transition-all duration-300" id="circleScore">
                         <div class="text-center">
@@ -158,7 +176,7 @@ import { API_URL } from '../lib/api';
 
                 <!-- Recomendaciones del Modelo de IA (CARD DESTACADA) -->
                 <div id="iaRecomendacionesCard"
-                    class="bg-white dark:bg-gray-900 border border-blue-200/80 dark:border-blue-900/60 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
+                    class="surface-card hidden rounded-3xl border-blue-200/80 p-6 dark:border-blue-900/60">
                     <div class="flex items-center gap-2 mb-4">
                         <div class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -173,7 +191,7 @@ import { API_URL } from '../lib/api';
 
                 <!-- Analisis Detallado Card -->
                 <div id="resultadoFormateado"
-                    class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
+                    class="surface-card hidden rounded-3xl p-6">
                     <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Resumen Financiero</h3>
 
                     <!-- Mini cards -->
@@ -188,7 +206,7 @@ import { API_URL } from '../lib/api';
 
                 <!-- Grafica de barras -->
                 <div id="graficaBox"
-                    class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 rounded-xl shadow-sm transition-colors duration-300 hidden">
+                    class="surface-card hidden rounded-3xl p-6">
                     <h3 class="font-bold text-xs text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">Distribución de Gastos</h3>
                     <div class="relative" style="height: 180px;">
                         <canvas id="barChart"></canvas>
@@ -196,7 +214,7 @@ import { API_URL } from '../lib/api';
                 </div>
 
                 <!-- JSON colapsable -->
-                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 rounded-xl shadow-sm transition-colors duration-300">
+                <div class="surface-card rounded-2xl p-4">
                     <button id="toggleJson"
                         class="w-full flex items-center justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
                         <span class="uppercase tracking-wide">Ver JSON de Respuesta (API)</span>
@@ -297,7 +315,7 @@ async function loadDashboardSummary() {
         } else {
             categoryContainer.replaceChildren(...categories.map(([category, amount]) => {
                 const row = document.createElement('div');
-                row.className = 'flex justify-between gap-4 text-sm';
+                row.className = 'flex items-center justify-between gap-4 rounded-lg bg-white px-3 py-2 text-sm shadow-sm dark:bg-slate-900';
                 const name = document.createElement('span');
                 name.textContent = category;
                 const value = document.createElement('strong');
@@ -356,7 +374,7 @@ function refreshAllDropdowns() {
 function createTransaccionRow(id, catValue, valValue) {
     const row = document.createElement('div');
     row.id = `row_${id}`;
-    row.className = 'flex items-center gap-2 tx-row-anim';
+    row.className = 'tx-row-anim flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2 dark:border-slate-700 dark:bg-slate-950/40';
     row.innerHTML = `
         <select id="cat_${id}" data-id="${id}"
             class="w-2/3 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer">
