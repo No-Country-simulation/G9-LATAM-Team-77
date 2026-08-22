@@ -1,41 +1,52 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: import.meta.env.GMAIL_USER,
-    pass: import.meta.env.GMAIL_PASS
-  }
-});
+function getTransporter() {
+  const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '';
+  const pass = (process.env.GMAIL_PASS || import.meta.env.GMAIL_PASS || '').replace(/\s+/g, '');
+
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: user,
+      pass: pass
+    }
+  });
+}
 
 export const sendWelcomeEmail = async (email: string) => {
+  const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '';
+  const transporter = getTransporter();
+
   const mailOptions = {
-    from: import.meta.env.GMAIL_USER,
+    from: `"FinanceAI" <${user}>`,
     to: email,
-    subject: 'Bienvenido a nuestra aplicación',
-    text: 'Gracias por registrarte en nuestra plataforma. ¡Estamos felices de tenerte!'
+    subject: 'Bienvenido a FinanceAI',
+    text: 'Gracias por registrarte en nuestra plataforma de salud financiera. ¡Estamos felices de tenerte!'
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     return info;
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.error('Error enviando correo de bienvenida:', error);
   }
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
+  const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '';
+  const transporter = getTransporter();
+
   const mailOptions = {
-    from: import.meta.env.GMAIL_USER,
+    from: `"FinanceAI Seguridad" <${user}>`,
     to: email,
-    subject: 'Restablecer contraseña',
-    text: `Para restablecer tu contraseña, usa el siguiente token o enlace: ${token}` // This will usually be a link in a real app
+    subject: 'Restablecer contraseña - FinanceAI',
+    text: `Para restablecer tu contraseña, usa el siguiente token de seguridad: ${token}`
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     return info;
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+    console.error('Error enviando correo de restablecimiento:', error);
   }
 };

@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer';
 
 function getTransporter() {
-    const rawPass = process.env.GMAIL_PASS || import.meta.env.GMAIL_PASS || 'uyirofpnwwsjzwlp';
+    const rawPass = process.env.GMAIL_PASS || import.meta.env.GMAIL_PASS || '';
     const pass = rawPass.replace(/\s+/g, '');
-    const user = (process.env.GMAIL_USER || import.meta.env.GMAIL_USER || 'fernando.jose.reynosa@gmail.com').trim();
+    const user = (process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '').trim();
 
     return nodemailer.createTransport({
         service: 'gmail',
@@ -158,7 +158,7 @@ function createEmailTemplate(title: string, subtitle: string, code: string, mess
  * Enviar Código de Verificación de Cuenta
  */
 export async function sendVerificationEmail(toEmail: string, code: string, name?: string) {
-    const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || 'fernando.jose.reynosa@gmail.com';
+    const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '';
     const transporter = getTransporter();
     const greeting = name ? `¡Hola ${name}!` : '¡Hola!';
     const html = createEmailTemplate(
@@ -181,7 +181,7 @@ export async function sendVerificationEmail(toEmail: string, code: string, name?
  * Enviar Código de Restablecimiento de Contraseña
  */
 export async function sendRecoveryEmail(toEmail: string, code: string) {
-    const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || 'fernando.jose.reynosa@gmail.com';
+    const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '';
     const transporter = getTransporter();
     const html = createEmailTemplate(
         'Recuperación de Contraseña',

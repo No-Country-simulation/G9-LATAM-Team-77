@@ -38,7 +38,7 @@ graph TD
 - **Sistema de Cierre de Sesión (Logout UX):**
   - Modal centrado superpuesto con desenfoque de fondo (`backdrop-blur-xl`).
   - Ocultamiento de la navegación, avatar y botones del Header durante la pantalla de logout para un diseño limpio y enfocado.
-- **Servicio de Correos:** Integración con **Nodemailer** y Gmail (`fernando.jose.reynosa@gmail.com`) con plantillas HTML de alta gama para envío de códigos de verificación de 6 dígitos al crear cuenta y restablecer contraseñas.
+- **Servicio de Correos:** Integración con **Nodemailer** y Gmail configurado por variables de entorno con plantillas HTML de alta gama para envío de códigos de verificación de 6 dígitos al crear cuenta y restablecer contraseñas.
 - **Seguridad y Validación:** Bloqueo estricto de emojis en formularios de registro, y guardias de protección de rutas síncronos en `/dashboard` e `/historial` que impiden acceder cambiando la URL sin autenticación previa.
 - **Vistas Principales:**
   - `/login`: Formulario interactivo de acceso y registro con bloqueo de emojis, envío automático de correos con Nodemailer para verificación de cuenta, y flujo guiado en 3 pasos para restablecer contraseña.
