@@ -7,5 +7,7 @@ public record ResetPasswordRequest(
         String email,
 
         @NotBlank(message = "La nueva contraseña es obligatoria")
-        String newPassword
+        String newPassword,
+
+        String token
 ) {}

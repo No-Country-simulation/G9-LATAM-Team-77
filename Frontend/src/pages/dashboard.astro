@@ -697,14 +697,14 @@ const hasServerSession = !!session;
                 localStorage.setItem('financeai_all_transactions', JSON.stringify(updatedHistory));
                 localStorage.setItem('financeai_dashboard_txns', JSON.stringify(updatedHistory));
 
-                window.showToast('¡Análisis Completado!', 'Resultados generados con el motor de IA', '');
+                window.showToast('¡Análisis Completado!', 'Resultados generados con el motor de IA', '✨');
             } else {
                 setCalculatingState(false);
-                window.showToast('Error en Análisis', `No fue posible completar el análisis (HTTP ${res.status}).`, '');
+                window.showToast('Error en Análisis', `No fue posible completar el análisis (HTTP ${res.status}).`, '⚠️');
             }
         } catch (e) {
             setCalculatingState(false);
-            window.showToast('Error de Conexión', 'No fue posible contactar con el backend.', '');
+            window.showToast('Error de Conexión', 'No fue posible contactar con el backend.', '📡');
         } finally {
             btn.disabled = false;
             btn.innerHTML = `

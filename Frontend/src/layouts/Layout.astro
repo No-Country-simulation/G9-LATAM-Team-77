@@ -95,7 +95,7 @@ const { title } = Astro.props;
 
 		<script is:inline>
 			let toastTimeout = null;
-			window.showToast = function(title, message, icon = "") {
+			window.showToast = function(title, message, icon = "🔔") {
 				const toast = document.getElementById('globalToast');
 				const toastTitle = document.getElementById('globalToastTitle');
 				const toastMessage = document.getElementById('globalToastMessage');
@@ -106,7 +106,7 @@ const { title } = Astro.props;
 
 				toastTitle.textContent = title;
 				toastMessage.textContent = message;
-				toastIcon.textContent = icon;
+				toastIcon.textContent = icon || "🔔";
 
 				toast.classList.remove('hidden');
 				setTimeout(() => {

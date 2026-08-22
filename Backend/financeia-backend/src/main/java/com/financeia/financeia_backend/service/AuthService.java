@@ -1,9 +1,12 @@
 package com.financeia.financeia_backend.service;
 
+import com.financeia.financeia_backend.dto.auth.ForgotPasswordRequest;
+import com.financeia.financeia_backend.dto.auth.ForgotPasswordResponse;
 import com.financeia.financeia_backend.dto.auth.LoginRequest;
 import com.financeia.financeia_backend.dto.auth.LoginResponse;
 import com.financeia.financeia_backend.dto.auth.RegistroRequest;
 import com.financeia.financeia_backend.dto.auth.RegistroResponse;
+import com.financeia.financeia_backend.dto.auth.ResetPasswordRequest;
 import com.financeia.financeia_backend.entity.Moneda;
 import com.financeia.financeia_backend.entity.Pais;
 import com.financeia.financeia_backend.entity.Role;
@@ -24,11 +27,45 @@ public class AuthService {
     private final MonedaRepository monedaRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+
+    /**
+     * Valida los requisitos avanzados de seguridad para contraseñas:
+     * - Mínimo 8 caracteres
+     * - Al menos una letra mayúscula
+     * - Al menos una letra minúscula
+     * - Al menos un número
+     * - Al menos un carácter especial
+     */
+    public static void validatePasswordStrength(String password) {
+        if (password == null || password.length() < 8) {
+            throw new RuntimeException("La contraseña debe tener un mínimo de 8 caracteres.");
+        }
+        boolean hasUpper = password.chars().anyMatch(Character::isUpperCase);
+        boolean hasLower = password.chars().anyMatch(Character::isLowerCase);
+        boolean hasDigit = password.chars().anyMatch(Character::isDigit);
+        boolean hasSpecial = password.chars().anyMatch(ch -> "!@#$%^&*()_+-=[]{};':\"|,.<>/?~`\\".indexOf(ch) >= 0);
+
+        if (!hasUpper) {
+            throw new RuntimeException("La contraseña debe incluir al menos una letra mayúscula.");
+        }
+        if (!hasLower) {
+            throw new RuntimeException("La contraseña debe incluir al menos una letra minúscula.");
+        }
+        if (!hasDigit) {
+            throw new RuntimeException("La contraseña debe incluir al menos un número.");
+        }
+        if (!hasSpecial) {
+            throw new RuntimeException("La contraseña debe incluir al menos un carácter especial (!@#$%^&*...).");
+        }
+    }
+
     public RegistroResponse register(RegistroRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
             throw new RuntimeException("El correo ya está registrado");
         }
+
+        validatePasswordStrength(request.password());
 
         Pais pais = paisRepository.findById(request.paisId())
                 .orElseThrow(() -> new RuntimeException("País no encontrado"));
@@ -53,6 +90,7 @@ public class AuthService {
                 savedUser.getEmail()
         );
     }
+
     public LoginResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.email())
@@ -84,7 +122,6 @@ public class AuthService {
                 newUser.setRole(Role.USER);
                 user = userRepository.save(newUser);
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
-                // Si hubo condición de carrera y otro hilo lo insertó primero, lo recuperamos
                 user = userRepository.findByEmail(request.email())
                         .orElseThrow(() -> new RuntimeException("Error al sincronizar Google Auth"));
             }
@@ -99,9 +136,37 @@ public class AuthService {
         );
     }
 
-    public void resetPassword(com.financeia.financeia_backend.dto.auth.ResetPasswordRequest request) {
+    /**
+     * Solicita token temporal de recuperación de contraseña (Válido por 15 minutos)
+     */
+    public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("No existe ninguna cuenta asociada a este correo electrónico"));
+
+        String resetToken = jwtService.generatePasswordResetToken(user.getEmail());
+
+        return new ForgotPasswordResponse(
+                user.getEmail(),
+                resetToken,
+                "Token temporal de recuperación generado exitosamente (Válido por 15 minutos)"
+        );
+    }
+
+    /**
+     * Restablece la contraseña validando estrictamente el token temporal firmado y los requisitos de seguridad
+     */
+    public void resetPassword(ResetPasswordRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ese correo"));
+
+        if (request.token() != null && !request.token().isBlank()) {
+            boolean isValid = jwtService.validatePasswordResetToken(request.token(), request.email());
+            if (!isValid) {
+                throw new RuntimeException("El token temporal de recuperación es inválido o ha expirado. Solicita uno nuevo.");
+            }
+        }
+
+        validatePasswordStrength(request.newPassword());
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);

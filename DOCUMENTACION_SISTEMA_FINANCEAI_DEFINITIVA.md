@@ -7,13 +7,14 @@
 ## TABLA DE CONTENIDOS GENERAL
 
 1. [Visión General y Arquitectura del Sistema](#1-visión-general-y-arquitectura-del-sistema)
+   - [1.1 Arquitectura Centralizada de Variables de Entorno (.env)](#11-arquitectura-centralizada-de-variables-de-entorno-env)
 2. [Módulo de Data Science & Machine Learning](#2-módulo-de-data-science--machine-learning)
    - [2.1 Formulación Matemática de Ratios Adimensionales](#21-formulación-matemática-de-ratios-adimensionales)
    - [2.2 Neutralidad Multidivisa en IA](#22-neutralidad-multidivisa-en-ia)
    - [2.3 Pipeline de Entrenamiento y Modelos](#23-pipeline-de-entrenamiento-y-modelos)
    - [2.4 Protocolo CLI de Inferencia Subprocess](#24-protocolo-cli-de-inferencia-subprocess)
    - [2.5 Matriz Heurística de Respaldo y Tolerancia a Fallos](#25-matriz-heurística-de-respaldo-y-tolerancia-a-fallos)
-3. [Módulo Backend (Spring Boot 3 & Java 21)](#3-módulo-backend-spring-boot-3--java-21)
+3. [Módulo Backend (Spring Boot 3 & Java 17 LTS)](#3-módulo-backend-spring-boot-3--java-17-lts)
    - [3.1 Tabla de Clases y Responsabilidades](#31-tabla-de-clases-y-responsabilidades)
    - [3.2 Esquema de Base de Datos y Entidades JPA](#32-esquema-de-base-de-datos-y-entidades-jpa)
    - [3.3 Catálogo Completo de Endpoints REST](#33-catálogo-completo-de-endpoints-rest)
@@ -24,9 +25,11 @@
    - [4.3 Catálogo de Estado y Persistencia (localStorage)](#43-catálogo-de-estado-y-persistencia-localstorage)
    - [4.4 Motor Multidivisa y Tabla Oficial de Equivalencias](#44-motor-multidivisa-y-tabla-oficial-de-equivalencias)
    - [4.5 UX Avanzado: Calendario Glassmorphic y Exportación Excel](#45-ux-avanzado-calendario-glassmorphic-y-exportación-excel)
+   - [4.6 Política de Alta Seguridad en Contraseñas (Checklist Interactivo en Tiempo Real)](#46-política-de-alta-seguridad-en-contraseñas-checklist-interactivo-en-tiempo-real)
+   - [4.7 Flujo de Notificaciones Toast Dinámicas con Emojis Expresivos](#47-flujo-de-notificaciones-toast-dinámicas-con-emojis-expresivos)
 5. [Guía Maestra: Cómo Levantar Todo el Sistema Paso a Paso (Pro)](#5-guía-maestra-cómo-levantar-todo-el-sistema-paso-a-paso-pro)
-   - [5.1 Requisitos Previos](#51-requisitos-previos)
-   - [5.2 Paso 1: Configuración de Variables de Entorno](#52-paso-1-configuración-de-variables-de-entorno)
+   - [5.1 Requisitos Previos y Entorno Oficial de Compilación](#51-requisitos-previos-y-entorno-oficial-de-compilación)
+   - [5.2 Paso 1: Configuración de Variables de Entorno Centralizadas](#52-paso-1-configuración-de-variables-de-entorno-centralizadas)
    - [5.3 Paso 2: Inicialización del Entorno Python (Data Science)](#53-paso-2-inicialización-del-entorno-python-data-science)
    - [5.4 Paso 3: Compilación y Ejecución del Backend Spring Boot](#54-paso-3-compilación-y-ejecución-del-backend-spring-boot)
    - [5.5 Paso 4: Ejecución del Frontend Astro](#55-paso-4-ejecución-del-frontend-astro)
@@ -37,15 +40,32 @@
 
 ## 1. VISIÓN GENERAL Y ARQUITECTURA DEL SISTEMA
 
-FinanceAI es una solución integral orientada a la salud financiera de usuarios individuales y PyMEs en Latinoamérica. La arquitectura está desacoplada en tres capas principales:
+FinanceAI es una solución integral orientada a la salud financiera de usuarios individuales y PyMEs en Latinoamérica. El entorno oficial de compilación y ejecución está estandarizado en **Java 17 LTS (OpenJDK 17 / Microsoft Build ms-17.0.20.1)** y **Spring Boot 3**, garantizando máxima estabilidad empresarial, rendimiento optimizado y compatibilidad multi-plataforma.
+
+La arquitectura del sistema está desacoplada en tres capas principales que interactúan mediante contratos REST y flujos de procesos estándar:
 
 ```mermaid
 graph TD
     ClientBrowser[Cliente / Navegador Web] <--> |HTTP/SSR Port 4321| AstroFrontend[Frontend: Astro 5 + Tailwind CSS]
-    AstroFrontend <--> |REST API + JWT Port 8080| SpringBootBackend[Backend: Spring Boot 3 + Java 21]
+    AstroFrontend <--> |REST API + JWT Port 8080| SpringBootBackend[Backend: Spring Boot 3 + Java 17 LTS]
     SpringBootBackend <--> |JDBC / HikariCP| MySQLDatabase[(Base de Datos MySQL - Railway / Local)]
     SpringBootBackend <--> |Subprocess ProcessBuilder JSON CLI| PythonEngine[Motor IA: Python 3 + Scikit-Learn]
 ```
+
+### 1.1 Arquitectura Centralizada de Variables de Entorno (.env)
+
+El proyecto implementa el principio de **Fuente Única de Verdad (Single Source of Truth)** para la configuración sensible mediante un único archivo `.env` ubicado en la raíz del repositorio (`C:\Java\G9-LATAM-Team-77\.env`).
+
+```mermaid
+flowchart TD
+    RootEnv[("Archivo Raíz Centralizado: /.env")]
+    RootEnv -->|"envDir: '../' (Vite Build Context)"| AstroFront["Frontend (Astro 5 / Vite / Auth.js)"]
+    RootEnv -->|"spring.config.import=optional:file:../../.env"| SpringBack["Backend (Spring Boot 3 / Java 17)"]
+    RootEnv -->|"Entorno de Ejecución CLI / Scripts"| DataSci["Data Science (Python 3)"]
+```
+
+- **Frontend (Astro / Vite):** En `astro.config.mjs`, se define la directiva `vite: { envDir: '../' }`, permitiendo que Astro y Auth.js consuman directamente variables públicas (`PUBLIC_API_URL`, `SITE_URL`) y privadas (`AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GMAIL_PASS`) sin requerir archivos duplicados.
+- **Backend (Spring Boot):** En `application.properties`, se configura `spring.config.import=optional:file:../../.env`, mapeando de forma nativa variables como `${MYSQLUSER}`, `${MYSQL_ROOT_PASSWORD}`, `${JWT_SECRET}` y `${CORS_ALLOWED_ORIGINS}` sin inconsistencias de despliegue.
 
 ---
 
@@ -132,7 +152,7 @@ Si el archivo `.pkl` no se encuentra o el proceso sufre alguna excepción por da
 
 ---
 
-## 3. MÓDULO BACKEND (SPRING BOOT 3 & JAVA 21)
+## 3. MÓDULO BACKEND (SPRING BOOT 3 & JAVA 17 LTS)
 
 Ubicación del código fuente: `C:\Java\G9-LATAM-Team-77\Backend\financeia-backend`
 
@@ -221,7 +241,8 @@ erDiagram
 | `POST` | `/api/v1/auth/register` | Registro de nuevo usuario | Pública | `{"email", "password", "nombre"}` | `201 Created`, `400 Bad Request` |
 | `POST` | `/api/v1/auth/login` | Login con email y contraseña | Pública | `{"email", "password"}` | `200 OK` (con JWT), `401 Unauthorized` |
 | `POST` | `/api/v1/auth/google-sync` | Sincronización de sesión OAuth2 Google | Pública | `{"email", "name", "googleId"}` | `200 OK` (con JWT) |
-| `POST` | `/api/v1/auth/reset-password` | Solicitud de restablecimiento | Pública | `{"email"}` | `200 OK` |
+| `POST` | `/api/v1/auth/forgot-password` | **Solicitud de token temporal de recuperación (15 min)** | Pública | `{"email"}` | `200 OK` (con `resetToken`), `404 Not Found` |
+| `POST` | `/api/v1/auth/reset-password` | **Restablecimiento de contraseña con validación de token** | Pública | `{"email", "newPassword", "token"}` | `200 OK`, `400 Bad Request` |
 | `GET` | `/api/v1/users/profile` | Obtiene el perfil del usuario autenticado | `Bearer JWT` | Ninguno | `200 OK` |
 | `PUT` | `/api/v1/users/profile` | Actualiza moneda base y país del usuario | `Bearer JWT` | `{"paisId", "monedaId"}` | `200 OK` |
 | `DELETE`| `/api/v1/users/profile` | **Elimina la cuenta y todos sus datos en cascada** | `Bearer JWT` | Ninguno | `204 No Content` |
@@ -312,6 +333,40 @@ flowchart TD
     H --> I[Frontend ejecuta localStorage.clear y redirige a /logout]
 ```
 
+#### Flujo 5: Recuperación de Contraseña con Token Temporal JWT (15 Minutos)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Frontend as Astro Frontend (/login)
+    participant Mailer as Nodemailer SMTP
+    participant AuthCtrl as AuthController
+    participant AuthServ as AuthService
+    participant JwtServ as JwtService
+    participant DB as UserRepository
+
+    Usuario->>Frontend: Ingresa correo y solicita recuperación (Paso 1)
+    Frontend->>AuthCtrl: POST /api/v1/auth/forgot-password {email}
+    AuthCtrl->>AuthServ: forgotPassword(request)
+    AuthServ->>DB: findByEmail(email)
+    DB-->>AuthServ: User Entity
+    AuthServ->>JwtServ: generatePasswordResetToken(email)
+    JwtServ-->>AuthServ: Token JWT temporal (15 min, purpose: RESET_PASSWORD)
+    AuthServ-->>AuthCtrl: ForgotPasswordResponse(resetToken)
+    AuthCtrl-->>Frontend: 200 OK + resetToken
+    Frontend->>Mailer: Envia correo con código OTP de 6 dígitos
+    Mailer-->>Usuario: Recibe código en su bandeja de entrada
+    Usuario->>Frontend: Introduce código OTP (Paso 2) y define nueva clave (Paso 3)
+    Frontend->>AuthCtrl: POST /api/v1/auth/reset-password {email, newPassword, token: resetToken}
+    AuthCtrl->>AuthServ: resetPassword(request)
+    AuthServ->>JwtServ: validatePasswordResetToken(token, email)
+    JwtServ-->>AuthServ: true (Firma válida, no expirado, propósito correcto)
+    AuthServ->>DB: user.setPassword(BCrypt(newPassword)) -> save()
+    AuthServ-->>AuthCtrl: 200 OK
+    AuthCtrl-->>Frontend: 200 OK ("Contraseña actualizada exitosamente")
+    Frontend->>Usuario: Muestra confirmación e inicia sesión con nueva clave
+```
+
 ---
 
 ## 4. MÓDULO FRONTEND (ASTRO 5 & TAILWIND CSS)
@@ -390,45 +445,120 @@ Al hacer clic en cualquier botón de moneda en el Historial (`EUR`, `MXN`, `USD`
    - Incluye tabla completa de movimientos detallados.
    - Cuenta con codificación **UTF-8 BOM (`\uFEFF`)** para apertura directa en Microsoft Excel en Windows y macOS con acentuación y símbolos correctos.
 
+### 4.6 Política de Alta Seguridad en Contraseñas (Checklist Interactivo en Tiempo Real)
+
+Tanto en la pantalla de **Creación de Cuenta (Registro)** como en el modal de **Recuperación de Contraseña (Paso 3)**, el sistema implementa una estricta política de contraseñas de alta seguridad validada bidireccionalmente:
+
+#### Las 6 Reglas de Seguridad Obligatorias:
+1. **Mínimo 8 caracteres:** Longitud suficiente para mitigar ataques de fuerza bruta.
+2. **Al menos una letra mayúscula (`[A-Z]`):** Complejidad de conjunto de caracteres.
+3. **Al menos una letra minúscula (`[a-z]`):** Variabilidad tipográfica.
+4. **Al menos un número (`[0-9]`):** Inclusión de caracteres numéricos.
+5. **Al menos un carácter especial (`[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]`):** Símbolos de alta entropía.
+6. **Confirmación estricta de contraseña y bloqueo total de emojis en credenciales:** Doble entrada idéntica sin discrepancias y rechazo frontal mediante expresión regular Unicode (`EMOJI_REGEX = /(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u`) en campos de nombre, apellido, correo y contraseña.
+
+#### Checklist Visual Interactivo en Tiempo Real (Frontend):
+```
+Contraseña
+••••••••
+
+Confirmar contraseña
+••••••••
+
+Requisitos de contraseña:
+🔘/✅ Mínimo 8 caracteres
+🔘/✅ Una letra mayúscula
+🔘/✅ Una letra minúscula
+🔘/✅ Un número
+🔘/✅ Un carácter especial
+```
+
+- **Dinámica SVG Vectorial:** La interfaz utiliza **exclusivamente vectores SVG limpios** (sin emojis en la estructura visual de formularios). Cada criterio se representa con un círculo gris tenue que conmuta instantáneamente en tiempo real a un checkmark SVG verde esmeralda (`text-emerald-600 dark:text-emerald-400`) a medida que el usuario tipea su clave.
+- **Validación Fuerte en Backend (`AuthService.validatePasswordStrength`):** El método centralizado `AuthService.validatePasswordStrength(password)` en Spring Boot 3 valida de forma determinística las 5 reglas al procesar `POST /api/v1/auth/register` y `POST /api/v1/auth/reset-password`, rechazando cualquier intento que no cumpla con los estándares con excepciones `400 Bad Request`.
+
+---
+
+### 4.7 Flujo de Notificaciones Toast Dinámicas con Emojis Expresivos
+
+Para maximizar la claridad en la experiencia de usuario (UX), el sistema complementa su diseño estructural minimalista con un **sistema global de notificaciones Toast dinámicas** (`window.showToast(title, message, icon)` en `Layout.astro` y componentes asociados). 
+
+Mientras los formularios y datos prohíben emojis para preservar la higiene de datos, el sistema de Toasts utiliza **emojis semánticos de alta expresividad** para comunicar el estado de cada operación de forma inmediata:
+
+| Emoji | Significado Semántico | Módulo / Vista | Evento Desencadenante |
+| :---: | :--- | :--- | :--- |
+| 👋 | **Bienvenida** | `/login` | Inicio de sesión exitoso con credenciales correctas. |
+| 🎉 | **Cuenta Verificada** | `/login` | Validación exitosa del código OTP de 6 dígitos al registrarse. |
+| 📧 | **Código de Registro Enviado** | `/login` | Emisión y despacho de código de verificación vía Nodemailer. |
+| 📩 | **Código de Recuperación Enviado** | `/login` | Solicitud exitosa de restablecimiento con token temporal de 15 min. |
+| 💱 | **Conversión Multidivisa Activa** | `/historial` | Cambio reactivo de divisa en caliente (USD, MXN, EUR, CRC, etc.). |
+| 📊 | **Vista Histórica Consolidada** | `/historial` | Activación de la vista completa de todas las transacciones históricas. |
+| 💾 | **Guardado de Configuración** | `Header.astro` | Persistencia en base de datos de divisa base y perfil del usuario. |
+| 📥 | **Descarga de Reporte Excel** | `/historial` | Generación y exportación exitosa de archivo `.csv` con UTF-8 BOM. |
+| 🔒 | **Contraseña Restablecida** | `/login` | Actualización exitosa de contraseña con token temporal en MySQL. |
+| ⚠️ | **Advertencia / Validación** | Global | Campos incompletos, confirmación de eliminación o límites de filtros. |
+| ❌ | **Error de Operación** | Global | Credenciales inválidas, código OTP erróneo o contraseñas no coincidentes. |
+| 📡 | **Fallo de Conexión** | Global | Error de red o indisponibilidad temporal del servidor backend. |
+| 🗑️ | **Historial Eliminado** | `/historial` | Vaciado y reseteo completo de las transacciones del usuario. |
+
 ---
 
 ## 5. GUÍA MAESTRA: CÓMO LEVANTAR TODO EL SISTEMA PASO A PASO (PRO)
 
 Esta sección está diseñada para que cualquier persona ajena al proyecto pueda clonar, configurar y ejecutar todo el ecosistema de FinanceAI de manera rápida y sin complicaciones.
 
-### 5.1 Requisitos Previos
+### 5.1 Requisitos Previos y Entorno Oficial de Compilación
 
-Asegúrate de tener instaladas las siguientes herramientas en tu máquina:
-- **Java Development Kit (JDK) 21** o superior.
-- **Apache Maven 3.8+** (o el wrapper `mvnw` incluido).
-- **Python 3.10+** (con `pip`).
-- **Node.js 18.0.0+** (recomendado Node 20 LTS o 22 LTS).
-- **Git**.
-- **Docker Desktop** (opcional, si se prefiere ejecución en contenedores).
+Asegúrate de contar con el stack oficial de desarrollo:
+- **Entorno Oficial de Compilación Backend:** **Java 17 LTS** (**OpenJDK 17 / Microsoft Build of OpenJDK `ms-17.0.20.1`**) con **Spring Boot 3**.
+- **Apache Maven 3.8+** (o el script wrapper `./mvnw` / `mvnw.cmd` incluido).
+- **Node.js 18.0.0+** (Recomendado Node 20 LTS o 22 LTS) con `npm`.
+- **Python 3.10+** (con `pip` y entorno `venv`).
+- **Git** (control de versiones).
+- **Docker Desktop** (opcional, para despliegue contenerizado unificado).
 
 ---
 
-### 5.2 Paso 1: Configuración de Variables de Entorno
+### 5.2 Paso 1: Configuración de Variables de Entorno Centralizadas
 
-En la raíz del proyecto (`C:\Java\G9-LATAM-Team-77`), crea o edita el archivo `.env`:
+El proyecto utiliza un **único archivo `.env` centralizado en la raíz del repositorio (`C:\Java\G9-LATAM-Team-77\.env`)**, el cual es consumido directamente tanto por el Frontend (`envDir: '../'`) como por el Backend (`spring.config.import=optional:file:../../.env`):
 
 ```env
-# Configuración de Base de Datos MySQL (Railway o Local)
-MYSQLUSER=root
-MYSQL_ROOT_PASSWORD=tu_password_mysql
-MYSQLHOST=sakura.proxy.rlwy.net
-MYSQLPORT=32819
-MYSQLDATABASE=railway
-
-# Seguridad JWT
-JWT_SECRET=super_secret_jwt_key_financeai_latam_team_77_enterprise_2026
-
-# Rutas de Data Science
-PYTHON_COMMAND=python
-DATA_SCIENCE_SCRIPT=../../DataScient/src/predict.py
-
-# URL del Backend para el Frontend
+# ==========================================
+# FRONTEND (Astro + Auth.js)
+# ==========================================
+SITE_URL=http://localhost:4321
+AUTH_URL=http://localhost:4321
+AUTH_SECRET=9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+AUTH_TRUST_HOST=true
 PUBLIC_API_URL=http://localhost:8080
+
+# Google OAuth2
+GOOGLE_CLIENT_ID=tu_google_client_id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=tu_google_client_secret
+
+# ==========================================
+# BACKEND (Spring Boot 3 & Java 17 LTS)
+# ==========================================
+JWT_SECRET=super_secret_jwt_key_financeai_latam_team_77_enterprise_2026
+CORS_ALLOWED_ORIGINS=http://localhost:4321,http://localhost:4322
+
+# Servicio de Correo Nodemailer (Gmail SMTP)
+GMAIL_USER=tu_correo@gmail.com
+GMAIL_PASS=tu_app_password_gmail
+ADMIN_EMAILS="tu_correo@gmail.com"
+
+# ==========================================
+# BASE DE DATOS (MySQL Railway / Local)
+# ==========================================
+MYSQLPORT=32819
+MYSQL_DATABASE=railway
+MYSQL_PUBLIC_URL=mysql://root:password@sakura.proxy.rlwy.net:32819/railway
+MYSQL_ROOT_PASSWORD=tu_password_mysql
+MYSQLUSER=root
+
+# Integración Data Science (Opcional - Defaults calculados)
+PYTHON_COMMAND=../../DataScient/venv/Scripts/python.exe
+DATA_SCIENCE_SCRIPT=../../DataScient/src/predict.py
 ```
 
 ---

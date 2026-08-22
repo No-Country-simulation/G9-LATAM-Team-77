@@ -523,7 +523,7 @@ const OFFICIAL_RATES_TABLE = [
                     currentViewingCurrency = selected;
                     updateCurrencyButtonsUI();
                     applyFilters();
-                    window.showToast?.('Moneda Actualizada', `Visualizando historial en ${currentViewingCurrency} con conversión oficial en vivo.`, '');
+                    window.showToast?.('Moneda Actualizada', `Visualizando historial en ${currentViewingCurrency} con conversión oficial en vivo.`, '💱');
                 }
             };
         });
@@ -954,7 +954,7 @@ const OFFICIAL_RATES_TABLE = [
             if (selFilterType) selFilterType.value = 'all';
             if (selFilterCat) selFilterCat.value = 'all';
             applyFilters();
-            window.showToast?.('Vista Completa', 'Mostrando todas las transacciones históricas acumuladas.', '');
+            window.showToast?.('Vista Completa', 'Mostrando todas las transacciones históricas acumuladas.', '📊');
         };
     }
 
@@ -995,7 +995,7 @@ const OFFICIAL_RATES_TABLE = [
             populateCategoryFilter();
             applyFilters();
 
-            window.showToast?.('Historial Eliminado', 'Todas las transacciones históricas han sido borradas.', '');
+            window.showToast?.('Historial Eliminado', 'Todas las transacciones históricas han sido borradas.', '🗑️');
         };
     }
 
@@ -1004,7 +1004,7 @@ const OFFICIAL_RATES_TABLE = [
     if (btnExportExcel) {
         btnExportExcel.onclick = () => {
             if (filteredTransactions.length === 0) {
-                window.showToast?.('Exportación', 'No hay transacciones disponibles para exportar con los filtros activos.', '');
+                window.showToast?.('Exportación', 'No hay transacciones disponibles para exportar con los filtros activos.', '⚠️');
                 return;
             }
 
@@ -1096,7 +1096,7 @@ const OFFICIAL_RATES_TABLE = [
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            window.showToast?.('¡Excel Descargado!', `Reporte ejecutivo generado con éxito en ${currentViewingCurrency}.`, '');
+            window.showToast?.('¡Excel Descargado!', `Reporte ejecutivo generado con éxito en ${currentViewingCurrency}.`, '📥');
         };
     }
 

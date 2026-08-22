@@ -55,7 +55,7 @@ class AuthServiceTest {
         RegistroRequest request = new RegistroRequest(
                 "Juan",
                 "juan@gmail.com",
-                "123456",
+                "FinanceAI#2026",
                 1L,
                 1L
         );
@@ -94,7 +94,7 @@ class AuthServiceTest {
         assertEquals("juan@gmail.com", response.email());
 
         verify(userRepository).existsByEmail("juan@gmail.com");
-        verify(passwordEncoder).encode("123456");
+        verify(passwordEncoder).encode("FinanceAI#2026");
         verify(userRepository).save(any(User.class));
     }
 
@@ -105,7 +105,7 @@ class AuthServiceTest {
         RegistroRequest request = new RegistroRequest(
                 "Juan",
                 "juan@gmail.com",
-                "123456",
+                "FinanceAI#2026",
                 1L,
                 1L
         );
@@ -136,7 +136,7 @@ class AuthServiceTest {
         RegistroRequest request = new RegistroRequest(
                 "Juan",
                 "juan@gmail.com",
-                "123456",
+                "FinanceAI#2026",
                 99L,
                 1L
         );
@@ -169,7 +169,7 @@ class AuthServiceTest {
         RegistroRequest request = new RegistroRequest(
                 "Juan",
                 "juan@gmail.com",
-                "123456",
+                "FinanceAI#2026",
                 1L,
                 99L
         );
@@ -210,7 +210,7 @@ class AuthServiceTest {
 
         LoginRequest request = new LoginRequest(
                 "juan@gmail.com",
-                "123456"
+                "FinanceAI#2026"
         );
 
         User user = new User();
@@ -242,7 +242,7 @@ class AuthServiceTest {
         verify(userRepository).findByEmail("juan@gmail.com");
 
         verify(passwordEncoder).matches(
-                "123456",
+                "FinanceAI#2026",
                 "password-encriptada"
         );
 
@@ -255,7 +255,7 @@ class AuthServiceTest {
 
         LoginRequest request = new LoginRequest(
                 "juan@gmail.com",
-                "123456"
+                "FinanceAI#2026"
         );
 
         when(userRepository.findByEmail(request.email()))

@@ -1,9 +1,12 @@
 package com.financeia.financeia_backend.controllers;
 
+import com.financeia.financeia_backend.dto.auth.ForgotPasswordRequest;
+import com.financeia.financeia_backend.dto.auth.ForgotPasswordResponse;
 import com.financeia.financeia_backend.dto.auth.LoginRequest;
 import com.financeia.financeia_backend.dto.auth.LoginResponse;
 import com.financeia.financeia_backend.dto.auth.RegistroRequest;
 import com.financeia.financeia_backend.dto.auth.RegistroResponse;
+import com.financeia.financeia_backend.dto.auth.ResetPasswordRequest;
 import com.financeia.financeia_backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +43,15 @@ public class AuthController {
         return ResponseEntity.ok(authService.googleSync(request));
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ForgotPasswordResponse> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        return ResponseEntity.ok(authService.forgotPassword(request));
+    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<java.util.Map<String, String>> resetPassword(
-            @Valid @RequestBody com.financeia.financeia_backend.dto.auth.ResetPasswordRequest request) {
+            @Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
         return ResponseEntity.ok(java.util.Map.of("message", "Contraseña actualizada exitosamente en la base de datos"));
     }

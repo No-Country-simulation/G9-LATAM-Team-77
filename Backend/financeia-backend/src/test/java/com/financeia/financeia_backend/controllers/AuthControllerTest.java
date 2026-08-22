@@ -36,7 +36,7 @@ class AuthControllerTest {
         RegistroRequest request = new RegistroRequest(
                 "Juan",
                 "juan@gmail.com",
-                "123456",
+                "FinanceAI#2026",
                 1L,
                 1L
         );
@@ -67,7 +67,7 @@ class AuthControllerTest {
 
         LoginRequest request = new LoginRequest(
                 "juan@gmail.com",
-                "123456"
+                "FinanceAI#2026"
         );
 
         LoginResponse response = new LoginResponse(
@@ -99,7 +99,7 @@ class AuthControllerTest {
         RegistroRequest request = new RegistroRequest(
                 "Juan",
                 "juan@gmail.com",
-                "123456",
+                "FinanceAI#2026",
                 1L,
                 1L
         );
@@ -125,7 +125,7 @@ class AuthControllerTest {
 
         LoginRequest request = new LoginRequest(
                 "juan@gmail.com",
-                "123456"
+                "FinanceAI#2026"
         );
 
         LoginResponse response = new LoginResponse(
