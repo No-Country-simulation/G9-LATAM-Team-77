@@ -1,39 +1,75 @@
-# 📊 FinanceAl - Asistente Inteligente de Salud Financiera
+# 📊 FinanceAI - Asistente Inteligente de Salud Financiera
 
-![Status](https://img.shields.io/badge/Status-En%20Desarrollo-yellow)
-![Fase](https://img.shields.io/badge/Fase-Definición%20y%20Objetivos-blue)
+![Status](https://img.shields.io/badge/Status-MVP%20Validado-brightgreen)
+![Fase](https://img.shields.io/badge/Fase-Entrega-blue)
+![Backend](https://img.shields.io/badge/Backend-Spring%20Boot-brightgreen)
+![Data Science](https://img.shields.io/badge/AI%2FML-Python-blue)
 
-> **Nota:** Este repositorio se encuentra en sus fases iniciales de desarrollo. La documentación y la arquitectura se irán actualizando progresivamente a medida que el proyecto avance.
+> **Nota:** Este repositorio contiene el Producto Mínimo Viable (MVP) de **FinanceAI**. El Frontend, el Backend, la base de datos y los modelos de Machine Learning están implementados e integrados.
 
 ## 🎯 El Desafío
-En la actualidad, el mercado de fintechs, bancos digitales y plataformas de educación financiera está en constante expansión. Muchas personas tienen acceso a los datos brutos de sus transacciones, pero **tienen gran dificultad para transformar esa información en conocimiento útil** para la toma de decisiones. 
+En la actualidad, el mercado de fintechs, bancos digitales y plataformas de educación financiera está en constante expansión. Muchas personas tienen acceso a los datos brutos de sus transacciones, pero **tienen gran dificultad para transformar esa información en conocimiento útil** para la toma de decisiones financieras a nivel personal.
 
 ## 💡 Nuestro Objetivo
-**FinanceAl** nace como una solución inteligente orientada a usuarios de carteras digitales e instituciones financieras. Nuestro objetivo principal es **analizar el comportamiento financiero de un usuario a partir de sus transacciones para generar una visión completa y clara de su salud financiera.**
+**FinanceAI** es una solución inteligente orientada a usuarios de carteras digitales e instituciones financieras. Nuestro objetivo principal es **analizar el comportamiento financiero de un usuario a partir de sus transacciones para generar una visión completa y clara de su salud financiera.**
 
 Buscamos transformar datos financieros aislados en información procesable que permita a los usuarios:
-- Organizar automáticamente sus gastos e ingresos.
-- Entender exactamente hacia dónde se está dirigiendo su dinero.
-- Identificar hábitos financieros (tanto positivos como de riesgo).
+- Organizar y categorizar automáticamente sus gastos e ingresos.
+- Entender exactamente hacia dónde se está dirigiendo su dinero mediante dashboards interactivos.
+- Identificar hábitos financieros y perfiles de usuario (ej. *Saludable, En riesgo*).
 - Recibir recomendaciones simples y objetivas de mejora.
 
-## 🚀 Alcance del Proyecto (MVP Propuesto)
-Para lograr este objetivo, estamos construyendo un Producto Mínimo Viable (MVP) que integrará Inteligencia Artificial, desarrollo Backend y servicios Cloud. 
+## 🛠️ Arquitectura y Tecnologías
+El proyecto está estructurado en módulos especializados para garantizar escalabilidad, seguridad y eficiencia:
 
-Las metas de desarrollo incluyen:
-1. **Motor de Clasificación (Data Science):** Un modelo de Machine Learning capaz de clasificar automáticamente los gastos en categorías (Alimentación, Transporte, Salud, etc.) e identificar el perfil financiero del usuario (ej. *Saludable, En riesgo*).
-2. **API REST (Backend):** Una interfaz de comunicación estructurada que recibirá los datos financieros del usuario, los procesará a través de nuestros modelos predictivos y devolverá los análisis en formato JSON.
-3. **Infraestructura Cloud (OCI):** Despliegue de la solución utilizando los servicios de Oracle Cloud Infrastructure (como Object Storage o Compute) para garantizar escalabilidad.
+### ⚙️ Backend (Java / Spring Boot)
+El núcleo de la aplicación es una API REST robusta que gestiona la lógica de negocio y la seguridad:
+- **Framework:** Spring Boot (Java).
+- **Seguridad:** Spring Security stateless con autenticación basada en JWT.
+- **Base de Datos:** MySQL 8.4 con migraciones Flyway V1 a V6.
+- **Documentación:** Swagger / OpenAPI para la exploración y prueba de endpoints.
+- **Módulos principales:** autenticación, usuarios, transacciones, catálogos, Dashboard, análisis financiero e historial autenticado.
 
-## 🗓️ Próximos Pasos (Roadmap Inicial)
-- [ ] Construcción y recolección del conjunto de datos (Dataset).
-- [ ] Análisis Exploratorio de Datos (EDA) y limpieza.
-- [ ] Entrenamiento del primer modelo de clasificación de gastos.
-- [ ] Diseño de los endpoints de la API.
-- [ ] Integración en la nube.
+### 🖥️ Frontend (Astro)
+La interfaz consume la API real y ofrece:
+- Registro e inicio de sesión con Honduras/HNL disponibles en los catálogos.
+- Dashboard financiero, análisis mediante Data Science e historial por usuario.
+- Recuperación de contraseña, cierre de sesión y protección de rutas privadas.
+- Estados de carga, error y contenido vacío, además de diseño responsive.
 
----
-*Este documento será modificado progresivamente según los avances técnicos del proyecto.*
+### 🧠 Motor de Clasificación (Data Science)
+Procesamiento de datos y modelado predictivo:
+- **Runtime oficial:** `financeai-data-science` con Python 3.12.
+- **Machine Learning:** modelos serializados para categorizar transacciones y determinar el perfil financiero.
+- **Integración:** el Backend ejecuta `src/predict.py` mediante un proceso con timeout y manejo seguro de errores.
+
+### 🐳 Infraestructura local
+- Docker Compose ejecuta Frontend, Backend con el runtime de Data Science y MySQL.
+- MySQL utiliza un volumen persistente y Flyway actualiza el esquema al iniciar.
+- El despliegue en **Oracle Cloud Infrastructure (OCI)** permanece como una etapa posterior y no forma parte de este cierre del MVP.
+
+## 🚀 Módulos de la API
+Actualmente, la API expone los siguientes controladores principales:
+- `AuthController`: registro, inicio de sesión y recuperación segura de contraseña.
+- `TransactionController`: Registro y consulta del historial de transacciones.
+- `AnalisisController`: Evaluación del perfil financiero y categorización de gastos mediante IA.
+- `DashboardController`: Generación de métricas y resúmenes para la interfaz de usuario.
+- `UserController`: Administración de perfiles de usuario.
+- `CatalogoController`: Consulta de países y monedas disponibles.
+- `HistorialAnalisisController`: Consulta autenticada del historial propio de análisis.
+
+## 🗓️ Roadmap del Proyecto
+- [x] Construcción y recolección de los conjuntos de datos (Datasets).
+- [x] Análisis Exploratorio de Datos (EDA) y limpieza.
+- [x] Entrenamiento del modelo de clasificación de transacciones y perfiles financieros.
+- [x] Diseño y desarrollo de los endpoints de la API REST (Spring Boot).
+- [x] Implementación de capa de seguridad con JWT.
+- [x] Documentación de la API con OpenAPI/Swagger.
+- [x] Integración del Frontend con la API REST.
+- [x] Integración del runtime de Data Science.
+- [x] Historial autenticado, Honduras/HNL y recuperación de contraseña.
+- [x] Entorno reproducible con Docker Compose.
+- [ ] Despliegue e integración en la nube (OCI).
 
 ## Ejecución local con Docker Compose
 
@@ -52,6 +88,27 @@ Boot con Python 3.12 y MySQL 8.4.7. MySQL conserva sus datos en el volumen
 
 `.env.docker` está ignorado por Git y no debe compartirse ni incorporarse a las
 imágenes. `AUTH_SECRET` pertenece al Frontend; `JWT_SECRET` pertenece al Backend.
+
+### Variables de entorno principales
+
+El archivo `.env.docker.example` documenta la configuración de la composición.
+Los valores reales deben existir únicamente en `.env.docker`:
+
+| Variable | Uso |
+| --- | --- |
+| `MYSQL_DATABASE` | Nombre de la base de datos |
+| `MYSQL_USER` | Usuario de aplicación de MySQL |
+| `MYSQL_PASSWORD` | Contraseña del usuario de aplicación |
+| `MYSQL_ROOT_PASSWORD` | Contraseña administrativa del contenedor MySQL |
+| `JWT_SECRET` | Firma de los tokens emitidos por el Backend |
+| `AUTH_SECRET` | Secreto independiente utilizado por el Frontend |
+| `PUBLIC_API_URL` | URL pública del Backend consumida por el navegador |
+| `CORS_ALLOWED_ORIGINS` | Orígenes permitidos por el Backend |
+| `DATA_SCIENCE_TIMEOUT_SECONDS` | Tiempo máximo de ejecución del proceso Python |
+
+Para ejecutar el Backend sin Docker también deben configurarse `DB_URL`,
+`DB_USERNAME`, `DB_PASSWORD`, `PYTHON_COMMAND` y `DATA_SCIENCE_SCRIPT` de acuerdo
+con las rutas y credenciales del entorno local.
 
 ### Comandos
 
@@ -124,3 +181,6 @@ prueba automatizada sustituye el servicio de correo y jamás contacta un servido
 externo. La validación manual de entrega requiere configurar SMTP localmente,
 solicitar el enlace, cambiar la contraseña, comprobar que la anterior falla y
 confirmar que el enlace no puede reutilizarse.
+
+---
+*Desarrollado por el Equipo 77 - Hackathon LATAM G9.*
