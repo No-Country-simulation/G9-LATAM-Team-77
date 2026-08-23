@@ -29,9 +29,9 @@ import { API_URL } from '../lib/api';
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" id="btnExportHistorialCsv" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer">
+                <button type="button" id="btnExportHistorialExcel" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer disabled:cursor-wait disabled:opacity-70">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Exportar CSV
+                    Exportar Excel
                 </button>
                 <a href="/dashboard" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition">
                     &larr; Volver al Dashboard
@@ -55,24 +55,135 @@ import { API_URL } from '../lib/api';
             </div>
         </div>
 
+        <!-- Visual analytics from authenticated analysis history -->
+        <section class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900" aria-labelledby="historyAnalyticsTitle">
+            <div class="flex flex-col gap-2 border-b border-gray-100 px-4 py-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">Inteligencia visual</p>
+                    <h2 id="historyAnalyticsTitle" class="font-josefin text-lg font-bold text-gray-900 dark:text-white sm:text-xl">Evolución de tu salud financiera</h2>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Las gráficas responden a los mismos filtros del historial y nunca mezclan datos de otros usuarios.</p>
+                </div>
+                <span class="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[10px] font-bold text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    Datos reales persistidos
+                </span>
+            </div>
+
+            <div class="grid gap-4 p-4 sm:p-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(19rem,.75fr)]">
+                <article class="rounded-2xl border border-gray-100 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-950/35 sm:p-4">
+                    <div class="mb-3 flex items-start justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Tendencia comparativa</h3>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Score, gasto sobre ingreso y capacidad de ahorro.</p>
+                        </div>
+                        <span class="rounded-lg bg-blue-100 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-blue-700 dark:bg-blue-950 dark:text-blue-300">0–100</span>
+                    </div>
+                    <div class="relative h-64 w-full sm:h-72 lg:h-80">
+                        <canvas id="historyTrendChart" aria-label="Gráfica de evolución financiera" role="img"></canvas>
+                        <div id="historyTrendEmpty" class="hidden absolute inset-0 flex items-center justify-center rounded-xl border border-dashed border-gray-300 text-center text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">No hay evaluaciones para representar con los filtros actuales.</div>
+                    </div>
+                </article>
+
+                <article class="rounded-2xl border border-gray-100 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-950/35 sm:p-4">
+                    <div class="mb-3">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Distribución por categorías</h3>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400">Composición acumulada de los análisis visibles.</p>
+                    </div>
+                    <div class="relative h-64 w-full sm:h-72 lg:h-80">
+                        <canvas id="historyCategoryChart" aria-label="Gráfica de distribución de gastos" role="img"></canvas>
+                        <div id="historyCategoryEmpty" class="hidden absolute inset-0 flex items-center justify-center rounded-xl border border-dashed border-gray-300 text-center text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">Los análisis visibles no contienen desglose por categorías.</div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="grid gap-3 border-t border-gray-100 bg-gray-50/60 px-4 py-4 dark:border-gray-800 dark:bg-gray-950/30 sm:grid-cols-3 sm:px-5">
+                <div class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900">
+                    <p class="text-[9px] font-black uppercase tracking-wide text-gray-400">Cambio del score</p>
+                    <p id="historyTrendInsight" class="mt-1 text-sm font-black text-blue-600 dark:text-blue-400">Calculando…</p>
+                </div>
+                <div class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900">
+                    <p class="text-[9px] font-black uppercase tracking-wide text-gray-400">Categoría dominante</p>
+                    <p id="historyCategoryInsight" class="mt-1 text-sm font-black text-blue-600 dark:text-blue-400">Calculando…</p>
+                </div>
+                <div class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900">
+                    <p class="text-[9px] font-black uppercase tracking-wide text-gray-400">Nivel de endeudamiento</p>
+                    <p id="historyDebtInsight" class="mt-1 text-sm font-black text-blue-600 dark:text-blue-400">Calculando…</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Search & Filter Controls -->
-        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-            <div class="relative flex-1 max-w-md">
-                <input type="text" id="searchInput" placeholder="Buscar por perfil o notas…" class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white" />
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5 sm:top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <section class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900" aria-labelledby="historyFiltersTitle">
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h2 id="historyFiltersTitle" class="text-sm font-bold text-gray-900 dark:text-white font-josefin">Explora tu evolución financiera</h2>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Filtra por mes, rango de fechas, frecuencia o perfil financiero.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="historyResultCount" class="text-[11px] font-semibold text-gray-500 dark:text-gray-400">0 resultados</span>
+                    <button id="btnResetHistoryFilters" type="button" class="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-400">Limpiar filtros</button>
+                    <button id="btnReloadHistory" type="button" class="rounded-xl border border-gray-200 bg-gray-50 p-2 text-gray-500 transition hover:text-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:text-blue-400" title="Recargar historial" aria-label="Recargar historial">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <select id="filterPerfil" class="px-3 py-2 text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-700 dark:text-gray-300 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600">
-                    <option value="ALL">Todos los perfiles</option>
-                    <option value="Excelente">Excelente / Saludable</option>
-                    <option value="Moderado">Moderado</option>
-                    <option value="Riesgo">En riesgo / Crítico</option>
-                </select>
-                <button id="btnReloadHistory" type="button" class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl transition cursor-pointer" title="Recargar">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                </button>
+
+            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <label class="relative sm:col-span-2 lg:col-span-2">
+                    <span class="sr-only">Buscar evaluaciones</span>
+                    <input type="search" id="searchInput" placeholder="Buscar perfil, frecuencia o recomendación…" class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:text-sm" />
+                    <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400 sm:top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>
+                </label>
+                <label class="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Mes
+                    <select id="filterMonth" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold normal-case text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="ALL">Todos los meses</option>
+                    </select>
+                </label>
+                <label class="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Perfil
+                    <select id="filterPerfil" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold normal-case text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="ALL">Todos los perfiles</option>
+                        <option value="Excelente">Excelente / Saludable</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Riesgo">En riesgo / Crítico</option>
+                    </select>
+                </label>
+                <label class="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Desde
+                    <input id="filterDateStart" type="date" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold normal-case text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 [color-scheme:light] dark:[color-scheme:dark]" />
+                </label>
+                <label class="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Hasta
+                    <input id="filterDateEnd" type="date" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold normal-case text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 [color-scheme:light] dark:[color-scheme:dark]" />
+                </label>
+                <label class="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Frecuencia
+                    <select id="filterFrequency" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold normal-case text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="ALL">Todas</option>
+                        <option value="Mensual">Mensual</option>
+                        <option value="Quincenal">Quincenal</option>
+                        <option value="Semanal">Semanal</option>
+                    </select>
+                </label>
+                <label class="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Categoría
+                    <select id="filterCategory" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold normal-case text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="ALL">Todas las categorías</option>
+                    </select>
+                </label>
+                <label class="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Ordenar
+                    <select id="filterSort" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold normal-case text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="NEWEST">Más recientes</option>
+                        <option value="OLDEST">Más antiguos</option>
+                        <option value="SCORE_DESC">Mayor puntuación</option>
+                        <option value="SCORE_ASC">Menor puntuación</option>
+                    </select>
+                </label>
             </div>
-        </div>
+            <p id="historyFilterError" class="mt-3 hidden rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200" role="alert"></p>
+        </section>
 
         <!-- Table Container -->
         <div class="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -105,21 +216,69 @@ import { API_URL } from '../lib/api';
     </div>
 </Layout>
 
+<script>
+    (window as any).downloadHistoryWorkbook = async (options: unknown) => {
+        const excelReport = await import('../lib/excelReport');
+        return excelReport.downloadHistoryWorkbook(options as any);
+    };
+</script>
+
+<script>
+    import { renderHistoryCharts } from '../lib/historyCharts';
+    let latestChartOptions: any = null;
+    (window as any).renderFinanceAIHistoryCharts = (options: any) => {
+        latestChartOptions = options;
+        renderHistoryCharts(options);
+    };
+    new MutationObserver(() => {
+        if (latestChartOptions) renderHistoryCharts(latestChartOptions);
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    window.dispatchEvent(new Event('financeai-history-charts-ready'));
+</script>
+
 <script define:vars={{ API_URL }}>
     (function () {
         const token = localStorage.getItem('financeai_token');
         let historyData = [];
+        let filteredHistoryData = [];
         let activeCurrency = 'HNL';
         let activeCurrencySymbol = 'L';
 
-        const tableBody = document.getElementById('historyTableBody');
-        const countDisplay = document.getElementById('totalEvaluacionesCount');
-        const avgDisplay = document.getElementById('promedioSaludScore');
-        const lastStatusDisplay = document.getElementById('ultimoEstadoBadge');
-        const searchInput = document.getElementById('searchInput');
-        const filterPerfil = document.getElementById('filterPerfil');
-        const btnReload = document.getElementById('btnReloadHistory');
-        const btnExportCsv = document.getElementById('btnExportHistorialCsv');
+        const byId = (id) => document.getElementById(id);
+        const tableBody = byId('historyTableBody');
+        const countDisplay = byId('totalEvaluacionesCount');
+        const avgDisplay = byId('promedioSaludScore');
+        const lastStatusDisplay = byId('ultimoEstadoBadge');
+        const searchInput = byId('searchInput');
+        const filterMonth = byId('filterMonth');
+        const filterPerfil = byId('filterPerfil');
+        const filterDateStart = byId('filterDateStart');
+        const filterDateEnd = byId('filterDateEnd');
+        const filterFrequency = byId('filterFrequency');
+        const filterCategory = byId('filterCategory');
+        const filterSort = byId('filterSort');
+        const filterError = byId('historyFilterError');
+        const resultCount = byId('historyResultCount');
+        const btnReload = byId('btnReloadHistory');
+        const btnExportExcel = byId('btnExportHistorialExcel');
+        let pendingChartOptions = null;
+
+        function renderCharts(items) {
+            pendingChartOptions = {
+                items,
+                currencyCode: activeCurrency,
+                currencySymbol: activeCurrencySymbol,
+            };
+            if (typeof window.renderFinanceAIHistoryCharts === 'function') {
+                window.renderFinanceAIHistoryCharts(pendingChartOptions);
+            }
+        }
+
+        window.addEventListener('financeai-history-charts-ready', () => {
+            if (pendingChartOptions && typeof window.renderFinanceAIHistoryCharts === 'function') {
+                window.renderFinanceAIHistoryCharts(pendingChartOptions);
+            }
+        });
 
         function clearSessionAndRedirect() {
             localStorage.removeItem('financeai_token');
@@ -127,10 +286,26 @@ import { API_URL } from '../lib/api';
             window.location.replace('/login');
         }
 
+        const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+        const scoreOf = (item) => {
+            const probability = Number(item?.probabilidad || 0);
+            return Math.round(probability > 1 ? probability : probability * 100);
+        };
+        const localDateKey = (value) => {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '';
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        };
+        const detailText = (value) => {
+            if (Array.isArray(value)) return value.map(String).join(' ');
+            if (value && typeof value === 'object') return Object.entries(value).map(([key, amount]) => `${key} ${amount}`).join(' ');
+            return String(value ?? '');
+        };
+
         async function loadProfile() {
             if (!token) return;
             const response = await fetch(`${API_URL}/api/v1/users/profile`, {
-                headers: { 'Authorization': `Bearer ${token}`, Accept: 'application/json' }
+                headers: { 'Authorization': `Bearer ${token}`, Accept: 'application/json' },
             });
             if (response.status === 401) return clearSessionAndRedirect();
             if (!response.ok) return;
@@ -139,165 +314,279 @@ import { API_URL } from '../lib/api';
             activeCurrencySymbol = profile.simboloMoneda || 'L';
         }
 
+        function renderLoading() {
+            if (!tableBody) return;
+            tableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center text-gray-500 dark:text-gray-400"><div class="flex flex-col items-center gap-2"><div class="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div><span>Cargando historial real…</span></div></td></tr>`;
+        }
+
+        function renderLoadError() {
+            if (!tableBody) return;
+            tableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center text-gray-500 dark:text-gray-400"><p class="text-sm font-semibold text-red-600 dark:text-red-400">No fue posible consultar el historial.</p><button type="button" id="retryHistoryInline" class="mt-2 text-xs font-bold text-blue-600 hover:underline dark:text-blue-400">Reintentar</button></td></tr>`;
+            byId('retryHistoryInline')?.addEventListener('click', loadHistory);
+        }
+
         async function loadHistory() {
             if (!token) return;
+            renderLoading();
+            if (btnReload) btnReload.disabled = true;
             try {
-                const res = await fetch(`${API_URL}/api/v1/historial-analisis`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetch(`${API_URL}/api/v1/historial-analisis`, {
+                    headers: { 'Authorization': `Bearer ${token}`, Accept: 'application/json' },
                 });
-
-                if (res.status === 401) return clearSessionAndRedirect();
-                if (res.ok) {
-                    historyData = await res.json();
-                    renderTable(historyData);
-                    updateMetrics(historyData);
-                } else {
-                    throw new Error();
-                }
+                if (response.status === 401) return clearSessionAndRedirect();
+                if (!response.ok) throw new Error('No se pudo cargar el historial.');
+                const data = await response.json();
+                historyData = Array.isArray(data) ? data : [];
+                populateDynamicFilters();
+                applyFilters();
             } catch {
-                if (tableBody) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                                <p class="text-sm font-semibold">No se encontraron evaluaciones registradas aún.</p>
-                                <a href="/dashboard" class="mt-2 inline-block text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Realizar un análisis en el Dashboard &rarr;</a>
-                            </td>
-                        </tr>
-                    `;
+                historyData = [];
+                filteredHistoryData = [];
+                updateMetrics([]);
+                renderCharts([]);
+                if (resultCount) resultCount.textContent = '0 resultados';
+                renderLoadError();
+            } finally {
+                if (btnReload) btnReload.disabled = false;
+            }
+        }
+
+        function populateDynamicFilters() {
+            if (filterMonth) {
+                const previous = filterMonth.value;
+                const months = [...new Set(historyData.map(item => localDateKey(item.fechaHora).slice(0, 7)).filter(Boolean))].sort().reverse();
+                filterMonth.innerHTML = '<option value="ALL">Todos los meses</option>' + months.map(month => {
+                    const [year, monthNumber] = month.split('-').map(Number);
+                    const label = new Intl.DateTimeFormat('es-HN', { month: 'long', year: 'numeric' }).format(new Date(year, monthNumber - 1, 1));
+                    return `<option value="${month}">${escapeHtml(label)}</option>`;
+                }).join('');
+                filterMonth.value = months.includes(previous) ? previous : 'ALL';
+            }
+
+            if (filterFrequency) {
+                const previous = filterFrequency.value;
+                const frequencies = [...new Set(historyData.map(item => String(item.frecuenciaAhorro || '').trim()).filter(Boolean))].sort();
+                filterFrequency.innerHTML = '<option value="ALL">Todas</option>' + frequencies.map(frequency => `<option value="${escapeHtml(frequency)}">${escapeHtml(frequency)}</option>`).join('');
+                filterFrequency.value = frequencies.includes(previous) ? previous : 'ALL';
+            }
+
+            if (filterCategory) {
+                const previous = filterCategory.value;
+                const categories = [...new Set(historyData.flatMap(item => item.resumenGastos && typeof item.resumenGastos === 'object' ? Object.keys(item.resumenGastos) : []))].sort();
+                filterCategory.innerHTML = '<option value="ALL">Todas las categorías</option>' + categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join('');
+                filterCategory.value = categories.includes(previous) ? previous : 'ALL';
+            }
+
+            const availableDates = historyData.map(item => localDateKey(item.fechaHora)).filter(Boolean).sort();
+            if (availableDates.length) {
+                if (filterDateStart) {
+                    filterDateStart.min = availableDates[0];
+                    filterDateStart.max = availableDates.at(-1);
+                }
+                if (filterDateEnd) {
+                    filterDateEnd.min = availableDates[0];
+                    filterDateEnd.max = availableDates.at(-1);
                 }
             }
         }
-        loadProfile().catch(() => {}).finally(loadHistory);
-        btnReload?.addEventListener('click', loadHistory);
 
         function updateMetrics(items) {
             if (!Array.isArray(items) || items.length === 0) {
                 if (countDisplay) countDisplay.textContent = '0';
                 if (avgDisplay) avgDisplay.textContent = '--';
-                if (lastStatusDisplay) lastStatusDisplay.textContent = 'Sin registros';
+                if (lastStatusDisplay) {
+                    lastStatusDisplay.textContent = 'Sin registros';
+                    lastStatusDisplay.className = 'text-sm font-bold text-gray-500 dark:text-gray-400 mt-2';
+                }
                 return;
             }
 
-            if (countDisplay) countDisplay.textContent = items.length.toString();
+            if (countDisplay) countDisplay.textContent = String(items.length);
+            const average = Math.round(items.reduce((sum, item) => sum + scoreOf(item), 0) / items.length);
+            if (avgDisplay) avgDisplay.textContent = `${average}/100`;
 
-            let totalScores = 0;
-            items.forEach(it => {
-                const prob = Number(it.probabilidad || 0);
-                const score = prob > 1 ? prob : Math.round(prob * 100);
-                totalScores += score;
-            });
-            const avg = Math.round(totalScores / items.length);
-            if (avgDisplay) avgDisplay.textContent = `${avg}/100`;
-
-            const lastItem = items[0];
-            const perfil = lastItem.perfilFinanciero || 'No disponible';
+            const latest = [...items].sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora))[0];
+            const profile = latest?.perfilFinanciero || 'No disponible';
             if (lastStatusDisplay) {
-                lastStatusDisplay.textContent = perfil;
-                if (perfil.toLowerCase().includes('excelente') || perfil.toLowerCase().includes('saludable')) {
-                    lastStatusDisplay.className = 'text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-2';
-                } else if (perfil.toLowerCase().includes('moderado')) {
-                    lastStatusDisplay.className = 'text-sm font-bold text-amber-600 dark:text-amber-400 mt-2';
-                } else {
-                    lastStatusDisplay.className = 'text-sm font-bold text-red-600 dark:text-red-400 mt-2';
-                }
+                lastStatusDisplay.textContent = profile;
+                const normalized = profile.toLowerCase();
+                lastStatusDisplay.className = normalized.includes('excelente') || normalized.includes('saludable')
+                    ? 'text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-2'
+                    : normalized.includes('moderado') || normalized.includes('observación')
+                        ? 'text-sm font-bold text-amber-600 dark:text-amber-400 mt-2'
+                        : 'text-sm font-bold text-red-600 dark:text-red-400 mt-2';
             }
+        }
+
+        function detailsHtml(item) {
+            const expenses = item.resumenGastos && typeof item.resumenGastos === 'object'
+                ? Object.entries(item.resumenGastos)
+                : [];
+            const recommendations = Array.isArray(item.recomendaciones) ? item.recomendaciones : [];
+            const money = value => `${activeCurrencySymbol} ${Number(value || 0).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            return `<div class="grid gap-4 text-left lg:grid-cols-2">
+                <div><p class="mb-2 text-[10px] font-bold uppercase tracking-wide text-gray-400">Distribución de gastos</p><div class="flex flex-wrap gap-2">${expenses.length ? expenses.map(([category, amount]) => `<span class="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"><strong>${escapeHtml(category)}</strong> · ${money(amount)}</span>`).join('') : '<span class="text-xs text-gray-500">Sin desglose disponible.</span>'}</div></div>
+                <div><p class="mb-2 text-[10px] font-bold uppercase tracking-wide text-gray-400">Recomendaciones de IA</p>${recommendations.length ? `<ol class="space-y-1.5 text-xs text-gray-600 dark:text-gray-300">${recommendations.map((recommendation, index) => `<li><strong class="text-blue-600 dark:text-blue-400">${index + 1}.</strong> ${escapeHtml(recommendation)}</li>`).join('')}</ol>` : '<span class="text-xs text-gray-500">Sin recomendaciones disponibles.</span>'}</div>
+            </div>`;
         }
 
         function renderTable(items) {
             if (!tableBody) return;
             if (!Array.isArray(items) || items.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                            <p class="text-sm font-semibold">No hay análisis que coincidan con la búsqueda.</p>
-                        </td>
-                    </tr>
-                `;
+                const hasHistory = historyData.length > 0;
+                tableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center text-gray-500 dark:text-gray-400"><p class="text-sm font-semibold">${hasHistory ? 'No hay análisis que coincidan con los filtros.' : 'Aún no tienes evaluaciones registradas.'}</p>${hasHistory ? '' : '<a href="/dashboard" class="mt-2 inline-block text-xs font-bold text-blue-600 hover:underline dark:text-blue-400">Realizar un análisis →</a>'}</td></tr>`;
                 return;
             }
 
-            const fmt = (v) => `${activeCurrencySymbol} ${Number(v || 0).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
-
+            const money = value => `${activeCurrencySymbol} ${Number(value || 0).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             tableBody.innerHTML = items.map(item => {
-                const dateStr = item.fechaHora ? new Date(item.fechaHora).toLocaleString('es-HN') : 'Reciente';
-                const ingreso = fmt(item.ingresoMensual);
-                const gastos = fmt(item.totalGastos);
-                const ahorro = fmt(item.ahorroEstimado);
-                const endeudamiento = `${Number(item.nivelEndeudamiento || 0)}%`;
+                const date = item.fechaHora ? new Date(item.fechaHora).toLocaleString('es-HN') : 'Reciente';
+                const score = scoreOf(item);
+                const profile = item.perfilFinanciero || 'No disponible';
+                const normalized = profile.toLowerCase();
+                const badgeClass = score < 45 || normalized.includes('riesgo')
+                    ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-300 dark:border-red-800'
+                    : score < 75 || normalized.includes('moderado') || normalized.includes('observación')
+                        ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                        : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800';
+                const detailId = `history-detail-${Number(item.id) || Math.abs(String(item.fechaHora).split('').reduce((sum, char) => sum + char.charCodeAt(0), 0))}`;
 
-                const prob = Number(item.probabilidad || 0);
-                const score = prob > 1 ? prob : Math.round(prob * 100);
-                const perfil = item.perfilFinanciero || 'No disponible';
-
-                let badgeClass = 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800';
-                if (score < 45 || perfil.toLowerCase().includes('riesgo')) {
-                    badgeClass = 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-300 dark:border-red-800';
-                } else if (score < 75 || perfil.toLowerCase().includes('moderado')) {
-                    badgeClass = 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800';
-                }
-
-                return `
-                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors">
-                        <td class="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">${escapeHtml(dateStr)}</td>
-                        <td class="px-4 py-3 font-mono font-semibold text-gray-900 dark:text-white">${ingreso}</td>
-                        <td class="px-4 py-3 font-mono text-red-600 dark:text-red-400">${gastos}</td>
-                        <td class="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">${ahorro}</td>
-                        <td class="px-4 py-3 font-mono text-gray-600 dark:text-gray-300">${endeudamiento}</td>
-                        <td class="px-4 py-3 text-center">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${badgeClass}">
-                                <span>${score}/100</span>
-                                <span>·</span>
-                                <span>${escapeHtml(perfil)}</span>
-                            </span>
-                        </td>
+                return `<tr class="transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/40">
+                        <td class="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">${escapeHtml(date)}<div class="mt-1 text-[10px] font-sans text-gray-400">${escapeHtml(item.frecuenciaAhorro || 'Sin frecuencia')}</div></td>
+                        <td class="px-4 py-3 font-mono font-semibold text-gray-900 dark:text-white">${money(item.ingresoMensual)}</td>
+                        <td class="px-4 py-3 font-mono text-red-600 dark:text-red-400">${money(item.totalGastos)}</td>
+                        <td class="px-4 py-3 font-mono font-semibold text-emerald-600 dark:text-emerald-400">${money(item.ahorroEstimado)}</td>
+                        <td class="px-4 py-3 font-mono text-gray-600 dark:text-gray-300">${Number(item.nivelEndeudamiento || 0)}%</td>
+                        <td class="px-4 py-3 text-center"><div class="flex flex-col items-center gap-1.5"><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold ${badgeClass}"><span>${score}/100</span><span>·</span><span>${escapeHtml(profile)}</span></span><button type="button" class="btn-history-detail text-[10px] font-bold text-blue-600 hover:underline dark:text-blue-400" data-target="${detailId}" aria-expanded="false">Ver detalle</button></div></td>
                     </tr>
-                `;
+                    <tr id="${detailId}" class="hidden bg-gray-50/70 dark:bg-gray-950/40"><td colspan="6" class="px-5 py-4">${detailsHtml(item)}</td></tr>`;
             }).join('');
+
+            tableBody.querySelectorAll('.btn-history-detail').forEach(button => {
+                button.addEventListener('click', () => {
+                    const detail = byId(button.getAttribute('data-target'));
+                    const willOpen = detail?.classList.contains('hidden');
+                    detail?.classList.toggle('hidden');
+                    button.textContent = willOpen ? 'Ocultar detalle' : 'Ver detalle';
+                    button.setAttribute('aria-expanded', String(Boolean(willOpen)));
+                });
+            });
         }
 
-        // ─── Filtros & Búsqueda ───
         function applyFilters() {
-            const query = (searchInput?.value || '').toLowerCase().trim();
-            const perfilVal = filterPerfil?.value || 'ALL';
+            const query = String(searchInput?.value || '').toLowerCase().trim();
+            const profileFilter = filterPerfil?.value || 'ALL';
+            const monthFilter = filterMonth?.value || 'ALL';
+            const frequencyFilter = filterFrequency?.value || 'ALL';
+            const categoryFilter = filterCategory?.value || 'ALL';
+            const startDate = filterDateStart?.value || '';
+            const endDate = filterDateEnd?.value || '';
 
-            const filtered = historyData.filter(item => {
-                const matchQuery = !query || (item.perfilFinanciero && item.perfilFinanciero.toLowerCase().includes(query)) || (item.fechaHora && item.fechaHora.includes(query));
-                let matchPerfil = true;
+            if (filterError) {
+                const invalidRange = startDate && endDate && startDate > endDate;
+                filterError.classList.toggle('hidden', !invalidRange);
+                filterError.textContent = invalidRange ? 'La fecha inicial no puede ser posterior a la fecha final.' : '';
+                if (invalidRange) {
+                    filteredHistoryData = [];
+                    renderTable([]);
+                    updateMetrics([]);
+                    renderCharts([]);
+                    if (resultCount) resultCount.textContent = '0 resultados';
+                    return;
+                }
+            }
+
+            filteredHistoryData = historyData.filter(item => {
                 const profile = String(item.perfilFinanciero || '').toLowerCase();
-                if (perfilVal === 'Excelente') matchPerfil = profile.includes('excelente') || profile.includes('saludable');
-                else if (perfilVal === 'Moderado') matchPerfil = profile.includes('moderado');
-                else if (perfilVal === 'Riesgo') matchPerfil = profile.includes('riesgo') || profile.includes('crítico') || profile.includes('critico');
-                return matchQuery && matchPerfil;
+                const itemDate = localDateKey(item.fechaHora);
+                const searchable = [profile, item.frecuenciaAhorro, item.fechaHora, detailText(item.resumenGastos), detailText(item.recomendaciones)].join(' ').toLowerCase();
+                const matchesQuery = !query || searchable.includes(query);
+                const matchesMonth = monthFilter === 'ALL' || itemDate.startsWith(monthFilter);
+                const matchesFrequency = frequencyFilter === 'ALL' || item.frecuenciaAhorro === frequencyFilter;
+                const matchesCategory = categoryFilter === 'ALL' || (item.resumenGastos && typeof item.resumenGastos === 'object' && Number(item.resumenGastos[categoryFilter] || 0) > 0);
+                const matchesStart = !startDate || itemDate >= startDate;
+                const matchesEnd = !endDate || itemDate <= endDate;
+                let matchesProfile = true;
+                if (profileFilter === 'Excelente') matchesProfile = profile.includes('excelente') || profile.includes('saludable');
+                else if (profileFilter === 'Moderado') matchesProfile = profile.includes('moderado') || profile.includes('observación');
+                else if (profileFilter === 'Riesgo') matchesProfile = profile.includes('riesgo') || profile.includes('crítico') || profile.includes('critico');
+                return matchesQuery && matchesMonth && matchesFrequency && matchesCategory && matchesStart && matchesEnd && matchesProfile;
             });
 
-            renderTable(filtered);
+            const sort = filterSort?.value || 'NEWEST';
+            filteredHistoryData.sort((a, b) => {
+                if (sort === 'OLDEST') return new Date(a.fechaHora) - new Date(b.fechaHora);
+                if (sort === 'SCORE_DESC') return scoreOf(b) - scoreOf(a);
+                if (sort === 'SCORE_ASC') return scoreOf(a) - scoreOf(b);
+                return new Date(b.fechaHora) - new Date(a.fechaHora);
+            });
+
+            renderTable(filteredHistoryData);
+            updateMetrics(filteredHistoryData);
+            renderCharts(filteredHistoryData);
+            if (resultCount) resultCount.textContent = `${filteredHistoryData.length} ${filteredHistoryData.length === 1 ? 'resultado' : 'resultados'}`;
         }
 
-        searchInput?.addEventListener('input', applyFilters);
-        filterPerfil?.addEventListener('change', applyFilters);
+        [searchInput, filterMonth, filterPerfil, filterDateStart, filterDateEnd, filterFrequency, filterCategory, filterSort].forEach(control => {
+            control?.addEventListener(control === searchInput ? 'input' : 'change', applyFilters);
+        });
+        byId('btnResetHistoryFilters')?.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            if (filterMonth) filterMonth.value = 'ALL';
+            if (filterPerfil) filterPerfil.value = 'ALL';
+            if (filterDateStart) filterDateStart.value = '';
+            if (filterDateEnd) filterDateEnd.value = '';
+            if (filterFrequency) filterFrequency.value = 'ALL';
+            if (filterCategory) filterCategory.value = 'ALL';
+            if (filterSort) filterSort.value = 'NEWEST';
+            applyFilters();
+        });
+        btnReload?.addEventListener('click', loadHistory);
 
-        // ─── Exportar historial real como CSV ───
-        btnExportCsv?.addEventListener('click', () => {
-            if (!historyData.length) {
-                if (window.showToast) window.showToast('Sin datos', 'No hay análisis para exportar.', 'ℹ️');
+        function selectedFilterSummary() {
+            const labels = [];
+            const query = String(searchInput?.value || '').trim();
+            if (query) labels.push(`Búsqueda: ${query}`);
+            if (filterMonth?.value && filterMonth.value !== 'ALL') labels.push(`Mes: ${filterMonth.selectedOptions[0]?.textContent || filterMonth.value}`);
+            if (filterPerfil?.value && filterPerfil.value !== 'ALL') labels.push(`Perfil: ${filterPerfil.selectedOptions[0]?.textContent || filterPerfil.value}`);
+            if (filterFrequency?.value && filterFrequency.value !== 'ALL') labels.push(`Frecuencia: ${filterFrequency.value}`);
+            if (filterCategory?.value && filterCategory.value !== 'ALL') labels.push(`Categoría: ${filterCategory.value}`);
+            if (filterDateStart?.value) labels.push(`Desde: ${filterDateStart.value}`);
+            if (filterDateEnd?.value) labels.push(`Hasta: ${filterDateEnd.value}`);
+            labels.push(`Orden: ${filterSort?.selectedOptions[0]?.textContent || 'Más recientes'}`);
+            return labels.join(' · ');
+        }
+
+        btnExportExcel?.addEventListener('click', async () => {
+            if (!filteredHistoryData.length) {
+                if (window.showToast) window.showToast('Sin datos', 'No hay análisis visibles para exportar.', 'ℹ️');
                 return;
             }
-            const csvCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
-            const headers = ['Fecha', 'Perfil', 'Score', 'Ingreso', 'Gastos', 'Ahorro', 'Endeudamiento', 'Frecuencia'];
-            const rows = historyData.map((item) => {
-                const probability = Number(item.probabilidad || 0);
-                const score = probability > 1 ? probability : Math.round(probability * 100);
-                return [item.fechaHora, item.perfilFinanciero, score, item.ingresoMensual, item.totalGastos, item.ahorroEstimado, item.nivelEndeudamiento, item.frecuenciaAhorro];
-            });
-            const csv = '\uFEFF' + [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
-            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `FinanceAI_historial_${activeCurrency}.csv`;
-            link.click();
-            URL.revokeObjectURL(url);
-            if (window.showToast) window.showToast('Historial exportado', 'El archivo CSV se descargó correctamente.', '✅');
+            if (typeof window.downloadHistoryWorkbook !== 'function') {
+                if (window.showToast) window.showToast('Excel no disponible', 'Recarga la página e intenta nuevamente.', '⚠️');
+                return;
+            }
+
+            const originalContent = btnExportExcel.innerHTML;
+            btnExportExcel.disabled = true;
+            btnExportExcel.textContent = 'Generando Excel…';
+            try {
+                await window.downloadHistoryWorkbook({
+                    rows: filteredHistoryData,
+                    currencyCode: activeCurrency,
+                    currencySymbol: activeCurrencySymbol,
+                    filterSummary: selectedFilterSummary(),
+                });
+                if (window.showToast) window.showToast('Excel generado', `${filteredHistoryData.length} evaluaciones exportadas con formato profesional.`, '✅');
+            } catch {
+                if (window.showToast) window.showToast('No se pudo exportar', 'Ocurrió un error al preparar el archivo Excel.', '⚠️');
+            } finally {
+                btnExportExcel.disabled = false;
+                btnExportExcel.innerHTML = originalContent;
+            }
         });
+
+        loadProfile().catch(() => {}).finally(loadHistory);
     })();
 </script>

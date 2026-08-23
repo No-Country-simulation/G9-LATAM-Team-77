@@ -11,6 +11,9 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
     volumes:
       - financeai_mysql_data:/var/lib/mysql
+    ports:
+      # Administrative access is restricted to the host and reached through SSH tunneling.
+      - "127.0.0.1:3307:3306"
     networks:
       - financeai_internal
     healthcheck:
@@ -34,6 +37,7 @@ services:
       DB_USERNAME: ${MYSQL_USER:?MYSQL_USER is required}
       DB_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       PYTHON_COMMAND: python3
       DATA_SCIENCE_SCRIPT: /opt/financeai-data-science/src/predict.py
       DATA_SCIENCE_TIMEOUT_SECONDS: ${DATA_SCIENCE_TIMEOUT_SECONDS:-30}
@@ -65,6 +69,7 @@ services:
       dockerfile: Dockerfile
       args:
         PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:8080}
+        PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     image: financeai-frontend:local
     restart: unless-stopped
     depends_on:
@@ -75,6 +80,7 @@ services:
       HOST: 0.0.0.0
       PORT: 4321
       PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:8080}
+      PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     ports:
       - "4321:4321"
     networks:

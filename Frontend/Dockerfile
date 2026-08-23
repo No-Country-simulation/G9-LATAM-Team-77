@@ -14,7 +14,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 FROM dependencies AS build
 COPY . .
 ARG PUBLIC_API_URL=http://localhost:8080
+ARG PUBLIC_GOOGLE_CLIENT_ID=
 ENV PUBLIC_API_URL=$PUBLIC_API_URL
+ENV PUBLIC_GOOGLE_CLIENT_ID=$PUBLIC_GOOGLE_CLIENT_ID
 RUN pnpm build
 
 FROM base AS production-dependencies

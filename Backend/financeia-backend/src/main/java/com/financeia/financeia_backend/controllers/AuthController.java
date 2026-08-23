@@ -2,6 +2,7 @@ package com.financeia.financeia_backend.controllers;
 
 import com.financeia.financeia_backend.dto.auth.LoginRequest;
 import com.financeia.financeia_backend.dto.auth.LoginResponse;
+import com.financeia.financeia_backend.dto.auth.GoogleLoginRequest;
 import com.financeia.financeia_backend.dto.auth.ForgotPasswordRequest;
 import com.financeia.financeia_backend.dto.auth.MessageResponse;
 import com.financeia.financeia_backend.dto.auth.RegistroRequest;
@@ -37,6 +38,12 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request) {
 
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<LoginResponse> googleLogin(
+            @Valid @RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(authService.googleLogin(request));
     }
 
     @PostMapping("/forgot-password")

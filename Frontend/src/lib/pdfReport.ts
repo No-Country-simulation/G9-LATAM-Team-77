@@ -18,6 +18,14 @@ export interface FinancialReportData {
   currencyCode?: string;
   currencySymbol?: string;
   transactions?: FinancialTransaction[];
+  analysis?: {
+    score?: number | string;
+    profile?: string;
+    summary?: string;
+    period?: string;
+    debtRatio?: number;
+    recommendations?: string[];
+  };
 }
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -99,14 +107,20 @@ export function generateExpedientePDF(data: FinancialReportData): void {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184); // slate-400
-  doc.text('Resumen personal de movimientos y salud financiera', margin, 18);
+  doc.text('Plataforma de Inteligencia Financiera & Control Patrimonial', margin, 18);
 
   // ─── 2. TÍTULO DEL EXPEDIENTE ───
   let currentY = 36;
   doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text('Reporte personal de movimientos registrados', margin, currentY);
+  doc.text(
+    data.analysis
+      ? 'Expediente de Análisis Financiero con IA'
+      : 'Expediente del Titular y Registro de Transacciones',
+    margin,
+    currentY,
+  );
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
@@ -198,7 +212,61 @@ export function generateExpedientePDF(data: FinancialReportData): void {
 
   currentY += 24;
 
-  // ─── 5. TABLA DE TRANSACCIONES DETALLADA ───
+  // ─── 5. RESULTADO DEL ANÁLISIS DE IA (cuando el reporte nace del Dashboard) ───
+  if (data.analysis) {
+    const analysis = data.analysis;
+    const recommendations = Array.isArray(analysis.recommendations)
+      ? analysis.recommendations.filter(Boolean).slice(0, 3)
+      : [];
+    const summaryLines = doc.splitTextToSize(
+      analysis.summary || 'Diagnóstico financiero generado por FinanceAI.',
+      pageWidth - (margin * 2) - 45,
+    );
+    const recommendationLines = recommendations.flatMap((item, index) =>
+      doc.splitTextToSize(`${index + 1}. ${item}`, pageWidth - (margin * 2) - 8).slice(0, 2),
+    );
+    const analysisHeight = 25 + (recommendationLines.length * 4);
+
+    doc.setFillColor(239, 246, 255);
+    doc.setDrawColor(191, 219, 254);
+    doc.roundedRect(margin, currentY, pageWidth - (margin * 2), analysisHeight, 2, 2, 'FD');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(30, 64, 175);
+    doc.text('DIAGNÓSTICO FINANCIERO CON IA', margin + 4, currentY + 6);
+
+    doc.setFontSize(15);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`${analysis.score ?? '--'}/100`, margin + 4, currentY + 14);
+    doc.setFontSize(9.5);
+    doc.text(analysis.profile || 'Análisis completado', margin + 25, currentY + 12);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(71, 85, 105);
+    const analysisMeta = [
+      analysis.period ? `Período: ${analysis.period}` : '',
+      Number.isFinite(Number(analysis.debtRatio)) ? `Endeudamiento: ${Number(analysis.debtRatio).toFixed(1)}%` : '',
+    ].filter(Boolean).join('  |  ');
+    if (analysisMeta) doc.text(doc.splitTextToSize(analysisMeta, pageWidth - (margin * 2) - 25)[0], margin + 25, currentY + 17);
+    doc.text(summaryLines.slice(0, 2), margin + 45, currentY + 10);
+
+    if (recommendationLines.length) {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 64, 175);
+      doc.text('Recomendaciones principales', margin + 4, currentY + 22);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(51, 65, 85);
+      recommendationLines.forEach((line, index) => {
+        doc.text(line, margin + 4, currentY + 27 + (index * 4));
+      });
+    }
+
+    currentY += analysisHeight + 6;
+  }
+
+  // ─── 6. TABLA DE TRANSACCIONES DETALLADA ───
   doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
@@ -278,7 +346,7 @@ export function generateExpedientePDF(data: FinancialReportData): void {
     (window as any).jspdf.autoTable(doc, tableOptions);
   }
 
-  // ─── 6. PIE DE PÁGINA Y AVISO LEGAL ───
+  // ─── 7. PIE DE PÁGINA Y AVISO LEGAL ───
   const pageCount = (doc.internal as any).getNumberOfPages ? (doc.internal as any).getNumberOfPages() : doc.getNumberOfPages();
 
   for (let i = 1; i <= pageCount; i++) {

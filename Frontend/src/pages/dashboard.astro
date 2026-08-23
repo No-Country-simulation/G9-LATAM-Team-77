@@ -46,8 +46,8 @@ import { API_URL } from '../lib/api';
         <section class="surface-card soft-lift rounded-3xl p-5 sm:p-6" aria-labelledby="summaryTitle">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 id="summaryTitle" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Resumen de Transacciones Persistidas</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Consolidado por el Backend con los movimientos de tu cuenta.</p>
+                    <h2 id="summaryTitle" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Tu panorama financiero</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Consulta tus ingresos, gastos y balance actualizados en un solo lugar.</p>
                 </div>
                 <button id="retrySummaryBtn" type="button" class="hidden text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Reintentar</button>
             </div>
@@ -92,7 +92,7 @@ import { API_URL } from '../lib/api';
                         <input type="number" step="0.01" min="1" id="inputIngresoMensual" required value="25000" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white font-mono" placeholder="Ej. 25000" />
                     </div>
 
-                    <!-- Frecuencia de Ahorro & Nivel Endeudamiento -->
+                    <!-- Frecuencia y período de referencia -->
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label for="selectFrecuencia" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Frecuencia</label>
@@ -102,36 +102,56 @@ import { API_URL } from '../lib/api';
                                 <option value="Semanal">Semanal</option>
                             </select>
                         </div>
-                        <div>
-                            <label for="inputEndeudamiento" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Endeudamiento (%)</label>
-                            <input type="number" step="0.1" min="0" max="100" id="inputEndeudamiento" required value="20" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white font-mono" placeholder="20%" />
+                        <div class="relative">
+                            <label for="periodCalendarTrigger" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Período a evaluar</label>
+                            <input type="hidden" id="inputPeriodDate" />
+                            <button type="button" id="periodCalendarTrigger" class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-left text-xs font-semibold text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:text-sm" aria-haspopup="dialog" aria-expanded="false">
+                                <span id="periodCalendarDisplay">Seleccionar período</span>
+                                <svg class="h-4 w-4 flex-shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z" /></svg>
+                            </button>
+                            <div id="periodCalendarPopover" class="absolute left-0 top-full z-50 mt-2 hidden w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-gray-200 bg-white p-3.5 shadow-2xl dark:border-gray-700 dark:bg-gray-900" role="dialog" aria-label="Seleccionar período financiero">
+                                <div class="mb-2.5 flex items-center justify-between border-b border-gray-100 pb-2 dark:border-gray-800">
+                                    <button type="button" id="periodCalendarPrevious" class="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Mes anterior">&larr;</button>
+                                    <strong id="periodCalendarMonth" class="text-sm capitalize text-gray-900 dark:text-white">Mes</strong>
+                                    <button type="button" id="periodCalendarNext" class="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Mes siguiente">&rarr;</button>
+                                </div>
+                                <p id="periodCalendarHint" class="mb-2 rounded-lg bg-blue-50 px-2 py-1 text-center text-[10px] font-medium text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">Selecciona una fecha</p>
+                                <div class="mb-1 grid grid-cols-7 gap-1 text-center text-[9px] font-bold uppercase text-gray-400">
+                                    <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+                                </div>
+                                <div id="periodCalendarGrid" class="grid grid-cols-7 gap-1 text-center"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Movimientos de Ejemplo para el Motor de IA -->
+                    <div class="flex items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/70 px-3 py-2.5 text-[11px] text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-300">
+                        <span class="flex items-center gap-1.5 font-semibold">
+                            <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z" /></svg>
+                            Rango seleccionado
+                        </span>
+                        <strong id="periodRangeNotice" class="text-right font-mono text-[10px] sm:text-[11px]">Calculando…</strong>
+                    </div>
+
+                    <div>
+                        <span class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Endeudamiento calculado</span>
+                        <div class="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 dark:border-gray-700 dark:bg-gray-800" aria-live="polite">
+                            <strong id="inputEndeudamiento" class="font-mono text-sm text-blue-600 dark:text-blue-400">0.0%</strong>
+                            <span id="debtAmountSummary" class="text-right text-[10px] font-medium text-gray-500 dark:text-gray-400">Sin deudas registradas</span>
+                        </div>
+                        <p class="mt-1 text-[10px] text-gray-400">Pago mensual de “Deudas” ÷ ingreso neto del período × 100.</p>
+                    </div>
+
+                    <!-- Transacciones del período para el Motor de IA -->
                     <div class="pt-2">
                         <div class="flex justify-between items-center mb-2">
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Movimientos / Conceptos Representativos</label>
-                            <span class="text-[11px] text-gray-400">4 elementos</span>
+                            <label class="block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">Transacciones</label>
+                            <span id="analysisTransactionCount" class="text-[11px] text-gray-400">4 agregadas</span>
                         </div>
-                        <div class="space-y-2 text-xs">
-                            <div class="flex gap-2">
-                                <input type="text" value="Alquiler de vivienda" class="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white tx-desc" />
-                                <input type="number" value="6500" class="w-24 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-mono tx-val" />
-                            </div>
-                            <div class="flex gap-2">
-                                <input type="text" value="Supermercado y despensa" class="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white tx-desc" />
-                                <input type="number" value="4000" class="w-24 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-mono tx-val" />
-                            </div>
-                            <div class="flex gap-2">
-                                <input type="text" value="Servicios de luz e internet" class="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white tx-desc" />
-                                <input type="number" value="1800" class="w-24 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-mono tx-val" />
-                            </div>
-                            <div class="flex gap-2">
-                                <input type="text" value="Combustible y transporte" class="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white tx-desc" />
-                                <input type="number" value="1500" class="w-24 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white font-mono tx-val" />
-                            </div>
-                        </div>
+                        <div id="analysisTransactionList" class="max-h-72 space-y-2 overflow-y-auto pr-1 text-xs"></div>
+                        <button id="btnAddAnalysisTransaction" type="button" class="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-gray-300 py-2.5 text-xs font-semibold text-gray-500 transition hover:border-blue-500 hover:text-blue-600 dark:border-gray-700 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                            Agregar transacción
+                        </button>
                     </div>
 
                     <!-- Botón de Análisis -->
@@ -144,12 +164,20 @@ import { API_URL } from '../lib/api';
 
             <!-- Columna Derecha: Diagnóstico con IA & Recomendaciones (7 Columnas) -->
             <div class="lg:col-span-7 bg-white dark:bg-gray-900 rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-800 space-y-5">
-                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-                    <div>
-                        <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Resultados del Modelo de IA</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Diagnóstico explicable XAI y clasificación multidimensional</p>
+                <div class="flex flex-col gap-3 border-b border-gray-100 pb-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-600 shadow-sm dark:border-blue-900/70 dark:from-blue-950/70 dark:to-indigo-950/70 dark:text-blue-400">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18l-.813-2.096a4.5 4.5 0 0 0-2.591-2.591L3.5 12.5l2.096-.813a4.5 4.5 0 0 0 2.591-2.591L9 7l.813 2.096a4.5 4.5 0 0 0 2.591 2.591l2.096.813-2.096.813a4.5 4.5 0 0 0-2.591 2.591ZM18.259 8.715 18 9.5l-.259-.785a3.375 3.375 0 0 0-2.456-2.456L14.5 6l.785-.259a3.375 3.375 0 0 0 2.456-2.456L18 2.5l.259.785a3.375 3.375 0 0 0 2.456 2.456L21.5 6l-.785.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.5l-.394-.933a2.25 2.25 0 0 0-1.173-1.173L14 19l.933-.394a2.25 2.25 0 0 0 1.173-1.173l.394-.933.394.933a2.25 2.25 0 0 0 1.173 1.173L19 19l-.933.394a2.25 2.25 0 0 0-1.173 1.173Z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="mb-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">Análisis personalizado</p>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white sm:text-lg font-josefin">Tu diagnóstico financiero inteligente</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Descubre qué impulsa tu salud financiera y cómo mejorarla.</p>
+                        </div>
                     </div>
-                    <span id="analysisProfileBadge" class="text-xs font-bold px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full border border-gray-300 dark:border-gray-700">
+                    <span id="analysisProfileBadge" class="self-start text-xs font-bold px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full border border-gray-300 dark:border-gray-700 sm:self-auto">
                         Sin analizar
                     </span>
                 </div>
@@ -221,6 +249,9 @@ import { API_URL } from '../lib/api';
         const token = localStorage.getItem('financeai_token');
         let currentCurrency = 'HNL';
         let currentCurrencySymbol = 'L';
+        let currentUserName = 'Usuario FinanceAI';
+        let currentUserEmail = 'No disponible';
+        let latestAnalysisExport = null;
 
         function clearSessionAndRedirect() {
             localStorage.removeItem('financeai_token');
@@ -234,6 +265,8 @@ import { API_URL } from '../lib/api';
             try {
                 const u = JSON.parse(userRaw);
                 const userNameDisplay = document.getElementById('dashboardUserNameHeader');
+                currentUserName = u.nombre || u.name || currentUserName;
+                currentUserEmail = u.email || currentUserEmail;
                 if (userNameDisplay && u.nombre) {
                     userNameDisplay.textContent = u.nombre.split(' ')[0];
                 }
@@ -251,6 +284,285 @@ import { API_URL } from '../lib/api';
         }
         updateCurrencyUI(currentCurrency, currentCurrencySymbol);
 
+        // ─── Período de referencia (sin cambiar el contrato de análisis) ───
+        const frequencySelect = document.getElementById('selectFrecuencia');
+        const periodDateInput = document.getElementById('inputPeriodDate');
+        const periodRangeNotice = document.getElementById('periodRangeNotice');
+        const periodBadge = document.getElementById('periodBadge');
+        const periodCalendarTrigger = document.getElementById('periodCalendarTrigger');
+        const periodCalendarDisplay = document.getElementById('periodCalendarDisplay');
+        const periodCalendarPopover = document.getElementById('periodCalendarPopover');
+        const periodCalendarMonth = document.getElementById('periodCalendarMonth');
+        const periodCalendarHint = document.getElementById('periodCalendarHint');
+        const periodCalendarGrid = document.getElementById('periodCalendarGrid');
+        const transactionList = document.getElementById('analysisTransactionList');
+        const transactionCount = document.getElementById('analysisTransactionCount');
+        const OFFICIAL_CATEGORIES = [
+            'Alimentación',
+            'Vivienda',
+            'Servicios',
+            'Transporte',
+            'Educación',
+            'Salud y bienestar',
+            'Entretenimiento',
+            'Compras',
+            'Deudas',
+            'Ahorro e inversión',
+            'Otros',
+        ];
+        let currentPeriodStart = '';
+        let currentPeriodEnd = '';
+        let calendarViewDate = new Date();
+        let nextTransactionId = 5;
+        let analysisTransactions = [
+            { id: 1, descripcion: 'Vivienda', valor: 6500, fecha: '' },
+            { id: 2, descripcion: 'Alimentación', valor: 4000, fecha: '' },
+            { id: 3, descripcion: 'Servicios', valor: 1800, fecha: '' },
+            { id: 4, descripcion: 'Transporte', valor: 1500, fecha: '' },
+        ];
+
+        function calculateDebtRatio(income) {
+            const debtAmount = analysisTransactions
+                .filter(transaction => transaction.descripcion === 'Deudas')
+                .reduce((total, transaction) => total + (Number(transaction.valor) || 0), 0);
+            const ratio = Number(income) > 0 ? (debtAmount / Number(income)) * 100 : 0;
+            return { debtAmount, ratio: Number(ratio.toFixed(1)) };
+        }
+
+        function updateDebtIndicator() {
+            const income = Number(document.getElementById('inputIngresoMensual')?.value);
+            const { debtAmount, ratio } = calculateDebtRatio(income);
+            const ratioDisplay = document.getElementById('inputEndeudamiento');
+            const amountDisplay = document.getElementById('debtAmountSummary');
+            if (ratioDisplay) ratioDisplay.textContent = `${ratio.toFixed(1)}%`;
+            if (amountDisplay) {
+                amountDisplay.textContent = debtAmount > 0
+                    ? `${currentCurrencySymbol} ${debtAmount.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} en deudas`
+                    : 'Sin deudas registradas';
+            }
+        }
+
+        function toLocalIso(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function parseLocalIso(value) {
+            const [year, month, day] = String(value).split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        function clampDate(date, minimum, maximum) {
+            if (date < minimum) return new Date(minimum);
+            if (date > maximum) return new Date(maximum);
+            return date;
+        }
+
+        function updateSelectedPeriod() {
+            if (!frequencySelect || !periodDateInput || !periodRangeNotice) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const minimum = new Date(today);
+            minimum.setFullYear(today.getFullYear() - 2);
+
+            periodDateInput.min = toLocalIso(minimum);
+            periodDateInput.max = toLocalIso(today);
+            if (!periodDateInput.value) periodDateInput.value = toLocalIso(today);
+
+            const selected = clampDate(parseLocalIso(periodDateInput.value), minimum, today);
+            periodDateInput.value = toLocalIso(selected);
+            const frequency = frequencySelect.value || 'Mensual';
+            let start;
+            let end;
+
+            if (frequency === 'Semanal') {
+                const mondayOffset = (selected.getDay() + 6) % 7;
+                start = new Date(selected);
+                start.setDate(selected.getDate() - mondayOffset);
+                end = new Date(start);
+                end.setDate(start.getDate() + 6);
+            } else if (frequency === 'Quincenal') {
+                const secondHalf = selected.getDate() > 15;
+                start = new Date(selected.getFullYear(), selected.getMonth(), secondHalf ? 16 : 1);
+                end = new Date(selected.getFullYear(), selected.getMonth() + (secondHalf ? 1 : 0), secondHalf ? 0 : 15);
+            } else {
+                start = new Date(selected.getFullYear(), selected.getMonth(), 1);
+                end = new Date(selected.getFullYear(), selected.getMonth() + 1, 0);
+            }
+
+            start = clampDate(start, minimum, today);
+            end = clampDate(end, minimum, today);
+            currentPeriodStart = toLocalIso(start);
+            currentPeriodEnd = toLocalIso(end);
+            const formatter = new Intl.DateTimeFormat('es-HN', { day: '2-digit', month: 'short', year: 'numeric' });
+            periodRangeNotice.textContent = `${formatter.format(start)} – ${formatter.format(end)}`;
+            if (periodBadge) periodBadge.textContent = frequency;
+            if (periodCalendarDisplay) {
+                if (frequency === 'Mensual') {
+                    periodCalendarDisplay.textContent = new Intl.DateTimeFormat('es-HN', { month: 'long', year: 'numeric' }).format(selected);
+                } else if (frequency === 'Quincenal') {
+                    periodCalendarDisplay.textContent = `${selected.getDate() <= 15 ? '1.ª' : '2.ª'} quincena · ${new Intl.DateTimeFormat('es-HN', { month: 'short', year: 'numeric' }).format(selected)}`;
+                } else {
+                    periodCalendarDisplay.textContent = `${formatter.format(start)} – ${formatter.format(end)}`;
+                }
+            }
+
+            analysisTransactions = analysisTransactions.map(transaction => ({
+                ...transaction,
+                fecha: !transaction.fecha || transaction.fecha < currentPeriodStart || transaction.fecha > currentPeriodEnd
+                    ? currentPeriodEnd
+                    : transaction.fecha,
+            }));
+            renderAnalysisTransactions();
+            renderPeriodCalendar();
+        }
+
+        function renderPeriodCalendar() {
+            if (!periodCalendarGrid || !periodCalendarMonth || !periodDateInput) return;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const minimum = new Date(today);
+            minimum.setFullYear(today.getFullYear() - 2);
+            const selectedIso = periodDateInput.value;
+            const year = calendarViewDate.getFullYear();
+            const month = calendarViewDate.getMonth();
+            const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const frequency = frequencySelect?.value || 'Mensual';
+
+            periodCalendarMonth.textContent = new Intl.DateTimeFormat('es-HN', { month: 'long', year: 'numeric' }).format(calendarViewDate);
+            if (periodCalendarHint) {
+                periodCalendarHint.textContent = frequency === 'Semanal'
+                    ? 'Elige un día y se marcará su semana completa'
+                    : frequency === 'Quincenal'
+                        ? 'Elige un día y se marcará su quincena'
+                        : 'Elige un día y se marcará el mes completo';
+            }
+
+            const cells = Array.from({ length: firstWeekday }, () => '<span aria-hidden="true"></span>');
+            for (let day = 1; day <= daysInMonth; day += 1) {
+                const date = new Date(year, month, day);
+                const iso = toLocalIso(date);
+                const disabled = date < minimum || date > today;
+                const inRange = Boolean(currentPeriodStart && currentPeriodEnd && iso >= currentPeriodStart && iso <= currentPeriodEnd);
+                const isAnchor = iso === selectedIso;
+                const stateClasses = disabled
+                    ? 'cursor-not-allowed text-gray-300 dark:text-gray-700'
+                    : inRange
+                        ? 'bg-blue-600 text-white shadow-sm hover:bg-blue-700'
+                        : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700 dark:text-gray-200 dark:hover:bg-blue-950/50 dark:hover:text-blue-300';
+                cells.push(`<button type="button" class="period-calendar-day h-8 rounded-lg text-[11px] font-semibold transition ${stateClasses} ${isAnchor ? 'ring-2 ring-blue-300 ring-offset-1 dark:ring-blue-700 dark:ring-offset-gray-900' : ''}" data-date="${iso}" ${disabled ? 'disabled' : ''} aria-label="${iso}">${day}</button>`);
+            }
+            periodCalendarGrid.innerHTML = cells.join('');
+            periodCalendarGrid.querySelectorAll('.period-calendar-day:not([disabled])').forEach(button => {
+                button.addEventListener('click', () => {
+                    periodDateInput.value = button.getAttribute('data-date') || '';
+                    updateSelectedPeriod();
+                    periodCalendarPopover?.classList.add('hidden');
+                    periodCalendarTrigger?.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+            const previousMonth = new Date(year, month - 1, 1);
+            const nextMonth = new Date(year, month + 1, 1);
+            const previousButton = document.getElementById('periodCalendarPrevious');
+            const nextButton = document.getElementById('periodCalendarNext');
+            if (previousButton) previousButton.disabled = previousMonth < new Date(minimum.getFullYear(), minimum.getMonth(), 1);
+            if (nextButton) nextButton.disabled = nextMonth > new Date(today.getFullYear(), today.getMonth(), 1);
+        }
+
+        function renderAnalysisTransactions() {
+            if (!transactionList) return;
+            transactionList.innerHTML = analysisTransactions.map(transaction => `
+                <div class="grid grid-cols-12 items-center gap-1.5 rounded-2xl border border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800/80" data-transaction-id="${transaction.id}">
+                    <div class="col-span-12 sm:col-span-5">
+                        <select class="tx-category w-full rounded-xl border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" aria-label="Categoría de la transacción">
+                            ${OFFICIAL_CATEGORIES.map(category => `<option value="${category}" ${transaction.descripcion === category ? 'selected' : ''}>${category}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-span-5 sm:col-span-3">
+                        <input type="number" min="0" step="0.01" value="${transaction.valor}" class="tx-amount w-full rounded-xl border border-gray-200 bg-white px-2.5 py-2 text-xs font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" aria-label="Monto de la transacción" />
+                    </div>
+                    <div class="col-span-5 sm:col-span-3">
+                        <input type="date" min="${currentPeriodStart}" max="${currentPeriodEnd}" value="${transaction.fecha || currentPeriodEnd}" class="tx-date w-full rounded-xl border border-gray-200 bg-white px-2 py-2 text-[11px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]" aria-label="Fecha de la transacción" />
+                    </div>
+                    <div class="col-span-2 flex justify-center sm:col-span-1">
+                        <button type="button" class="btn-remove-analysis-transaction rounded-lg p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/30" aria-label="Eliminar transacción" title="Eliminar transacción">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m6 6 12 12M18 6 6 18" /></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            if (transactionCount) transactionCount.textContent = `${analysisTransactions.length} agregada${analysisTransactions.length === 1 ? '' : 's'}`;
+
+            transactionList.querySelectorAll('[data-transaction-id]').forEach(row => {
+                const id = Number(row.getAttribute('data-transaction-id'));
+                const transaction = analysisTransactions.find(item => item.id === id);
+                if (!transaction) return;
+
+                row.querySelector('.tx-category')?.addEventListener('change', event => {
+                    transaction.descripcion = event.target.value;
+                    updateDebtIndicator();
+                });
+                row.querySelector('.tx-amount')?.addEventListener('input', event => {
+                    transaction.valor = Number(event.target.value);
+                    updateDebtIndicator();
+                });
+                row.querySelector('.tx-date')?.addEventListener('change', event => {
+                    transaction.fecha = event.target.value;
+                });
+                row.querySelector('.btn-remove-analysis-transaction')?.addEventListener('click', () => {
+                    analysisTransactions = analysisTransactions.filter(item => item.id !== id);
+                    renderAnalysisTransactions();
+                });
+            });
+            updateDebtIndicator();
+        }
+
+        document.getElementById('btnAddAnalysisTransaction')?.addEventListener('click', () => {
+            if (analysisTransactions.length >= 12) {
+                if (window.showToast) window.showToast('Límite alcanzado', 'Puedes analizar hasta 12 transacciones por ejecución.', 'ℹ️');
+                return;
+            }
+            analysisTransactions.push({
+                id: nextTransactionId++,
+                descripcion: 'Alimentación',
+                valor: 0,
+                fecha: currentPeriodEnd,
+            });
+            renderAnalysisTransactions();
+        });
+
+        frequencySelect?.addEventListener('change', updateSelectedPeriod);
+        document.getElementById('inputIngresoMensual')?.addEventListener('input', updateDebtIndicator);
+        periodCalendarTrigger?.addEventListener('click', () => {
+            if (periodDateInput?.value) calendarViewDate = parseLocalIso(periodDateInput.value);
+            const willOpen = periodCalendarPopover?.classList.contains('hidden');
+            periodCalendarPopover?.classList.toggle('hidden');
+            periodCalendarTrigger.setAttribute('aria-expanded', String(Boolean(willOpen)));
+            renderPeriodCalendar();
+        });
+        document.getElementById('periodCalendarPrevious')?.addEventListener('click', () => {
+            calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() - 1, 1);
+            renderPeriodCalendar();
+        });
+        document.getElementById('periodCalendarNext')?.addEventListener('click', () => {
+            calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + 1, 1);
+            renderPeriodCalendar();
+        });
+        periodCalendarPopover?.addEventListener('click', event => event.stopPropagation());
+        document.addEventListener('click', event => {
+            if (!periodCalendarPopover?.contains(event.target) && !periodCalendarTrigger?.contains(event.target)) {
+                periodCalendarPopover?.classList.add('hidden');
+                periodCalendarTrigger?.setAttribute('aria-expanded', 'false');
+            }
+        });
+        updateSelectedPeriod();
+
         async function loadProfile() {
             if (!token) return;
             const response = await fetch(`${API_URL}/api/v1/users/profile`, {
@@ -260,12 +572,18 @@ import { API_URL } from '../lib/api';
             if (!response.ok) throw new Error('No se pudo cargar el perfil.');
             const profile = await response.json();
             const userNameDisplay = document.getElementById('dashboardUserNameHeader');
+            currentUserName = [profile.nombre, profile.apellido].filter(Boolean).join(' ') || currentUserName;
+            currentUserEmail = profile.email || currentUserEmail;
             if (userNameDisplay && profile.nombre) userNameDisplay.textContent = profile.nombre;
             updateCurrencyUI(profile.codigoMoneda || 'HNL', profile.simboloMoneda || 'L');
+            updateDebtIndicator();
         }
 
         window.addEventListener('currency-changed', (e) => {
-            if (e.detail?.currency) updateCurrencyUI(e.detail.currency, e.detail.symbol);
+            if (e.detail?.currency) {
+                updateCurrencyUI(e.detail.currency, e.detail.symbol);
+                updateDebtIndicator();
+            }
         });
 
         // ─── Cargar Resumen del Backend ───
@@ -312,21 +630,15 @@ import { API_URL } from '../lib/api';
             if (!token) return;
 
             const ingreso = Number(document.getElementById('inputIngresoMensual')?.value);
-            const endeudamiento = Number(document.getElementById('inputEndeudamiento')?.value);
+            const endeudamiento = calculateDebtRatio(ingreso).ratio;
             const frecuencia = document.getElementById('selectFrecuencia')?.value || 'Mensual';
 
-            const txDesc = document.querySelectorAll('.tx-desc');
-            const txVal = document.querySelectorAll('.tx-val');
-            const transacciones = [];
+            const transacciones = analysisTransactions
+                .filter(transaction => transaction.descripcion && Number.isFinite(transaction.valor) && transaction.valor >= 0)
+                .map(transaction => ({ descripcion: transaction.descripcion, valor: transaction.valor }));
 
-            txDesc.forEach((descInput, i) => {
-                const val = Number(txVal[i]?.value);
-                const desc = descInput.value.trim();
-                if (desc && Number.isFinite(val) && val >= 0) transacciones.push({ descripcion: desc, valor: val });
-            });
-
-            if (!Number.isFinite(ingreso) || ingreso <= 0 || !Number.isFinite(endeudamiento) || endeudamiento < 0 || endeudamiento > 100 || transacciones.length === 0) {
-                if (window.showToast) window.showToast('Datos incompletos', 'Revisa el ingreso, endeudamiento y movimientos antes de analizar.', '⚠️');
+            if (!Number.isFinite(ingreso) || ingreso <= 0 || transacciones.length === 0) {
+                if (window.showToast) window.showToast('Datos incompletos', 'Revisa el ingreso y los movimientos antes de analizar.', '⚠️');
                 return;
             }
 
@@ -382,6 +694,7 @@ import { API_URL } from '../lib/api';
             const circle = document.getElementById('circleScoreIndicator');
             const scoreTitle = document.getElementById('scoreTitle');
             const scoreDesc = document.getElementById('scoreDescription');
+            let diagnosisSummary = 'Diagnóstico financiero generado por FinanceAI.';
 
             if (scoreDisplay) scoreDisplay.textContent = score;
             if (profileBadge) profileBadge.textContent = perfil;
@@ -390,22 +703,25 @@ import { API_URL } from '../lib/api';
                 if (profileBadge) profileBadge.className = 'text-xs font-bold px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-300 dark:border-emerald-800';
                 if (circle) circle.className = 'relative w-28 h-28 flex items-center justify-center rounded-full border-[6px] border-emerald-500 shadow-sm flex-shrink-0';
                 if (scoreTitle) scoreTitle.textContent = 'Salud Financiera Óptima';
-                if (scoreDesc) scoreDesc.textContent = 'Excelente control de gastos y bajo nivel de endeudamiento. Capacidad alta de ahorro.';
+                diagnosisSummary = 'Excelente control de gastos y bajo nivel de endeudamiento. Capacidad alta de ahorro.';
+                if (scoreDesc) scoreDesc.textContent = diagnosisSummary;
             } else if (score >= 45) {
                 if (profileBadge) profileBadge.className = 'text-xs font-bold px-3 py-1 bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 rounded-full border border-amber-300 dark:border-amber-800';
                 if (circle) circle.className = 'relative w-28 h-28 flex items-center justify-center rounded-full border-[6px] border-amber-500 shadow-sm flex-shrink-0';
                 if (scoreTitle) scoreTitle.textContent = 'Salud Financiera Moderada';
-                if (scoreDesc) scoreDesc.textContent = 'Tus gastos o compromisos de deuda consumen una porción considerable de tus ingresos.';
+                diagnosisSummary = 'Tus gastos o compromisos de deuda consumen una porción considerable de tus ingresos.';
+                if (scoreDesc) scoreDesc.textContent = diagnosisSummary;
             } else {
                 if (profileBadge) profileBadge.className = 'text-xs font-bold px-3 py-1 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-full border border-red-300 dark:border-red-800';
                 if (circle) circle.className = 'relative w-28 h-28 flex items-center justify-center rounded-full border-[6px] border-red-500 shadow-sm flex-shrink-0';
                 if (scoreTitle) scoreTitle.textContent = 'Salud Financiera en Riesgo';
-                if (scoreDesc) scoreDesc.textContent = 'Alerta de sobreendeudamiento o exceso de gastos fijos. Se recomienda ajuste inmediato.';
+                diagnosisSummary = 'Alerta de sobreendeudamiento o exceso de gastos fijos. Se recomienda ajuste inmediato.';
+                if (scoreDesc) scoreDesc.textContent = diagnosisSummary;
             }
 
             const totalGastos = transacciones.reduce((acc, t) => acc + t.valor, 0);
             const ratioGI = ingreso > 0 ? ((totalGastos / ingreso) * 100).toFixed(1) : '0';
-            const ratioAh = ingreso > 0 ? (Math.max(0, 100 - Number(ratioGI) - endeudamiento)).toFixed(1) : '0';
+            const ratioAh = ingreso > 0 ? (Math.max(0, 100 - Number(ratioGI))).toFixed(1) : '0';
 
             const elGI = document.getElementById('ratioGastoIngreso');
             const elAh = document.getElementById('ratioAhorro');
@@ -420,9 +736,9 @@ import { API_URL } from '../lib/api';
                 : (Array.isArray(data.recomendaciones) ? data.recomendaciones : []);
             const alerts = Array.isArray(data.alerts) ? data.alerts : [];
             const items = [...alerts, ...recommendations];
+            const safeItems = items.length ? items : ['El modelo no devolvió recomendaciones adicionales para este análisis.'];
             const list = document.getElementById('recommendationsList');
             if (list) {
-                const safeItems = items.length ? items : ['El modelo no devolvió recomendaciones adicionales para este análisis.'];
                 list.replaceChildren(...safeItems.map((message, index) => {
                     const item = document.createElement('li');
                     item.className = 'p-2.5 bg-blue-50/50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900/40 flex items-start gap-2';
@@ -435,11 +751,56 @@ import { API_URL } from '../lib/api';
                     return item;
                 }));
             }
+
+            latestAnalysisExport = {
+                ingreso,
+                periodEnd: currentPeriodEnd,
+                transactions: analysisTransactions.map(transaction => ({ ...transaction })),
+                analysis: {
+                    score,
+                    profile: perfil,
+                    summary: diagnosisSummary,
+                    period: `${frequencySelect?.value || 'Mensual'} · ${periodRangeNotice?.textContent || ''}`,
+                    debtRatio: endeudamiento,
+                    recommendations: safeItems.map(String),
+                },
+            };
         }
 
         // ─── Exportar PDF desde Dashboard ───
         document.getElementById('btnExportDashboardPdf')?.addEventListener('click', () => {
-            document.getElementById('btnHeaderExportPdf')?.click();
+            if (!latestAnalysisExport) {
+                if (window.showToast) window.showToast('Análisis pendiente', 'Ejecuta primero el diagnóstico para generar el reporte de IA.', 'ℹ️');
+                return;
+            }
+
+            const transactions = [
+                {
+                    description: 'Ingreso del período analizado',
+                    category: 'Ingresos',
+                    type: 'INGRESO',
+                    amount: latestAnalysisExport.ingreso,
+                    date: latestAnalysisExport.periodEnd,
+                },
+                ...latestAnalysisExport.transactions.map(transaction => ({
+                    description: transaction.descripcion,
+                    category: transaction.descripcion,
+                    type: 'GASTO',
+                    amount: transaction.valor,
+                    date: transaction.fecha,
+                })),
+            ];
+
+            if (typeof window.generateExpedientePDF === 'function') {
+                window.generateExpedientePDF({
+                    userName: currentUserName,
+                    userEmail: currentUserEmail,
+                    currencyCode: currentCurrency,
+                    currencySymbol: currentCurrencySymbol,
+                    transactions,
+                    analysis: latestAnalysisExport.analysis,
+                });
+            }
         });
     })();
 </script>

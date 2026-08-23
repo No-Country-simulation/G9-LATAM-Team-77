@@ -57,6 +57,21 @@ class AuthSecurityControllerTest {
     }
 
     @Test
+    void shouldAllowGoogleLoginWithoutPreviousAuthentication() throws Exception {
+        when(authService.googleLogin(any())).thenReturn(
+                new LoginResponse("jwt-google", 2L, "Ana", "ana@gmail.com")
+        );
+
+        mockMvc.perform(post("/api/v1/auth/google")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"credential":"google-id-token"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("jwt-google"));
+    }
+
+    @Test
     void shouldReturnControlledUnauthorizedResponseForInvalidLogin() throws Exception {
         when(authService.login(any())).thenThrow(
                 new ApiException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas")
