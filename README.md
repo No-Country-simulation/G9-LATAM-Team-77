@@ -69,7 +69,7 @@ Actualmente, la API expone los siguientes controladores principales:
 - [x] Integración del runtime de Data Science.
 - [x] Historial autenticado, Honduras/HNL y recuperación de contraseña.
 - [x] Entorno reproducible con Docker Compose.
-- [ ] Despliegue e integración en la nube (OCI).
+- [x] Despliegue e integración en la nube (OCI).
 
 ## Ejecución local con Docker Compose
 
