@@ -3,6 +3,8 @@ services:
     image: mysql:8.0
     container_name: financeai-db
     restart: always
+    env_file:
+      - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-railway}
@@ -24,6 +26,8 @@ services:
       dockerfile: Dockerfile
     container_name: financeai-backend
     restart: always
+    env_file:
+      - .env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/${MYSQL_DATABASE:-railway}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
@@ -47,10 +51,14 @@ services:
       dockerfile: Dockerfile
     container_name: financeai-frontend
     restart: always
+    env_file:
+      - .env
     environment:
       - SITE_URL=https://${DOMAIN_NAME:-localhost}
       - AUTH_URL=https://${DOMAIN_NAME:-localhost}
+      - NEXTAUTH_URL=https://${DOMAIN_NAME:-localhost}
       - AUTH_SECRET=${AUTH_SECRET:-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08}
+      - NEXTAUTH_SECRET=${AUTH_SECRET:-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08}
       - AUTH_TRUST_HOST=true
       - PUBLIC_API_URL=https://${DOMAIN_NAME:-localhost}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
