@@ -6,16 +6,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-railway}
-      MYSQL_USER: ${MYSQLUSER:-root}
-      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/database_schema.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!} || mysqladmin ping -h 127.0.0.1 || exit 1"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!} || exit 1"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 25
       start_period: 15s
     networks:
       - app-network
@@ -28,7 +26,7 @@ services:
     restart: always
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/${MYSQL_DATABASE:-railway}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=${MYSQLUSER:-root}
+      - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
       - JWT_SECRET=${JWT_SECRET:-8a9b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3}
       - PYTHON_COMMAND=/app/DataScient/venv/bin/python
