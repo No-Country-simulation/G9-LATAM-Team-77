@@ -1,10 +1,10 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9 --activate
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
 RUN pnpm install --no-frozen-lockfile
 COPY . .
-RUN pnpm run build
+RUN npx astro build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
