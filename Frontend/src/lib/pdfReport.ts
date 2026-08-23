@@ -28,7 +28,7 @@ export function generateExpedientePDF(data: UserExpedienteData) {
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 14;
 
-  // Formateador de moneda
+  // Formateador de moneda y tipos de cambio oficiales
   const CURRENCY_SYMBOLS: Record<string, string> = {
     USD: '$',
     MXN: '$',
@@ -41,10 +41,40 @@ export function generateExpedientePDF(data: UserExpedienteData) {
     HNL: 'L',
     BRL: 'R$'
   };
-  const currencySymbol = CURRENCY_SYMBOLS[data.currency] || '$';
+
+  const OFFICIAL_USD_VALUES: Record<string, number> = {
+    USD: 1.00,
+    MXN: 0.0591,
+    EUR: 1.1687,
+    CRC: 0.0022,
+    COP: 0.000326,
+    ARS: 0.000667,
+    CLP: 0.001093,
+    PEN: 0.2982,
+    HNL: 0.0404,
+    BRL: 0.1770
+  };
+
+  const targetCurrency = (data.currency || 'USD').toUpperCase();
+  const currencySymbol = CURRENCY_SYMBOLS[targetCurrency] || '$';
+
+  function convertAmount(amount: number, fromCur?: string, toCur?: string): number {
+    if (!amount || isNaN(amount)) return 0;
+    const from = (fromCur || 'USD').toUpperCase();
+    const to = (toCur || targetCurrency).toUpperCase();
+    if (from === to) return Number(amount);
+
+    const fromVal = OFFICIAL_USD_VALUES[from] || 1.0;
+    const toVal = OFFICIAL_USD_VALUES[to] || 1.0;
+
+    const inUSD = Number(amount) * fromVal;
+    const converted = inUSD / toVal;
+    return Math.round(converted * 100) / 100;
+  }
+
   const formatMoney = (val: number) => {
     const sign = val < 0 ? '-' : '';
-    return `${sign}${currencySymbol}${Math.abs(val).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${data.currency}`;
+    return `${sign}${currencySymbol}${Math.abs(val).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${targetCurrency}`;
   };
 
   // Cálculos financieros
@@ -55,13 +85,14 @@ export function generateExpedientePDF(data: UserExpedienteData) {
 
   validTransactions.forEach(t => {
     const rawAmt = typeof t.amount === 'string' ? parseFloat(t.amount) : (t.amount || 0);
-    const amt = isNaN(rawAmt) ? 0 : Math.abs(rawAmt);
+    const originCur = ((t as any).originalCurrency || (t as any).moneda || 'USD').toUpperCase();
+    const convertedAmt = convertAmount(isNaN(rawAmt) ? 0 : Math.abs(rawAmt), originCur, targetCurrency);
     const typeStr = (t.type || '').toUpperCase();
 
     if (typeStr === 'INGRESO' || typeStr === 'INCOME') {
-      totalIngresos += amt;
+      totalIngresos += convertedAmt;
     } else {
-      totalGastos += amt;
+      totalGastos += convertedAmt;
     }
   });
 
@@ -91,17 +122,6 @@ export function generateExpedientePDF(data: UserExpedienteData) {
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184); // slate-400
   doc.text('Plataforma de Inteligencia Financiera & Control Patrimonial', margin, 18);
-
-  // Badge derecho: Certificado ARCO
-  doc.setFillColor(16, 185, 129); // emerald-500
-  doc.roundedRect(pageWidth - margin - 58, 7, 58, 14, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.text('CERTIFICADO OFICIAL ARCO', pageWidth - margin - 55, 12);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.5);
-  doc.text('Derecho de Acceso a Datos', pageWidth - margin - 55, 17);
 
   // ─── 2. TÍTULO DEL EXPEDIENTE ───
   let currentY = 36;
@@ -210,7 +230,8 @@ export function generateExpedientePDF(data: UserExpedienteData) {
 
   const tableRows = validTransactions.map((t, idx) => {
     const rawAmt = typeof t.amount === 'string' ? parseFloat(t.amount) : (t.amount || 0);
-    const amt = isNaN(rawAmt) ? 0 : Math.abs(rawAmt);
+    const originCur = ((t as any).originalCurrency || (t as any).moneda || 'USD').toUpperCase();
+    const amt = convertAmount(isNaN(rawAmt) ? 0 : Math.abs(rawAmt), originCur, targetCurrency);
     const isIncome = (t.type || '').toUpperCase() === 'INGRESO' || (t.type || '').toUpperCase() === 'INCOME';
     const typeLabel = isIncome ? 'Ingreso (+)' : 'Gasto (-)';
 

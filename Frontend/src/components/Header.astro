@@ -56,7 +56,7 @@ const googleEmail = session?.user?.email || '';
                     {!hideTotalAhorrado && (
                         <div id="navSaldoFavorPillDesktop" class="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0" title="Total Ahorrado General (Click para mostrar u ocultar)">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 nav-saldo-dot"></span>
-                            <span class="hidden xl:inline text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider">Total Ahorrado:</span>
+                            <span class="hidden xl:inline text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider nav-saldo-label">Total Ahorrado:</span>
                             <span class="font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm nav-saldo-text">••••••</span>
                             <button type="button" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer btn-toggle-nav-eye" aria-label="Mostrar u ocultar saldo">
                                 <svg class="w-3.5 h-3.5 hidden icon-nav-eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -68,7 +68,7 @@ const googleEmail = session?.user?.email || '';
                                 </svg>
                             </button>
                             
-                            <span class="text-emerald-300 dark:text-emerald-700/80 font-light select-none">|</span>
+                            <span class="text-emerald-300 dark:text-emerald-700/80 font-light select-none nav-saldo-sep">|</span>
 
                             <select class="nav-currency-select bg-transparent text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none" title="Seleccionar divisa" aria-label="Seleccionar divisa" onclick="event.stopPropagation()">
                                 <option value="USD" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">USD</option>
@@ -345,6 +345,54 @@ const googleEmail = session?.user?.email || '';
             </button>
             <button id="btnCancelDeleteAccount" onclick="window.closeDeleteAccountModal && window.closeDeleteAccountModal()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm cursor-pointer">
                 Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Seleccionar Divisa del PDF ARCO -->
+<div id="pdfCurrencyExportModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-gray-900/70 backdrop-blur-md p-4 font-inter">
+    <div class="bg-white dark:bg-gray-900 max-w-md w-full rounded-3xl p-6 sm:p-7 shadow-2xl border border-gray-200 dark:border-gray-800 animate-scale-in">
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg font-bold flex-shrink-0 border border-emerald-200 dark:border-emerald-800">
+                    📄
+                </div>
+                <div>
+                    <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Exportar Expediente PDF</h3>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Certificado Oficial ARCO de Acceso a Datos</p>
+                </div>
+            </div>
+            <button type="button" id="btnClosePdfExportModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-white text-xl font-bold p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">&times;</button>
+        </div>
+
+        <p class="text-xs text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+            Selecciona la divisa en la que deseas que se calculen, conviertan y expresen todos los balances, ingresos, gastos y transacciones en tu documento oficial:
+        </p>
+
+        <div class="mb-5">
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Moneda del Documento</label>
+            <select id="pdfTargetCurrencySelect" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white cursor-pointer font-medium">
+                <option value="USD">USD ($) - Dólar Estadounidense</option>
+                <option value="MXN">MXN ($) - Peso Mexicano</option>
+                <option value="EUR">EUR (€) - Euro</option>
+                <option value="CRC">CRC (₡) - Colón Costarricense</option>
+                <option value="COP">COP ($) - Peso Colombiano</option>
+                <option value="ARS">ARS ($) - Peso Argentino</option>
+                <option value="CLP">CLP ($) - Peso Chileno</option>
+                <option value="PEN">PEN (S/) - Sol Peruano</option>
+                <option value="HNL">HNL (L) - Lempira Hondureño</option>
+                <option value="BRL">BRL (R$) - Real Brasileño</option>
+            </select>
+        </div>
+
+        <div class="flex gap-2.5">
+            <button type="button" id="btnCancelPdfExportModal" class="flex-1 px-4 py-2.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer">
+                Cancelar
+            </button>
+            <button type="button" id="btnConfirmGeneratePdf" class="flex-1 px-4 py-2.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer shadow-emerald-600/20">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Descargar PDF
             </button>
         </div>
     </div>
@@ -671,14 +719,37 @@ const googleEmail = session?.user?.email || '';
 
     // ─── Gestión de Derechos ARCO (LFPDPPP / GDPR) ───
     
-    // 1. Derecho de Acceso: Descargar Expediente de Datos en PDF
-    document.getElementById('btnArcoExportData')?.addEventListener('click', async () => {
-        const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+    // 1. Derecho de Acceso: Abrir modal para elegir divisa y descargar Expediente PDF
+    const pdfExportModal = document.getElementById('pdfCurrencyExportModal');
+    const pdfCurrencySelect = document.getElementById('pdfTargetCurrencySelect');
+    const btnClosePdfModal = document.getElementById('btnClosePdfExportModal');
+    const btnCancelPdfModal = document.getElementById('btnCancelPdfExportModal');
+    const btnConfirmPdf = document.getElementById('btnConfirmGeneratePdf');
+
+    document.getElementById('btnArcoExportData')?.addEventListener('click', () => {
         const preferredCurrency = (localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
+        if (pdfCurrencySelect) {
+            pdfCurrencySelect.value = preferredCurrency;
+        }
+        pdfExportModal?.classList.remove('hidden');
+    });
+
+    const closePdfModal = () => {
+        pdfExportModal?.classList.add('hidden');
+    };
+
+    btnClosePdfModal?.addEventListener('click', closePdfModal);
+    btnCancelPdfModal?.addEventListener('click', closePdfModal);
+
+    btnConfirmPdf?.addEventListener('click', async () => {
+        closePdfModal();
+
+        const selectedPdfCurrency = (pdfCurrencySelect?.value || localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
+        const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
         const currentToken = localStorage.getItem('financeai_token');
         
         if (window.showToast) {
-            window.showToast('Generando PDF', 'Recopilando datos y preparando tu expediente financiero...', '⏳');
+            window.showToast('Generando PDF', `Preparando tu expediente financiero en ${selectedPdfCurrency}...`, '⏳');
         }
 
         let transacciones = [];
@@ -729,11 +800,11 @@ const googleEmail = session?.user?.email || '';
                 window.generateExpedientePDF({
                     userName: cachedUser.name || googleName || 'Usuario FinanceAI',
                     userEmail: cachedUser.email || googleEmail || 'N/A',
-                    currency: preferredCurrency,
+                    currency: selectedPdfCurrency,
                     transactions: normalizedTx
                 });
                 if (window.showToast) {
-                    window.showToast('¡Descarga Lista!', 'Tu expediente financiero ha sido generado en PDF.', '📄');
+                    window.showToast('¡Descarga Lista!', `Tu expediente financiero ha sido generado en ${selectedPdfCurrency}.`, '📄');
                 }
             } else {
                 console.error('generateExpedientePDF no está disponible en window');
@@ -867,6 +938,9 @@ const googleEmail = session?.user?.email || '';
         const saldoTexts = document.querySelectorAll('.nav-saldo-text');
         const eyeOpens = document.querySelectorAll('.icon-nav-eye-open');
         const eyeCloseds = document.querySelectorAll('.icon-nav-eye-closed');
+        const eyeBtns = document.querySelectorAll('.btn-toggle-nav-eye');
+        const labels = document.querySelectorAll('.nav-saldo-label');
+        const seps = document.querySelectorAll('.nav-saldo-sep');
         const pillDesktop = document.getElementById('navSaldoFavorPillDesktop');
         const pillMobile = document.getElementById('navSaldoFavorPillMobile');
         const dots = document.querySelectorAll('.nav-saldo-dot');
@@ -887,6 +961,19 @@ const googleEmail = session?.user?.email || '';
                 el.textContent = '••••••';
                 el.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm nav-saldo-text';
             });
+            labels.forEach(el => {
+                el.textContent = 'Total Ahorrado:';
+                el.className = 'hidden xl:inline text-[10px] sm:text-xs font-bold uppercase tracking-wider nav-saldo-label text-emerald-700 dark:text-emerald-300';
+            });
+            eyeBtns.forEach(el => {
+                el.className = 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer btn-toggle-nav-eye';
+            });
+            seps.forEach(el => {
+                el.className = 'text-emerald-300 dark:text-emerald-700/80 font-light select-none nav-saldo-sep';
+            });
+            navCurSelects.forEach(el => {
+                el.className = 'nav-currency-select bg-transparent text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none';
+            });
             eyeOpens.forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
             eyeCloseds.forEach(el => { el.classList.remove('hidden'); el.classList.add('block'); });
             
@@ -906,6 +993,19 @@ const googleEmail = session?.user?.email || '';
                     el.textContent = `-${symbol}${formattedNumber}`;
                     el.className = 'font-bold font-mono text-red-600 dark:text-red-400 text-xs sm:text-sm nav-saldo-text';
                 });
+                labels.forEach(el => {
+                    el.textContent = 'Déficit:';
+                    el.className = 'hidden xl:inline text-[10px] sm:text-xs font-bold uppercase tracking-wider nav-saldo-label text-red-700 dark:text-red-300';
+                });
+                eyeBtns.forEach(el => {
+                    el.className = 'text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer btn-toggle-nav-eye';
+                });
+                seps.forEach(el => {
+                    el.className = 'text-red-300 dark:text-red-700/80 font-light select-none nav-saldo-sep';
+                });
+                navCurSelects.forEach(el => {
+                    el.className = 'nav-currency-select bg-transparent text-[10px] sm:text-xs font-bold text-red-700 dark:text-red-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none';
+                });
                 if (pillDesktop) {
                     pillDesktop.className = 'hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 rounded-full text-xs font-semibold text-red-700 dark:text-red-300 shadow-sm cursor-pointer select-none transition hover:bg-red-100/70 dark:hover:bg-red-900/50 flex-shrink-0';
                 }
@@ -917,6 +1017,19 @@ const googleEmail = session?.user?.email || '';
                 saldoTexts.forEach(el => {
                     el.textContent = `${symbol}${formattedNumber}`;
                     el.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm nav-saldo-text';
+                });
+                labels.forEach(el => {
+                    el.textContent = 'Total Ahorrado:';
+                    el.className = 'hidden xl:inline text-[10px] sm:text-xs font-bold uppercase tracking-wider nav-saldo-label text-emerald-700 dark:text-emerald-300';
+                });
+                eyeBtns.forEach(el => {
+                    el.className = 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer btn-toggle-nav-eye';
+                });
+                seps.forEach(el => {
+                    el.className = 'text-emerald-300 dark:text-emerald-700/80 font-light select-none nav-saldo-sep';
+                });
+                navCurSelects.forEach(el => {
+                    el.className = 'nav-currency-select bg-transparent text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none';
                 });
                 if (pillDesktop) {
                     pillDesktop.className = 'hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0';

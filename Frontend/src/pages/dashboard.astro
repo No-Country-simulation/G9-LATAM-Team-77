@@ -615,6 +615,20 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
     const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const MONTH_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
+    function formatWeeklyLabel(dStart, dEnd) {
+        const startDay = dStart.getDate();
+        const endDay = dEnd.getDate();
+        const startMonth = MONTH_NAMES[dStart.getMonth()];
+        const endMonth = MONTH_NAMES[dEnd.getMonth()];
+        const endYear = dEnd.getFullYear();
+
+        if (dStart.getMonth() === dEnd.getMonth()) {
+            return `Semana del ${startDay} al ${endDay} de ${endMonth} ${endYear}`;
+        } else {
+            return `Semana del ${startDay} de ${startMonth} al ${endDay} de ${endMonth} ${endYear}`;
+        }
+    }
+
     function updateSubPeriods() {
         const periodicity = selectPeriodicity.value;
         periodBadge.textContent = periodicity.charAt(0).toUpperCase() + periodicity.slice(1);
@@ -666,7 +680,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
             const startStr = dStart.toISOString().slice(0, 10);
             let endStr = dEnd.toISOString().slice(0, 10);
             if (endStr > todayISO) endStr = todayISO;
-            setPeriodSelection(startStr, endStr, `Semana del ${startStr.slice(5)} al ${endStr.slice(5)} ${year}`);
+            setPeriodSelection(startStr, endStr, formatWeeklyLabel(dStart, dEnd));
         } else if (periodicity === 'diario') {
             setPeriodSelection(todayISO, todayISO, `${now.getDate()} de ${MONTH_NAMES[month]} ${year}`);
         }
@@ -871,7 +885,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
             let endStr = dEnd.toISOString().slice(0, 10);
             if (endStr > todayISO) endStr = todayISO;
 
-            setPeriodSelection(startStr, endStr, `Semana del ${startStr.slice(5)} al ${endStr.slice(5)} ${dashCalYear}`);
+            setPeriodSelection(startStr, endStr, formatWeeklyLabel(dStart, dEnd));
         } else if (periodicity === 'diario') {
             setPeriodSelection(dayISO, dayISO, `${d} de ${MONTH_NAMES[dashCalMonth]} ${dashCalYear}`);
         }
