@@ -35,6 +35,9 @@ const siteUrl = process.env.SITE_URL || 'https://financeai-app.duckdns.org';
 export default defineConfig({
   site: siteUrl,
   output: 'server',
+  security: {
+    checkOrigin: false
+  },
   adapter: node({
     mode: 'standalone'
   }),
