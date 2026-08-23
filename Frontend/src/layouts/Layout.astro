@@ -4,17 +4,34 @@ import Header from '../components/Header.astro';
 
 interface Props {
 	title: string;
+	description?: string;
 }
 
-const { title } = Astro.props;
+const {
+	title,
+	description = 'Gestiona tus finanzas, analiza tus hábitos y recibe recomendaciones personalizadas con FinanceAI.',
+} = Astro.props;
+const pathname = new URL(Astro.request.url).pathname;
+const privateRoute = ['/dashboard', '/historial', '/reset-password'].includes(pathname);
+const publicUrl = `https://financeai-team77.duckdns.org${pathname}`;
 ---
 
 <!doctype html>
 <html lang="es">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="FinanceAI - Asistente Inteligente de Salud Financiera" />
+		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#0f172a" />
+		<meta name="robots" content={privateRoute ? 'noindex, nofollow' : 'index, follow'} />
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="es_HN" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={publicUrl} />
+		<meta property="og:image" content="https://financeai-team77.duckdns.org/og-financeai.svg" />
+		<meta name="twitter:card" content="summary_large_image" />
+		{!privateRoute && <link rel="canonical" href={publicUrl} />}
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
 		<!-- Ciberseguridad: Meta tags de protección OWASP en el cliente -->
@@ -50,5 +67,14 @@ const { title } = Astro.props;
 		<main class="flex-grow flex">
 			<slot />
 		</main>
+		<footer class="border-t border-slate-200/80 bg-white/70 px-4 py-5 text-xs text-slate-500 backdrop-blur dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-400">
+			<div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
+				<p>© {new Date().getFullYear()} FinanceAI Team 77 · Orientación financiera, no asesoría profesional.</p>
+				<nav aria-label="Información legal" class="flex items-center gap-4 font-semibold">
+					<a href="/privacidad" class="hover:text-blue-600 dark:hover:text-blue-400">Privacidad</a>
+					<a href="/terminos" class="hover:text-blue-600 dark:hover:text-blue-400">Términos</a>
+				</nav>
+			</div>
+		</footer>
 	</body>
 </html>

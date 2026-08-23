@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">FinanceAI</title><desc id="desc">Salud financiera inteligente para Latinoamérica</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#020617"/><stop offset=".55" stop-color="#172554"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
+  <rect width="1200" height="630" rx="48" fill="url(#bg)"/><circle cx="1030" cy="100" r="250" fill="#38bdf8" opacity=".09"/><circle cx="160" cy="590" r="260" fill="#2563eb" opacity=".12"/>
+  <g transform="translate(100 168)"><rect width="118" height="118" rx="32" fill="#fff"/><circle cx="39" cy="59" r="12" fill="#2563eb"/><circle cx="59" cy="59" r="12" fill="#ef4444"/><circle cx="79" cy="59" r="12" fill="#facc15"/></g>
+  <text x="250" y="245" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="92" font-weight="800">FinanceAI</text>
+  <text x="105" y="355" fill="#bfdbfe" font-family="Inter,Arial,sans-serif" font-size="38" font-weight="600">Salud financiera inteligente</text>
+  <text x="105" y="420" fill="#cbd5e1" font-family="Inter,Arial,sans-serif" font-size="27">Dashboard · Data Science · Historial seguro</text>
+</svg>

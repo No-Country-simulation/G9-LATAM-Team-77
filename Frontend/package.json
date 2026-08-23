@@ -13,11 +13,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrojs/node": "latest",
+    "@astrojs/node": "11.1.2",
     "@auth/core": "^0.34.3",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "latest",
+    "astro": "7.2.2",
     "auth-astro": "^4.2.0",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

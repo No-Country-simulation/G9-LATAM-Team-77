@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Privacidad | FinanceAI" description="Cómo FinanceAI trata y protege los datos personales y financieros registrados por sus usuarios.">
+    <main class="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+        <header class="ui-enter overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-slate-950 via-emerald-950 to-emerald-700 px-6 py-8 text-white shadow-xl sm:px-10 sm:py-12">
+            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-200">Información clara</p>
+            <h1 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl">Privacidad en FinanceAI</h1>
+            <p class="mt-4 max-w-2xl text-sm leading-relaxed text-emerald-50/85">Tus datos se utilizan para operar tu cuenta, mostrar tus movimientos y generar análisis financieros personalizados.</p>
+        </header>
+
+        <article class="surface-card ui-enter ui-enter-delay-1 mt-6 space-y-8 rounded-3xl p-6 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:p-9">
+            <section><h2 class="text-xl font-extrabold text-slate-950 dark:text-white">Datos que tratamos</h2><p class="mt-2">Al registrarte proporcionas nombre, correo, país y moneda. Al usar la plataforma registras transacciones y datos necesarios para el análisis, como ingresos, gastos, ahorro y endeudamiento. FinanceAI no solicita números de tarjeta, credenciales bancarias ni acceso a cuentas bancarias.</p></section>
+            <section><h2 class="text-xl font-extrabold text-slate-950 dark:text-white">Para qué los usamos</h2><p class="mt-2">Los usamos exclusivamente para autenticar tu cuenta, presentar el Dashboard, almacenar tu historial, generar recomendaciones y permitir la recuperación segura de contraseña. Cada consulta protegida se vincula al usuario autenticado mediante JWT.</p></section>
+            <section><h2 class="text-xl font-extrabold text-slate-950 dark:text-white">Seguridad y conservación</h2><p class="mt-2">Las contraseñas se almacenan como hash, los enlaces de recuperación son temporales y de un solo uso, y los secretos de infraestructura se mantienen fuera del repositorio. La comunicación pública del despliegue usa HTTPS. Conservamos los datos mientras la cuenta y el entorno de la aplicación permanezcan activos.</p></section>
+            <section><h2 class="text-xl font-extrabold text-slate-950 dark:text-white">Tus decisiones</h2><p class="mt-2">Puedes actualizar tu país y moneda desde Mi perfil y descargar un reporte de tus movimientos. Para solicitudes relacionadas con acceso, corrección o eliminación de información, contacta al equipo responsable de FinanceAI Team 77 por el canal oficial de entrega del proyecto.</p></section>
+            <aside class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"><strong>Importante:</strong> FinanceAI es un MVP educativo. Esta página describe su funcionamiento actual y no sustituye asesoría legal.</aside>
+            <div class="flex flex-wrap gap-3"><a href="/login" class="rounded-xl bg-slate-950 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500">Volver a FinanceAI</a><a href="/terminos" class="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Ver términos</a></div>
+        </article>
+    </main>
+</Layout>

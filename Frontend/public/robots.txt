@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /historial
+Disallow: /reset-password
+
+Sitemap: https://financeai-team77.duckdns.org/sitemap.xml
