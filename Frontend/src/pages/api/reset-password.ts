@@ -1,4 +1,4 @@
-import { API_URL } from '../../lib/api';
+import { SERVER_API_URL } from '../../lib/api';
 import type { APIRoute } from 'astro';
 import { sendPasswordResetEmail } from '../../lib/email';
 
@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Call backend API to request password reset token if necessary, or just mock it here
-    const res = await fetch(`${API_URL}/api/v1/auth/reset-password`, {
+    const res = await fetch(`${SERVER_API_URL}/api/v1/auth/reset-password`, {
       method: "POST",
       body: JSON.stringify({ email }),
       headers: { "Content-Type": "application/json" }

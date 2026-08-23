@@ -1,11 +1,23 @@
 {$DOMAIN_NAME:localhost} {
     # Proxy para el API Backend
     handle /api/v1/* {
-        reverse_proxy backend:8080
+        reverse_proxy backend:8080 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+        }
     }
 
-    # Proxy para el Frontend
+    # Proxy para el Frontend y Auth.js
     handle {
-        reverse_proxy frontend:4321
+        reverse_proxy frontend:4321 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+        }
     }
 }
