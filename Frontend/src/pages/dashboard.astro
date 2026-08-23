@@ -27,7 +27,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-200 dark:border-gray-800 pb-4">
             <div class="space-y-0.5 sm:space-y-1">
                 <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-josefin leading-snug">
-                    <span>Bienvenido, </span><span id="dashboardUserNameHeader" class="font-extrabold">{initialUserName ? initialUserName.replace(/^,\s*/, '') : 'Usuario'}</span>
+                    <span>Bienvenido, </span><span id="dashboardUserNameHeader" class="text-blue-600 dark:text-blue-400 font-extrabold">{initialUserName ? initialUserName.replace(/^,\s*/, '') : 'Usuario'}</span>
                 </h1>
                 <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-inter">
                     Evaluación inteligente con IA.
@@ -40,6 +40,44 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                 <span>Moneda: <strong id="activeCurrencyDisplay">USD</strong></span>
             </div>
         </div>
+
+        <!-- BANNER SUPERIOR: TOTAL AHORRADO / BALANCE NETO (ESTILO HISTORIAL) CON MENÚ DESPLEGABLE -->
+        <section class="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+            <!-- Izquierda: Icono + Balance Neto / Total Ahorrado -->
+            <div class="flex items-center gap-3.5 sm:gap-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Ahorrado / Balance</span>
+                        <span id="topAhorroTag" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 animate-pulse">En tiempo real</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 mt-0.5">
+                        <h3 id="statTotalAhorradoTop" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-mono tracking-tight">$0 USD</h3>
+                        <button type="button" id="btnToggleCensorTop" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition cursor-pointer" title="Censurar / Mostrar saldo">
+                            <svg id="iconEyeTopClosed" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            <svg id="iconEyeTopOpen" class="w-4 h-4 block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                    <p id="topAhorroSubtext" class="text-[10px] text-gray-400 dark:text-gray-500">Ahorro neto calculado (Ingresos − Gastos)</p>
+                </div>
+            </div>
+
+            <!-- Derecha: Menú Desplegable con opciones de filtro / vista -->
+            <div class="flex items-center gap-2 self-start sm:self-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-gray-800 w-full sm:w-auto justify-between sm:justify-end">
+                <label for="selectTopAhorroView" class="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                    <span>Filtro de Ahorro:</span>
+                </label>
+                <select id="selectTopAhorroView" class="px-3 py-2 text-xs font-semibold bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer shadow-sm">
+                    <option value="evaluacion" selected>📊 Período Actual de Evaluación</option>
+                    <option value="mensual">📅 Proyección Mensual</option>
+                    <option value="anual">📈 Proyección Anual (12 Meses)</option>
+                    <option value="historico">🏛️ Saldo Total Acumulado (Histórico)</option>
+                </select>
+            </div>
+        </section>
 
         <!-- Main Layout: 2 Columns Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
@@ -60,7 +98,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
-                            Periodicidad
+                            Frecuencia
                         </label>
                         <select id="selectPeriodicity" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="mensual" selected>Mensual</option>
@@ -70,13 +108,71 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                         </select>
                     </div>
 
-                    <div>
+                    <div class="relative">
                         <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
-                            Tramo del Período
+                            Período a evaluar
                         </label>
-                        <select id="selectSubPeriod" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <!-- Opciones dinámicas de los últimos 24 meses generadas con JS -->
-                        </select>
+                        <!-- Trigger del Calendario Personalizado -->
+                        <button type="button" id="btnCustomSubPeriodTrigger" class="w-full flex items-center justify-between px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white text-left focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer">
+                            <span id="customSubPeriodDisplay" class="truncate">Agosto 2026</span>
+                            <svg class="w-4 h-4 text-blue-500 flex-shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </button>
+
+                        <!-- Popover Desplegable con Calendario Personalizado Glassmorphic -->
+                        <div id="customSubPeriodDropdown" class="hidden absolute top-full left-0 mt-2 z-50 w-72 sm:w-80 max-w-[calc(100vw-32px)] bg-white dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200 dark:border-gray-700 shadow-2xl rounded-2xl p-3.5 animate-scale-in">
+                            
+                            <!-- 1. VISTA MENSUAL: Cuadrícula de 12 Meses (Sin números de días) -->
+                            <div id="dashCalMonthlyView">
+                                <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800 mb-2.5">
+                                    <button type="button" id="btnDashPrevYear" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition cursor-pointer" title="Año anterior">&lt;</button>
+                                    <span id="dashYearLabel" class="font-bold text-sm text-gray-900 dark:text-white font-josefin">2026</span>
+                                    <button type="button" id="btnDashNextYear" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition cursor-pointer" title="Año siguiente">&gt;</button>
+                                </div>
+                                <div class="mb-2 text-[10px] text-center text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 py-1 px-2 rounded-lg font-medium">
+                                    Selecciona el mes a evaluar
+                                </div>
+                                <div class="grid grid-cols-3 gap-1.5" id="dashMonthsGrid">
+                                    <!-- 12 Tiles de meses -->
+                                </div>
+                            </div>
+
+                            <!-- 2. VISTA DÍAS: Cuadrícula con Días (Para Quincenal, Semanal y Diario) -->
+                            <div id="dashCalDaysView" class="hidden">
+                                <!-- Header de Navegación de Mes y Año -->
+                                <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800 mb-2.5">
+                                    <button type="button" id="btnDashPrevMonth" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition cursor-pointer" title="Mes anterior">&lt;</button>
+                                    <div class="flex items-center gap-1.5 font-bold text-xs text-gray-900 dark:text-white font-josefin">
+                                        <span id="dashCalMonthLabel">Agosto</span>
+                                        <span id="dashCalYearLabel">2026</span>
+                                    </div>
+                                    <button type="button" id="btnDashNextMonth" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition cursor-pointer" title="Mes siguiente">&gt;</button>
+                                </div>
+
+                                <!-- Banner contextual según la frecuencia seleccionada -->
+                                <div id="dashCalContextBanner" class="mb-2 text-[10px] text-center text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 py-1 px-2 rounded-lg font-medium">
+                                    Haz clic en cualquier día para seleccionar el período
+                                </div>
+
+                                <!-- Botones de Quincena (Solo visibles en modo Quincenal) -->
+                                <div id="dashCalQuincenaButtons" class="hidden grid grid-cols-2 gap-1.5 mb-2">
+                                    <button type="button" id="btnQ1" class="py-1.5 px-2 text-[10px] font-bold rounded-lg transition-all border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 cursor-pointer">1ra Quincena (1-15)</button>
+                                    <button type="button" id="btnQ2" class="py-1.5 px-2 text-[10px] font-bold rounded-lg transition-all border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">2da Quincena (16-Fin)</button>
+                                </div>
+
+                                <!-- Cabecera de Días de la Semana -->
+                                <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 uppercase mb-1">
+                                    <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+                                </div>
+
+                                <!-- Cuadrícula Dinámica de Días del Calendario (1 a 31) -->
+                                <div class="grid grid-cols-7 gap-1 text-center" id="dashCalDaysGrid">
+                                    <!-- Días generados dinámicamente -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Select oculto para mantener compatibilidad total -->
+                        <select id="selectSubPeriod" class="hidden"></select>
                     </div>
                 </div>
 
@@ -163,14 +259,19 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
 
                     <!-- Resumen Métricas Clave (7 Cols) -->
                     <div class="sm:col-span-7 grid grid-cols-2 gap-2.5 sm:gap-3">
+                        <!-- 1. Total Gastos -->
                         <div class="p-2.5 sm:p-3 bg-gray-50 dark:bg-gray-800/60 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700/50">
                             <span class="text-[10px] font-semibold text-gray-400 uppercase">Total Gastos</span>
                             <div id="statGastos" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">$0</div>
                         </div>
+
+                        <!-- 2. Ahorro Est. -->
                         <div class="p-2.5 sm:p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl sm:rounded-2xl border border-emerald-100 dark:border-emerald-900/40">
                             <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Ahorro Est.</span>
-                            <div id="statAhorro" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">$0</div>
+                            <div id="statAhorroEst" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">$0</div>
                         </div>
+
+                        <!-- 3. Endeudamiento -->
                         <div class="p-2.5 sm:p-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl sm:rounded-2xl border border-amber-100 dark:border-amber-900/40" title="Porcentaje de ingresos comprometido en deudas fijas o créditos">
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Endeudamiento</span>
@@ -179,6 +280,8 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                             <div id="statDeuda" class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">0%</div>
                             <p id="statDeudaNote" class="text-[9px] text-gray-500 dark:text-gray-400 truncate mt-0.5">Sin deudas fijas</p>
                         </div>
+
+                        <!-- 4. Frec. Ahorro -->
                         <div class="p-2.5 sm:p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl sm:rounded-2xl border border-blue-100 dark:border-blue-900/40">
                             <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase">Frec. Ahorro</span>
                             <div id="statFrecuencia" class="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400 mt-0.5 truncate">Automática</div>
@@ -214,10 +317,10 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                             </p>
                         </div>
 
-                        <!-- Capa 2: Causa Principal -->
+                        <!-- Capa 2: Causa Raíz (Rojo) -->
                         <div class="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-800/60 rounded-xl sm:rounded-2xl border border-gray-200/60 dark:border-gray-700/50 space-y-1.5">
-                            <div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div class="flex items-center gap-1.5 text-red-600 dark:text-red-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                 <span class="text-[10px] font-bold uppercase tracking-wider">2. Causa Raíz</span>
                             </div>
                             <p id="capa2Text" class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
@@ -225,14 +328,14 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                             </p>
                         </div>
 
-                        <!-- Capa 3: Acción Recomendada -->
+                        <!-- Capa 3: Acción Directa -->
                         <div class="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-800/60 rounded-xl sm:rounded-2xl border border-gray-200/60 dark:border-gray-700/50 space-y-1.5">
                             <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                 <span class="text-[10px] font-bold uppercase tracking-wider">3. Acción Directa</span>
                             </div>
                             <p id="capa3Text" class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                                Plan de acción inmediato formulado por el modelo financiero.
+                                Plan de acción inmediato formulado por el motor financiero.
                             </p>
                         </div>
                     </div>
@@ -427,108 +530,398 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         "Otros"
     ];
 
-    // ─── GESTIÓN DE PERIODICIDAD DINÁMICA (Últimos 24 meses hasta la fecha de hoy) ───
+    // ─── GESTIÓN DE PERIODICIDAD & CALENDARIO UNIVERSAL ───
     const now = new Date();
     const todayISO = now.toISOString().slice(0, 10);
     
     let currentMinDate = todayISO.slice(0, 7) + "-01";
     let currentMaxDate = todayISO;
+    let dashCalYear = now.getFullYear();
+    let dashCalMonth = now.getMonth(); // 0-11
+    let dashPickerYear = now.getFullYear();
+    let selectedQuincena = now.getDate() >= 16 ? 2 : 1;
 
     const selectPeriodicity = document.getElementById('selectPeriodicity');
     const selectSubPeriod = document.getElementById('selectSubPeriod');
     const periodBadge = document.getElementById('periodBadge');
     const dateRangeNotice = document.getElementById('dateRangeNotice');
 
+    const btnCustomSubPeriodTrigger = document.getElementById('btnCustomSubPeriodTrigger');
+    const customSubPeriodDisplay = document.getElementById('customSubPeriodDisplay');
+    const customSubPeriodDropdown = document.getElementById('customSubPeriodDropdown');
+    const dashCalMonthlyView = document.getElementById('dashCalMonthlyView');
+    const dashCalDaysView = document.getElementById('dashCalDaysView');
+    const dashYearLabel = document.getElementById('dashYearLabel');
+    const dashMonthsGrid = document.getElementById('dashMonthsGrid');
+    const btnDashPrevYear = document.getElementById('btnDashPrevYear');
+    const btnDashNextYear = document.getElementById('btnDashNextYear');
+    const dashCalMonthLabel = document.getElementById('dashCalMonthLabel');
+    const dashCalYearLabel = document.getElementById('dashCalYearLabel');
+    const btnDashPrevMonth = document.getElementById('btnDashPrevMonth');
+    const btnDashNextMonth = document.getElementById('btnDashNextMonth');
+    const dashCalContextBanner = document.getElementById('dashCalContextBanner');
+    const dashCalQuincenaButtons = document.getElementById('dashCalQuincenaButtons');
+    const btnQ1 = document.getElementById('btnQ1');
+    const btnQ2 = document.getElementById('btnQ2');
+    const dashCalDaysGrid = document.getElementById('dashCalDaysGrid');
+
+    // Censura y Visualización de Total Ahorrado Superior
+    let isTopAhorroCensored = false;
+    let lastCalculatedAhorro = 0;
+    let historicalNetBalance = 0;
+    const btnToggleCensorTop = document.getElementById('btnToggleCensorTop');
+    const iconEyeTopOpen = document.getElementById('iconEyeTopOpen');
+    const iconEyeTopClosed = document.getElementById('iconEyeTopClosed');
+    const statTotalAhorradoTop = document.getElementById('statTotalAhorradoTop');
+    const selectTopAhorroView = document.getElementById('selectTopAhorroView');
+
+    function updateTopAhorroDisplay(amount) {
+        if (!statTotalAhorradoTop) return;
+        const amt = typeof amount === 'number' ? amount : lastCalculatedAhorro;
+        if (isTopAhorroCensored) {
+            statTotalAhorradoTop.textContent = '••••••';
+            iconEyeTopOpen?.classList.add('hidden');
+            iconEyeTopClosed?.classList.remove('hidden');
+        } else {
+            const sign = amt < 0 ? '-' : '';
+            statTotalAhorradoTop.textContent = `${sign}$${Math.abs(Math.round(amt)).toLocaleString('es-MX')} ${activeCurrency}`;
+            iconEyeTopOpen?.classList.remove('hidden');
+            iconEyeTopClosed?.classList.add('hidden');
+        }
+    }
+
+    btnToggleCensorTop?.addEventListener('click', () => {
+        isTopAhorroCensored = !isTopAhorroCensored;
+        recalculateLocalSavings();
+    });
+
+    selectTopAhorroView?.addEventListener('change', () => {
+        recalculateLocalSavings();
+    });
+
     const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const MONTH_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
     function updateSubPeriods() {
         const periodicity = selectPeriodicity.value;
         periodBadge.textContent = periodicity.charAt(0).toUpperCase() + periodicity.slice(1);
+        
+        dashCalYear = now.getFullYear();
+        dashCalMonth = now.getMonth();
+        dashPickerYear = now.getFullYear();
+        
+        setDefaultPeriodBounds(periodicity);
+        refreshCalendarUI();
+    }
 
-        let optionsHTML = '';
+    function refreshCalendarUI() {
+        const periodicity = selectPeriodicity.value;
+        if (periodicity === 'mensual') {
+            dashCalMonthlyView?.classList.remove('hidden');
+            dashCalDaysView?.classList.add('hidden');
+            renderDashMonthlyGrid();
+        } else {
+            dashCalMonthlyView?.classList.add('hidden');
+            dashCalDaysView?.classList.remove('hidden');
+            renderUniversalCalendar();
+        }
+    }
+
+    function setDefaultPeriodBounds(periodicity) {
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const mStr = String(month + 1).padStart(2, '0');
+        const lastDay = new Date(year, month + 1, 0).getDate();
 
         if (periodicity === 'mensual') {
-            // Generar los últimos 24 meses hacia atrás
-            for (let i = 0; i < 24; i++) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const year = d.getFullYear();
-                const month = d.getMonth();
-                const mStr = String(month + 1).padStart(2, '0');
-                
-                const start = `${year}-${mStr}-01`;
-                // Último día del mes o hoy si es el mes actual
-                const lastDay = new Date(year, month + 1, 0).getDate();
-                let end = `${year}-${mStr}-${String(lastDay).padStart(2, '0')}`;
-                if (i === 0 && end > todayISO) {
-                    end = todayISO;
-                }
-
-                const isSelected = i === 0 ? 'selected' : '';
-                optionsHTML += `<option value="${start}|${end}" ${isSelected}>${MONTH_NAMES[month]} ${year}</option>`;
-            }
+            const start = `${year}-${mStr}-01`;
+            let end = `${year}-${mStr}-${String(lastDay).padStart(2, '0')}`;
+            if (end > todayISO) end = todayISO;
+            setPeriodSelection(start, end, `${MONTH_NAMES[month]} ${year}`);
         } else if (periodicity === 'quincenal') {
-            // Generar quincenas de los últimos 24 meses
-            for (let i = 0; i < 24; i++) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const year = d.getFullYear();
-                const month = d.getMonth();
-                const mStr = String(month + 1).padStart(2, '0');
-                const lastDay = new Date(year, month + 1, 0).getDate();
-
-                const q2Start = `${year}-${mStr}-16`;
-                let q2End = `${year}-${mStr}-${String(lastDay).padStart(2, '0')}`;
-                if (i === 0 && q2End > todayISO) q2End = todayISO;
-
-                const q1Start = `${year}-${mStr}-01`;
-                let q1End = `${year}-${mStr}-15`;
-                if (i === 0 && q1End > todayISO) q1End = todayISO;
-
-                // Solo agregar 2da quincena si la fecha actual ya llegó al día 16 o es mes pasado
-                if (i > 0 || now.getDate() >= 16) {
-                    const isSelected = i === 0 ? 'selected' : '';
-                    optionsHTML += `<option value="${q2Start}|${q2End}" ${isSelected}>2da Quincena ${MONTH_NAMES[month].slice(0, 3)} ${year} (16-${q2End.slice(8)})</option>`;
-                }
-                const isSelectedQ1 = (i === 0 && now.getDate() < 16) ? 'selected' : '';
-                optionsHTML += `<option value="${q1Start}|${q1End}" ${isSelectedQ1}>1ra Quincena ${MONTH_NAMES[month].slice(0, 3)} ${year} (01-${q1End.slice(8)})</option>`;
+            if (now.getDate() >= 16) {
+                selectedQuincena = 2;
+                setPeriodSelection(`${year}-${mStr}-16`, todayISO, `2da Quincena ${MONTH_NAMES[month].slice(0, 3)} ${year}`);
+            } else {
+                selectedQuincena = 1;
+                setPeriodSelection(`${year}-${mStr}-01`, `${year}-${mStr}-15`, `1ra Quincena ${MONTH_NAMES[month].slice(0, 3)} ${year}`);
             }
         } else if (periodicity === 'semanal') {
-            // Generar semanas hacia atrás
-            for (let w = 0; w < 48; w++) {
-                const dEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (w * 7));
-                const dStart = new Date(dEnd.getFullYear(), dEnd.getMonth(), dEnd.getDate() - 6);
-                
-                const startStr = dStart.toISOString().slice(0, 10);
-                let endStr = dEnd.toISOString().slice(0, 10);
-                if (endStr > todayISO) endStr = todayISO;
-
-                const isSelected = w === 0 ? 'selected' : '';
-                optionsHTML += `<option value="${startStr}|${endStr}" ${isSelected}>Semana del ${startStr} al ${endStr}</option>`;
-            }
+            const dayOfWeek = (now.getDay() + 6) % 7;
+            const dStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek);
+            const dEnd = new Date(dStart.getFullYear(), dStart.getMonth(), dStart.getDate() + 6);
+            const startStr = dStart.toISOString().slice(0, 10);
+            let endStr = dEnd.toISOString().slice(0, 10);
+            if (endStr > todayISO) endStr = todayISO;
+            setPeriodSelection(startStr, endStr, `Semana del ${startStr.slice(5)} al ${endStr.slice(5)} ${year}`);
         } else if (periodicity === 'diario') {
-            // Generar días individuales de los últimos 60 días
-            for (let d = 0; d < 60; d++) {
-                const targetDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - d);
-                const dayISO = targetDay.toISOString().slice(0, 10);
-                
-                let label = `${targetDay.getDate()} de ${MONTH_NAMES[targetDay.getMonth()]} ${targetDay.getFullYear()}`;
-                if (d === 0) label = `Hoy (${label})`;
-                else if (d === 1) label = `Ayer (${label})`;
+            setPeriodSelection(todayISO, todayISO, `${now.getDate()} de ${MONTH_NAMES[month]} ${year}`);
+        }
+    }
 
-                const isSelected = d === 0 ? 'selected' : '';
-                optionsHTML += `<option value="${dayISO}|${dayISO}" ${isSelected}>${label}</option>`;
+    // 1. RENDER VISTA MENSUAL (Solo los 12 meses, sin números de días)
+    function renderDashMonthlyGrid() {
+        if (!dashYearLabel || !dashMonthsGrid) return;
+        dashYearLabel.textContent = dashPickerYear.toString();
+
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+
+        dashMonthsGrid.innerHTML = MONTH_ABBR.map((mName, idx) => {
+            const mStr = String(idx + 1).padStart(2, '0');
+            const start = `${dashPickerYear}-${mStr}-01`;
+            const lastDay = new Date(dashPickerYear, idx + 1, 0).getDate();
+            let end = `${dashPickerYear}-${mStr}-${String(lastDay).padStart(2, '0')}`;
+            if (dashPickerYear === currentYear && idx === currentMonth && end > todayISO) {
+                end = todayISO;
+            }
+
+            const val = `${start}|${end}`;
+            const isFuture = (dashPickerYear === currentYear && idx > currentMonth) || (dashPickerYear > currentYear);
+            const isTooOld = dashPickerYear < currentYear - 2;
+            const isDisabled = isFuture || isTooOld;
+            
+            const isSelected = currentMinDate === start;
+
+            return `
+                <button type="button" class="dash-month-tile py-2.5 px-2 text-xs font-semibold rounded-xl transition-all ${
+                    isSelected 
+                        ? 'bg-blue-600 text-white font-bold shadow-md scale-[1.02]'
+                        : isDisabled
+                            ? 'text-gray-300 dark:text-gray-700 cursor-not-allowed bg-transparent'
+                            : 'text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/40 hover:text-blue-600 cursor-pointer'
+                }" data-start="${start}" data-end="${end}" data-label="${MONTH_NAMES[idx]} ${dashPickerYear}" ${isDisabled ? 'disabled' : ''}>
+                    ${mName}
+                </button>
+            `;
+        }).join('');
+
+        dashMonthsGrid.querySelectorAll('.dash-month-tile:not([disabled])').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const start = btn.getAttribute('data-start');
+                const end = btn.getAttribute('data-end');
+                const label = btn.getAttribute('data-label');
+                setPeriodSelection(start, end, label);
+                customSubPeriodDropdown?.classList.add('hidden');
+                renderDashMonthlyGrid();
+            };
+        });
+    }
+
+    btnDashPrevYear?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (dashPickerYear > now.getFullYear() - 2) {
+            dashPickerYear--;
+            renderDashMonthlyGrid();
+        }
+    });
+
+    btnDashNextYear?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (dashPickerYear < now.getFullYear()) {
+            dashPickerYear++;
+            renderDashMonthlyGrid();
+        }
+    });
+
+    // 2. RENDER VISTA DÍAS (Para Quincenal, Semanal y Diario)
+    function renderUniversalCalendar() {
+        if (!dashCalMonthLabel || !dashCalYearLabel || !dashCalDaysGrid) return;
+
+        dashCalMonthLabel.textContent = MONTH_NAMES[dashCalMonth];
+        dashCalYearLabel.textContent = dashCalYear.toString();
+
+        const periodicity = selectPeriodicity.value;
+
+        if (dashCalContextBanner) {
+            if (periodicity === 'quincenal') {
+                dashCalContextBanner.textContent = 'Selecciona la 1ra o 2da quincena del mes';
+                dashCalQuincenaButtons?.classList.remove('hidden');
+                updateQuincenaButtonsUI();
+            } else if (periodicity === 'semanal') {
+                dashCalContextBanner.textContent = 'Haz clic en cualquier día para seleccionar su semana completa';
+                dashCalQuincenaButtons?.classList.add('hidden');
+            } else if (periodicity === 'diario') {
+                dashCalContextBanner.textContent = 'Haz clic en el día exacto que deseas evaluar';
+                dashCalQuincenaButtons?.classList.add('hidden');
             }
         }
 
-        selectSubPeriod.innerHTML = optionsHTML;
+        const daysInMonth = new Date(dashCalYear, dashCalMonth + 1, 0).getDate();
+        const firstDayIndex = (new Date(dashCalYear, dashCalMonth, 1).getDay() + 6) % 7;
+
+        let gridHTML = '';
+
+        for (let i = 0; i < firstDayIndex; i++) {
+            gridHTML += `<div class="p-1 text-[11px] text-gray-300 dark:text-gray-700 select-none"></div>`;
+        }
+
+        const mStr = String(dashCalMonth + 1).padStart(2, '0');
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dStr = String(d).padStart(2, '0');
+            const dayISO = `${dashCalYear}-${mStr}-${dStr}`;
+            const isFuture = dayISO > todayISO;
+            const isTooOld = dashCalYear < now.getFullYear() - 2;
+            const isDisabled = isFuture || isTooOld;
+
+            const isInCurrentRange = (dayISO >= currentMinDate && dayISO <= currentMaxDate);
+
+            gridHTML += `
+                <button type="button" class="cal-day-cell p-1.5 text-[11px] font-semibold transition-all ${
+                    isDisabled 
+                        ? 'text-gray-300 dark:text-gray-700 cursor-not-allowed bg-transparent'
+                        : isInCurrentRange
+                            ? 'bg-blue-600 text-white font-bold rounded-lg shadow-sm scale-105 z-10'
+                            : 'text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800/80 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 rounded-lg cursor-pointer'
+                }" data-day="${d}" data-date="${dayISO}" ${isDisabled ? 'disabled' : ''}>
+                    ${d}
+                </button>
+            `;
+        }
+
+        dashCalDaysGrid.innerHTML = gridHTML;
+
+        dashCalDaysGrid.querySelectorAll('.cal-day-cell:not([disabled])').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const d = parseInt(btn.getAttribute('data-day'));
+                const dayISO = btn.getAttribute('data-date');
+                handleDaySelection(d, dayISO);
+            };
+        });
+    }
+
+    function updateQuincenaButtonsUI() {
+        if (!btnQ1 || !btnQ2) return;
+        if (selectedQuincena === 1) {
+            btnQ1.className = 'py-1.5 px-2 text-[10px] font-bold rounded-lg transition-all border border-blue-600 bg-blue-600 text-white shadow-sm cursor-pointer';
+            btnQ2.className = 'py-1.5 px-2 text-[10px] font-bold rounded-lg transition-all border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer';
+        } else {
+            btnQ2.className = 'py-1.5 px-2 text-[10px] font-bold rounded-lg transition-all border border-blue-600 bg-blue-600 text-white shadow-sm cursor-pointer';
+            btnQ1.className = 'py-1.5 px-2 text-[10px] font-bold rounded-lg transition-all border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer';
+        }
+    }
+
+    btnQ1?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedQuincena = 1;
+        const mStr = String(dashCalMonth + 1).padStart(2, '0');
+        const start = `${dashCalYear}-${mStr}-01`;
+        let end = `${dashCalYear}-${mStr}-15`;
+        if (end > todayISO) end = todayISO;
+        setPeriodSelection(start, end, `1ra Quincena ${MONTH_NAMES[dashCalMonth].slice(0, 3)} ${dashCalYear}`);
+        customSubPeriodDropdown?.classList.add('hidden');
+        renderUniversalCalendar();
+    });
+
+    btnQ2?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedQuincena = 2;
+        const mStr = String(dashCalMonth + 1).padStart(2, '0');
+        const lastDay = new Date(dashCalYear, dashCalMonth + 1, 0).getDate();
+        const start = `${dashCalYear}-${mStr}-16`;
+        let end = `${dashCalYear}-${mStr}-${String(lastDay).padStart(2, '0')}`;
+        if (end > todayISO) end = todayISO;
+        setPeriodSelection(start, end, `2da Quincena ${MONTH_NAMES[dashCalMonth].slice(0, 3)} ${dashCalYear}`);
+        customSubPeriodDropdown?.classList.add('hidden');
+        renderUniversalCalendar();
+    });
+
+    function handleDaySelection(d, dayISO) {
+        const periodicity = selectPeriodicity.value;
+        const mStr = String(dashCalMonth + 1).padStart(2, '0');
+        const lastDay = new Date(dashCalYear, dashCalMonth + 1, 0).getDate();
+
+        if (periodicity === 'quincenal') {
+            if (d <= 15) {
+                selectedQuincena = 1;
+                const start = `${dashCalYear}-${mStr}-01`;
+                let end = `${dashCalYear}-${mStr}-15`;
+                if (end > todayISO) end = todayISO;
+                setPeriodSelection(start, end, `1ra Quincena ${MONTH_NAMES[dashCalMonth].slice(0, 3)} ${dashCalYear}`);
+            } else {
+                selectedQuincena = 2;
+                const start = `${dashCalYear}-${mStr}-16`;
+                let end = `${dashCalYear}-${mStr}-${String(lastDay).padStart(2, '0')}`;
+                if (end > todayISO) end = todayISO;
+                setPeriodSelection(start, end, `2da Quincena ${MONTH_NAMES[dashCalMonth].slice(0, 3)} ${dashCalYear}`);
+            }
+        } else if (periodicity === 'semanal') {
+            const selectedDate = new Date(dashCalYear, dashCalMonth, d);
+            const dayOfWeek = (selectedDate.getDay() + 6) % 7;
+            const dStart = new Date(dashCalYear, dashCalMonth, d - dayOfWeek);
+            const dEnd = new Date(dStart.getFullYear(), dStart.getMonth(), dStart.getDate() + 6);
+
+            const startStr = dStart.toISOString().slice(0, 10);
+            let endStr = dEnd.toISOString().slice(0, 10);
+            if (endStr > todayISO) endStr = todayISO;
+
+            setPeriodSelection(startStr, endStr, `Semana del ${startStr.slice(5)} al ${endStr.slice(5)} ${dashCalYear}`);
+        } else if (periodicity === 'diario') {
+            setPeriodSelection(dayISO, dayISO, `${d} de ${MONTH_NAMES[dashCalMonth]} ${dashCalYear}`);
+        }
+
+        customSubPeriodDropdown?.classList.add('hidden');
+        renderUniversalCalendar();
+    }
+
+    function setPeriodSelection(start, end, label) {
+        currentMinDate = start;
+        currentMaxDate = end;
+        selectSubPeriod.value = `${start}|${end}`;
+        if (customSubPeriodDisplay) customSubPeriodDisplay.textContent = label;
         applyDateBounds();
     }
 
-    function applyDateBounds() {
-        const parts = selectSubPeriod.value.split('|');
-        currentMinDate = parts[0];
-        currentMaxDate = parts[1];
+    btnDashPrevMonth?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (dashCalMonth === 0) {
+            if (dashCalYear > now.getFullYear() - 2) {
+                dashCalYear--;
+                dashCalMonth = 11;
+                renderUniversalCalendar();
+            }
+        } else {
+            dashCalMonth--;
+            renderUniversalCalendar();
+        }
+    });
 
-        // Asegurar que no exceda nunca la fecha actual de la máquina
+    btnDashNextMonth?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        if (dashCalYear === currentYear && dashCalMonth >= currentMonth) return;
+
+        if (dashCalMonth === 11) {
+            if (dashCalYear < currentYear) {
+                dashCalYear++;
+                dashCalMonth = 0;
+                renderUniversalCalendar();
+            }
+        } else {
+            dashCalMonth++;
+            renderUniversalCalendar();
+        }
+    });
+
+    btnCustomSubPeriodTrigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        customSubPeriodDropdown?.classList.toggle('hidden');
+        refreshCalendarUI();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!customSubPeriodDropdown?.contains(e.target) && e.target !== btnCustomSubPeriodTrigger) {
+            customSubPeriodDropdown?.classList.add('hidden');
+        }
+    });
+
+    function applyDateBounds() {
+        if (!currentMinDate || !currentMaxDate) return;
+
         if (currentMaxDate > todayISO) {
             currentMaxDate = todayISO;
         }
@@ -543,10 +936,95 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         });
 
         renderTransacciones();
+        recalculateLocalSavings();
+    }
+
+    function recalculateLocalSavings() {
+        const ingresoInput = document.getElementById('ingreso');
+        const ingresoVal = ingresoInput ? (parseFloat(ingresoInput.value) || 0) : 0;
+        let totalG = 0;
+        transacciones.forEach(t => {
+            totalG += (parseFloat(t.monto) || 0);
+        });
+        
+        const netEvaluacion = Math.max(0, ingresoVal - totalG);
+        lastCalculatedAhorro = netEvaluacion;
+
+        const viewMode = selectTopAhorroView ? selectTopAhorroView.value : 'evaluacion';
+        let displayAmount = netEvaluacion;
+        const subtextEl = document.getElementById('topAhorroSubtext');
+
+        if (viewMode === 'evaluacion') {
+            displayAmount = netEvaluacion;
+            if (subtextEl) subtextEl.textContent = 'Ahorro neto calculado del período (Ingresos − Gastos)';
+        } else if (viewMode === 'mensual') {
+            const periodicity = selectPeriodicity ? selectPeriodicity.value : 'mensual';
+            let factor = 1;
+            if (periodicity === 'quincenal') factor = 2;
+            else if (periodicity === 'semanal') factor = 4.33;
+            else if (periodicity === 'diario') factor = 30;
+            displayAmount = Math.round(netEvaluacion * factor);
+            if (subtextEl) subtextEl.textContent = 'Proyección de ahorro normalizado a 1 mes';
+        } else if (viewMode === 'anual') {
+            const periodicity = selectPeriodicity ? selectPeriodicity.value : 'mensual';
+            let factor = 12;
+            if (periodicity === 'quincenal') factor = 24;
+            else if (periodicity === 'semanal') factor = 52;
+            else if (periodicity === 'diario') factor = 365;
+            displayAmount = Math.round(netEvaluacion * factor);
+            if (subtextEl) subtextEl.textContent = 'Proyección de ahorro acumulado en 1 año (12 meses)';
+        } else if (viewMode === 'historico') {
+            displayAmount = historicalNetBalance !== 0 ? historicalNetBalance : netEvaluacion;
+            if (subtextEl) subtextEl.textContent = 'Saldo histórico total registrado en base de datos';
+        }
+
+        updateTopAhorroDisplay(displayAmount);
+
+        // Actualizar píldoras de resumen
+        const statGastos = document.getElementById('statGastos');
+        if (statGastos) {
+            statGastos.textContent = `$${Math.round(totalG).toLocaleString('es-MX')}`;
+        }
+        const statAhorroEst = document.getElementById('statAhorroEst');
+        if (statAhorroEst) {
+            statAhorroEst.textContent = `$${Math.round(netEvaluacion).toLocaleString('es-MX')}`;
+        }
+
+        // Sincronizar en tiempo real con el Navbar Header
+        try {
+            localStorage.setItem('financeai_saldo_favor', JSON.stringify({ amount: displayAmount, currency: activeCurrency }));
+            window.dispatchEvent(new CustomEvent('financeai_saldo_updated', {
+                detail: { amount: displayAmount, currency: activeCurrency }
+            }));
+        } catch (_) {}
     }
 
     selectPeriodicity?.addEventListener('change', updateSubPeriods);
     selectSubPeriod?.addEventListener('change', applyDateBounds);
+    document.getElementById('ingreso')?.addEventListener('input', recalculateLocalSavings);
+
+    // Cargar balance histórico del usuario para sincronización
+    const dashTok = localStorage.getItem('financeai_token');
+    if (dashTok) {
+        fetch(`${API_URL}/api/v1/transactions`, {
+            headers: { 'Authorization': `Bearer ${dashTok}` }
+        })
+        .then(r => r.ok ? r.json() : [])
+        .then(txs => {
+            if (Array.isArray(txs)) {
+                let inc = 0, exp = 0;
+                txs.forEach(t => {
+                    const a = parseFloat(t.amount) || 0;
+                    const typ = (t.type || '').toUpperCase();
+                    if (typ === 'INCOME' || typ === 'INGRESO') inc += a;
+                    else exp += a;
+                });
+                historicalNetBalance = inc - exp;
+                recalculateLocalSavings();
+            }
+        })
+        .catch(() => {});
+    }
 
     // Estado inicial de transacciones
     let transacciones = [
@@ -591,6 +1069,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                 const id = parseInt(btn.getAttribute('data-id'));
                 transacciones = transacciones.filter(t => t.id !== id);
                 renderTransacciones();
+                recalculateLocalSavings();
             });
         });
 
@@ -603,6 +1082,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         document.querySelectorAll('.tx-amount').forEach((inp, idx) => {
             inp.addEventListener('input', () => {
                 transacciones[idx].monto = parseFloat(inp.value) || 0;
+                recalculateLocalSavings();
             });
         });
 
@@ -621,6 +1101,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         const nextId = transacciones.length > 0 ? Math.max(...transacciones.map(t => t.id)) + 1 : 1;
         transacciones.push({ id: nextId, descripcion: 'Alimentación', monto: 150, fecha: currentMinDate });
         renderTransacciones();
+        recalculateLocalSavings();
     });
 
     updateSubPeriods();
@@ -653,9 +1134,10 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         const badge = document.getElementById('scoreBadge');
         const badgeText = document.getElementById('scoreBadgeText');
         const statGastos = document.getElementById('statGastos');
-        const statAhorro = document.getElementById('statAhorro');
+        const statAhorroEst = document.getElementById('statAhorroEst');
         const statDeuda = document.getElementById('statDeuda');
         const statFrecuencia = document.getElementById('statFrecuencia');
+        const statTotalAhorradoTop = document.getElementById('statTotalAhorradoTop');
 
         if (isCalculating) {
             scoreRing.classList.add('animate-pulse', 'text-blue-500');
@@ -665,13 +1147,13 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
             badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 animate-pulse';
             badgeText.textContent = 'Calculando IA...';
 
-            [statGastos, statAhorro, statDeuda, statFrecuencia].forEach(el => {
+            [statGastos, statAhorroEst, statDeuda, statFrecuencia, statTotalAhorradoTop].forEach(el => {
                 if (el) el.classList.add('animate-pulse', 'opacity-60');
             });
         } else {
             scoreRing.classList.remove('animate-pulse');
             scoreText.classList.remove('animate-pulse');
-            [statGastos, statAhorro, statDeuda, statFrecuencia].forEach(el => {
+            [statGastos, statAhorroEst, statDeuda, statFrecuencia, statTotalAhorradoTop].forEach(el => {
                 if (el) el.classList.remove('animate-pulse', 'opacity-60');
             });
         }
@@ -802,10 +1284,14 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         // 3. Conteo Progresivo de Métricas Clave
         const totalGastos = Math.round(data.total_gastos || 0);
         const ahorroEst = Math.round(data.ahorro_estimado || 0);
+        const ingresoInput = document.getElementById('ingreso');
+        const ingresoVal = data.ingreso_mensual || (ingresoInput ? parseFloat(ingresoInput.value) || 0 : 0);
+        lastCalculatedAhorro = Math.max(0, ingresoVal - totalGastos);
         const deudaPct = Math.round(data.nivel_endeudamiento || 0);
 
         animateValue('statGastos', 0, totalGastos, 1000, `${activeCurrency} `);
-        animateValue('statAhorro', 0, ahorroEst, 1000, `${activeCurrency} `);
+        animateValue('statAhorroEst', 0, ahorroEst, 1000, `${activeCurrency} `);
+        recalculateLocalSavings();
         animateValue('statDeuda', 0, deudaPct, 900, '', '%');
         
         const statDeudaNote = document.getElementById('statDeudaNote');

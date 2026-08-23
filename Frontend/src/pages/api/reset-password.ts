@@ -14,8 +14,9 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    const backendUrl = process.env.INTERNAL_BACKEND_URL || 'http://127.0.0.1:8080';
     // Call backend API to request password reset token if necessary, or just mock it here
-    const res = await fetch(`${API_URL}/api/v1/auth/reset-password`, {
+    const res = await fetch(`${backendUrl}/api/v1/auth/reset-password`, {
       method: "POST",
       body: JSON.stringify({ email }),
       headers: { "Content-Type": "application/json" }

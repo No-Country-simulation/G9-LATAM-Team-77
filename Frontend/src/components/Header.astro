@@ -43,8 +43,17 @@ const googleEmail = session?.user?.email || '';
 
     <!-- Right Controls -->
     {!isLogoutPage && (
-        <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
+        <div class="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
             
+            <!-- Saldo a Favor Badge -->
+            {!isAuthPage && (
+                <div id="navSaldoFavorPill" class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm" title="Saldo a favor (Ingresos − Gastos)">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
+                    <span class="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 uppercase font-bold tracking-wider hidden xs:inline">Saldo a favor:</span>
+                    <span id="navSaldoFavorText" class="font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs">$0 USD</span>
+                </div>
+            )}
+
             <!-- Backend Health Indicator -->
             <div id="backendIndicator" class="hidden md:flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
                 <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -126,16 +135,16 @@ const googleEmail = session?.user?.email || '';
             <div class="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
                 <img id="modalCurrentAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Foto de perfil actual" class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-500 shadow-md flex-shrink-0" />
                 <div class="min-w-0 flex-1">
-                    <h4 id="modalUserName" class="text-sm sm:text-base font-bold text-gray-900 dark:text-white truncate">{googleName || "Usuario FinanceAI"}</h4>
+                    <h4 id="modalUserName" class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 truncate">{googleName || "Usuario FinanceAI"}</h4>
                     <p id="modalUserEmail" class="text-xs text-gray-500 dark:text-gray-400 truncate">{googleEmail || "usuario@correo.com"}</p>
                     <span class="inline-block mt-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-md">Cuenta Activa</span>
                 </div>
             </div>
 
-            <!-- Selector de 9 Avatares -->
+            <!-- Selector de 12 Avatares Inclusivos -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Selecciona tu Foto de Perfil (9 Avatares)</label>
-                <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-2.5 pt-1" id="avatarGrid">
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Selecciona tu Foto de Perfil (Avatares Inclusivos y Diversos)</label>
+                <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-2.5 pt-1" id="avatarGrid">
                     <!-- Dynamic avatar grid -->
                 </div>
             </div>
@@ -190,7 +199,7 @@ const googleEmail = session?.user?.email || '';
                         </div>
                         <div>
                             <strong class="text-xs font-semibold text-gray-900 dark:text-white block">Derecho de Acceso</strong>
-                            <span class="text-[10px] text-gray-500 dark:text-gray-400">Descargar expediente (.JSON)</span>
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400">Descargar expediente (.PDF)</span>
                         </div>
                     </button>
 
@@ -228,7 +237,7 @@ const googleEmail = session?.user?.email || '';
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-3.5 leading-relaxed">
                     Eliminar tu cuenta borrará todos tus datos financieros, transacciones, registros y configuraciones de forma permanente e irreversible de la base de datos (Derecho de Cancelación).
                 </p>
-                <button id="btnOpenDeleteAccountModal" class="px-4 py-2.5 text-xs sm:text-sm font-bold text-red-600 hover:text-white bg-red-50 dark:bg-red-900/20 hover:bg-red-600 border border-red-200 dark:border-red-800 rounded-xl transition-colors shadow-sm cursor-pointer">
+                <button id="btnOpenDeleteAccountModal" onclick="window.openDeleteAccountModal && window.openDeleteAccountModal()" class="px-4 py-2.5 text-xs sm:text-sm font-bold text-red-600 hover:text-white bg-red-50 dark:bg-red-900/20 hover:bg-red-600 border border-red-200 dark:border-red-800 rounded-xl transition-colors shadow-sm cursor-pointer">
                     Eliminar mi cuenta
                 </button>
             </div>
@@ -282,19 +291,24 @@ const googleEmail = session?.user?.email || '';
     document.getElementById('themeToggle')?.addEventListener('click', window.toggleTheme);
     updateThemeIcons();
 
-    // 9 Avatares Predefinidos
+    // 12 Avatares Robots (Femeninos y Masculinos con fondos de diferentes colores)
     const predefinedAvatars = [
         ...(googleImage ? [googleImage] : []),
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Felix",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Bella",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Max",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Luna",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Charlie",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Milo",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Coco",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Rocky",
-        "https://api.dicebear.com/7.x/bottts/svg?seed=Sophie"
-    ].slice(0, 9);
+        // Robots Femeninos (Fondos rosas, lilas, magenta, coral)
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Luna&backgroundColor=ffd5dc",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Sophie&backgroundColor=c0aede",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Bella&backgroundColor=ffc6ff",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Chloe&backgroundColor=f3c4fb",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Mia&backgroundColor=ffd1dc",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Zoe&backgroundColor=ffb5a7",
+        // Robots Masculinos (Fondos azul cielo, índigo, ámbar, esmeralda, turquesa, menta)
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Leo&backgroundColor=b6e3f4",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Max&backgroundColor=d1d4f9",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Felix&backgroundColor=ffdfbf",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Alex&backgroundColor=bbecb8",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Titan&backgroundColor=c5e3f6",
+        "https://api.dicebear.com/7.x/bottts/svg?seed=Nova&backgroundColor=d0f4de"
+    ].slice(0, 12);
 
     let selectedAvatar = localStorage.getItem('financeai_avatar') || (googleImage || predefinedAvatars[0]);
 
@@ -505,12 +519,16 @@ const googleEmail = session?.user?.email || '';
 
     // ─── Gestión de Derechos ARCO (LFPDPPP / GDPR) ───
     
-    // 1. Derecho de Acceso: Descargar Expediente de Datos en JSON
+    // 1. Derecho de Acceso: Descargar Expediente de Datos en PDF
     document.getElementById('btnArcoExportData')?.addEventListener('click', async () => {
         const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
         const preferredCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
         const currentToken = localStorage.getItem('financeai_token');
         
+        if (window.showToast) {
+            window.showToast('Generando PDF', 'Recopilando datos y preparando tu expediente financiero...', '⏳');
+        }
+
         let transacciones = [];
         if (currentToken) {
             try {
@@ -523,32 +541,32 @@ const googleEmail = session?.user?.email || '';
             } catch (_) {}
         }
 
-        const expedienteARCO = {
-            titulo: "Expediente de Datos Personales y Financieros - FinanceAI",
-            marcoLegal: "Cumplimiento con Artículos 22 al 35 de la LFPDPPP (México) y Artículos 15 al 20 del GDPR (UE)",
-            fechaGeneracion: new Date().toISOString(),
-            titular: {
-                id: cachedUser.id || "N/A",
-                nombre: cachedUser.name || googleName || "Usuario FinanceAI",
-                correo: cachedUser.email || googleEmail || "N/A",
-                monedaBase: preferredCurrency
-            },
-            derechoAccesoEjercido: true,
-            totalTransaccionesRegistradas: Array.isArray(transacciones) ? transacciones.length : 0,
-            registrosFinancieros: transacciones,
-            garantiaNoVentaDatos: "FinanceAI certifica que estos datos no han sido vendidos ni compartidos con fines comerciales."
-        };
+        try {
+            if (typeof (window as any).generateExpedientePDF === 'function') {
+                (window as any).generateExpedientePDF({
+                    userName: cachedUser.name || googleName || 'Usuario FinanceAI',
+                    userEmail: cachedUser.email || googleEmail || 'N/A',
+                    currency: preferredCurrency,
+                    transactions: transacciones
+                });
+            } else {
+                const mod = await import('../lib/pdfReport');
+                mod.generateExpedientePDF({
+                    userName: cachedUser.name || googleName || 'Usuario FinanceAI',
+                    userEmail: cachedUser.email || googleEmail || 'N/A',
+                    currency: preferredCurrency,
+                    transactions: transacciones
+                });
+            }
 
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(expedienteARCO, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `expediente_datos_financeai_${Date.now()}.json`);
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-
-        if (window.showToast) {
-            window.showToast('Derecho de Acceso', 'Tu expediente de datos personales ha sido descargado en formato .JSON.', '📥');
+            if (window.showToast) {
+                window.showToast('¡Descarga Lista!', 'Tu expediente financiero ha sido generado en PDF.', '📄');
+            }
+        } catch (pdfErr) {
+            console.error('Error generando PDF:', pdfErr);
+            if (window.showToast) {
+                window.showToast('Error', 'No se pudo generar el PDF. Inténtalo nuevamente.', '⚠️');
+            }
         }
     });
 
@@ -610,6 +628,81 @@ const googleEmail = session?.user?.email || '';
             });
     }
 
+    // Saldo a Favor sincronizado en Header
+    function updateNavSaldoFavor() {
+        const saldoElem = document.getElementById('navSaldoFavorText');
+        if (!saldoElem) return;
+
+        const preferredCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+        const cachedSaldo = localStorage.getItem('financeai_saldo_favor');
+
+        if (cachedSaldo) {
+            try {
+                const parsed = JSON.parse(cachedSaldo);
+                const amt = typeof parsed === 'number' ? parsed : (parsed.amount || 0);
+                const cur = (parsed && parsed.currency) ? parsed.currency : preferredCurrency;
+                const sign = amt >= 0 ? '+' : '';
+                saldoElem.textContent = `${sign}$${Math.round(amt).toLocaleString('es-MX')} ${cur}`;
+                if (amt < 0) {
+                    saldoElem.className = 'font-bold font-mono text-red-600 dark:text-red-400 text-xs';
+                } else {
+                    saldoElem.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs';
+                }
+                return;
+            } catch (_) {}
+        }
+
+        const token = localStorage.getItem('financeai_token');
+        if (token) {
+            fetch(`${API_URL}/api/v1/transactions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.ok ? res.json() : [])
+            .then(txs => {
+                if (Array.isArray(txs)) {
+                    let inc = 0;
+                    let exp = 0;
+                    txs.forEach(t => {
+                        const a = parseFloat(t.amount) || 0;
+                        const typ = (t.type || '').toUpperCase();
+                        if (typ === 'INCOME' || typ === 'INGRESO') {
+                            inc += a;
+                        } else {
+                            exp += a;
+                        }
+                    });
+                    const net = inc - exp;
+                    localStorage.setItem('financeai_saldo_favor', JSON.stringify({ amount: net, currency: preferredCurrency }));
+                    const sign = net >= 0 ? '+' : '';
+                    saldoElem.textContent = `${sign}$${Math.round(net).toLocaleString('es-MX')} ${preferredCurrency}`;
+                }
+            })
+            .catch(() => {});
+        }
+    }
+
+    window.addEventListener('financeai_saldo_updated', (e) => {
+        const saldoElem = document.getElementById('navSaldoFavorText');
+        if (!saldoElem || !e.detail) return;
+        const amt = e.detail.amount || 0;
+        const cur = e.detail.currency || 'USD';
+        const sign = amt >= 0 ? '+' : '';
+        saldoElem.textContent = `${sign}$${Math.round(amt).toLocaleString('es-MX')} ${cur}`;
+        if (amt < 0) {
+            saldoElem.className = 'font-bold font-mono text-red-600 dark:text-red-400 text-xs';
+        } else {
+            saldoElem.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs';
+        }
+    });
+
     checkBackendHealth();
+    updateNavSaldoFavor();
     setInterval(checkBackendHealth, 15000);
+</script>
+
+<script>
+    import { generateExpedientePDF } from '../lib/pdfReport';
+    if (typeof window !== 'undefined') {
+        (window as any).generateExpedientePDF = generateExpedientePDF;
+    }
 </script>

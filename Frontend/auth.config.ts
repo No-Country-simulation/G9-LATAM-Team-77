@@ -2,7 +2,7 @@ import Google from '@auth/core/providers/google';
 import Credentials from '@auth/core/providers/credentials';
 import { defineConfig } from 'auth-astro';
 
-const apiUrl = process.env.PUBLIC_API_URL || import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
+const apiUrl = process.env.INTERNAL_BACKEND_URL || process.env.PUBLIC_API_URL || 'http://127.0.0.1:8080';
 
 export default defineConfig({
   providers: [
@@ -39,6 +39,7 @@ export default defineConfig({
     })
   ],
   secret: process.env.AUTH_SECRET || import.meta.env.AUTH_SECRET || process.env.JWT_SECRET,
+  trustHost: true,
   callbacks: {
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;

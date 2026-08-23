@@ -1078,72 +1078,118 @@ const OFFICIAL_RATES_TABLE = [
 
             const balanceNeto = totalIngresos - totalGastos;
 
-            // Construir archivo CSV estructurado profesionalmente
-            const csvLines = [
-                // Encabezado Corporativo
-                ["================================================================================"],
-                ["REPORTE FINANCIERO INTEGRAL — FINANCEAI"],
-                ["================================================================================"],
-                [`Fecha de Generación:,${nowStr}`],
-                [`Moneda de Visualización:,${currentViewingCurrency}`],
-                [`Tasa Oficial de Equivalencia:,1 ${currentViewingCurrency} = $${usdVal} USD`],
-                [`Total de Movimientos Exportados:,${filteredTransactions.length}`],
-                [""],
-                // Resumen Financiero Ejecutivo
-                ["RESUMEN FINANCIERO EJECUTIVO"],
-                ["--------------------------------------------------------------------------------"],
-                [`Total Ingresos:,${totalIngresos.toFixed(2)},${currentViewingCurrency}`],
-                [`Total Gastos:,${totalGastos.toFixed(2)},${currentViewingCurrency}`],
-                [`Balance Neto:,${balanceNeto.toFixed(2)},${currentViewingCurrency}`],
-                [""],
-                // Desglose por Categoría
-                ["DESGLOSE DE GASTOS POR CATEGORÍA"],
-                ["--------------------------------------------------------------------------------"],
-                ["Categoría,Total Gastado,Moneda,% del Gasto Total"]
-            ];
+            const XLSX = (window as any).XLSX;
+            if (XLSX) {
+                const wb = XLSX.utils.book_new();
 
-            Object.entries(categoryBreakdown).forEach(([cat, val]) => {
-                const pct = totalGastos > 0 ? ((val / totalGastos) * 100).toFixed(1) + '%' : '0%';
-                csvLines.push([`"${cat}",${val.toFixed(2)},${currentViewingCurrency},${pct}`]);
-            });
+                // ─── HOJA 1: RESUMEN EJECUTIVO & CATEGORÍAS ───
+                const resumenData = [
+                    ['REPORTE FINANCIERO INTEGRAL — FINANCEAI'],
+                    ['Fecha de Generación:', nowStr],
+                    ['Moneda de Visualización:', currentViewingCurrency],
+                    ['Tasa Oficial de Equivalencia:', `1 ${currentViewingCurrency} = $${usdVal} USD`],
+                    ['Total de Movimientos:', filteredTransactions.length],
+                    [],
+                    ['MÉTRICA EJECUTIVA', 'MONTO', 'MONEDA'],
+                    ['Total Ingresos', Number(totalIngresos.toFixed(2)), currentViewingCurrency],
+                    ['Total Gastos', Number(totalGastos.toFixed(2)), currentViewingCurrency],
+                    ['Balance Neto', Number(balanceNeto.toFixed(2)), currentViewingCurrency],
+                    [],
+                    ['DESGLOSE DE GASTOS POR CATEGORÍA'],
+                    ['Categoría', 'Total Gastado', 'Moneda', '% del Total']
+                ];
 
-            csvLines.push([""]);
-            csvLines.push(["DETALLE DE MOVIMIENTOS Y TRANSACCIONES"]);
-            csvLines.push(["--------------------------------------------------------------------------------"]);
-            csvLines.push(["ID,Fecha,Descripción,Categoría,Tipo de Flujo,Monto Original,Moneda Origen,Monto Convertido,Moneda Visualización"]);
+                Object.entries(categoryBreakdown).forEach(([cat, val]) => {
+                    const pct = totalGastos > 0 ? Number(((val / totalGastos) * 100).toFixed(2)) : 0;
+                    resumenData.push([cat, Number(val.toFixed(2)), currentViewingCurrency, `${pct}%`]);
+                });
 
-            filteredTransactions.forEach(t => {
-                const rawAmt = parseFloat(t.amount) || 0;
-                const originCur = t.originalCurrency || profileBaseCurrency;
-                const convertedAmt = convertAmount(rawAmt, originCur, currentViewingCurrency);
-                const tipoLabel = t.type === 'INCOME' ? 'Ingreso' : 'Gasto';
+                const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+                wsResumen['!cols'] = [{ wch: 32 }, { wch: 18 }, { wch: 14 }, { wch: 14 }];
+                XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen Financiero');
 
-                csvLines.push([
-                    t.id,
-                    t.date,
-                    `"${(t.description || '').replace(/"/g, '""')}"`,
-                    `"${(t.category || 'Otros').replace(/"/g, '""')}"`,
-                    tipoLabel,
-                    rawAmt.toFixed(2),
-                    originCur,
-                    convertedAmt.toFixed(2),
-                    currentViewingCurrency
-                ]);
-            });
+                // ─── HOJA 2: DETALLE COMPLETO DE TRANSACCIONES ───
+                const txHeader = ['ID', 'Fecha', 'Descripción / Concepto', 'Categoría', 'Tipo de Flujo', 'Monto Original', 'Moneda Origen', 'Monto Convertido', 'Moneda Visualización'];
+                const txRows = [txHeader];
 
-            // Generar contenido con UTF-8 BOM para apertura perfecta en Excel
-            const csvContent = "\uFEFF" + csvLines.map(line => Array.isArray(line) ? line.join(',') : line).join('\r\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Reporte_Financiero_FinanceAI_${currentViewingCurrency}_${new Date().toISOString().slice(0, 10)}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+                filteredTransactions.forEach(t => {
+                    const rawAmt = parseFloat(t.amount) || 0;
+                    const originCur = t.originalCurrency || profileBaseCurrency;
+                    const convertedAmt = convertAmount(rawAmt, originCur, currentViewingCurrency);
+                    const tipoLabel = t.type === 'INCOME' ? 'Ingreso (+)' : 'Gasto (-)';
 
-            window.showToast?.('¡Excel Descargado!', `Reporte ejecutivo generado con éxito en ${currentViewingCurrency}.`, '📥');
+                    txRows.push([
+                        t.id,
+                        t.date || '',
+                        t.description || 'Sin descripción',
+                        t.category || 'Otros',
+                        tipoLabel,
+                        Number(rawAmt.toFixed(2)),
+                        originCur,
+                        Number(convertedAmt.toFixed(2)),
+                        currentViewingCurrency
+                    ]);
+                });
+
+                const wsTx = XLSX.utils.aoa_to_sheet(txRows);
+                wsTx['!cols'] = [
+                    { wch: 14 },
+                    { wch: 14 },
+                    { wch: 35 },
+                    { wch: 22 },
+                    { wch: 15 },
+                    { wch: 16 },
+                    { wch: 14 },
+                    { wch: 18 },
+                    { wch: 18 }
+                ];
+                XLSX.utils.book_append_sheet(wb, wsTx, 'Detalle Transacciones');
+
+                const fileName = `Reporte_Financiero_FinanceAI_${currentViewingCurrency}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                window.showToast?.('¡Excel Descargado!', `Libro contable .XLSX generado con éxito en ${currentViewingCurrency}.`, '📊');
+            } else {
+                const csvLines = [
+                    ["REPORTE FINANCIERO INTEGRAL — FINANCEAI"],
+                    [`Fecha de Generación:,${nowStr}`],
+                    [`Moneda de Visualización:,${currentViewingCurrency}`],
+                    [`Total Ingresos:,${totalIngresos.toFixed(2)},${currentViewingCurrency}`],
+                    [`Total Gastos:,${totalGastos.toFixed(2)},${currentViewingCurrency}`],
+                    [`Balance Neto:,${balanceNeto.toFixed(2)},${currentViewingCurrency}`],
+                    [""],
+                    ["ID,Fecha,Descripción,Categoría,Tipo,Monto Original,Moneda Origen,Monto Convertido,Moneda Visualización"]
+                ];
+
+                filteredTransactions.forEach(t => {
+                    const rawAmt = parseFloat(t.amount) || 0;
+                    const originCur = t.originalCurrency || profileBaseCurrency;
+                    const convertedAmt = convertAmount(rawAmt, originCur, currentViewingCurrency);
+                    csvLines.push([
+                        t.id,
+                        t.date,
+                        `"${(t.description || '').replace(/"/g, '""')}"`,
+                        `"${(t.category || 'Otros').replace(/"/g, '""')}"`,
+                        t.type === 'INCOME' ? 'Ingreso' : 'Gasto',
+                        rawAmt.toFixed(2),
+                        originCur,
+                        convertedAmt.toFixed(2),
+                        currentViewingCurrency
+                    ]);
+                });
+
+                const csvContent = "\uFEFF" + csvLines.map(line => Array.isArray(line) ? line.join(',') : line).join('\r\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Reporte_Financiero_FinanceAI_${currentViewingCurrency}_${new Date().toISOString().slice(0, 10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                window.showToast?.('¡Reporte Descargado!', `Reporte generado con éxito en ${currentViewingCurrency}.`, '📥');
+            }
         };
     }
 
