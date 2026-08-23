@@ -12,10 +12,11 @@ services:
       - mysql_data:/var/lib/mysql
       - ./database/database_schema.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!} || mysqladmin ping -h 127.0.0.1 || exit 1"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 20
+      start_period: 15s
     networks:
       - app-network
 
