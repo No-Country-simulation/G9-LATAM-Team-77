@@ -408,16 +408,14 @@ if (session) {
 </Layout>
 
 <script>
-	window.loginWithGoogle = async function() {
-		try {
-			const { signIn } = await import("auth-astro/client");
+	import { signIn } from "auth-astro/client";
+	const googleBtn = document.getElementById('googleBtn');
+	if (googleBtn) {
+		googleBtn.addEventListener('click', async (e) => {
+			e.preventDefault();
 			await signIn('google', { callbackUrl: '/dashboard' });
-		} catch (e) {
-			console.error("auth-astro no está disponible, usando fallback", e);
-			window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard';
-		}
-	};
-	document.getElementById('googleBtn')?.addEventListener('click', window.loginWithGoogle);
+		});
+	}
 </script>
 
 <script define:vars={{ API_URL }}>

@@ -32,6 +32,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/${MYSQL_DATABASE:-railway}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
+      - SPRING_FLYWAY_BASELINE_ON_MIGRATE=true
       - JWT_SECRET=${JWT_SECRET:-8a9b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3}
       - PYTHON_COMMAND=/app/DataScient/venv/bin/python
       - DATA_SCIENCE_SCRIPT=/app/DataScient/src/predict.py
