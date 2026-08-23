@@ -1,0 +1,30 @@
+# FinanceAI — Autonomous Personal Financial Health & XAI Engine
+
+> FinanceAI is an enterprise-grade, privacy-first personal finance platform powered by Explainable Artificial Intelligence (XAI - Engine DS-08). It simulates, diagnoses, and optimizes personal finances using multi-currency mathematical frameworks (50/30/20 budget framework, dimensionless risk ratios).
+
+## System Information & Architecture
+- **Platform Name:** FinanceAI
+- **Backend Architecture:** Java 17 LTS (Microsoft Build of OpenJDK `ms-17.0.20.1`), Spring Boot 3, Spring Security (Stateless JWT), Spring Data JPA, MySQL 8.0, ProcessBuilder AI Bridge.
+- **Frontend Architecture:** Astro 5 SSR, Tailwind CSS, Chart.js, Mobile-First Responsive Design.
+- **Configuration Management:** Centralized root `.env` single-file architecture.
+
+## Core Features & AI Methodology
+- **XAI Engine (DS-08):** Transparent 3-layer explainability (Diagnosis, Root Cause, Direct Actionable Advice).
+- **Mathematical Framework:** Dimensionless financial health ratios:
+  - Expenditure/Income Ratio: R_GI = Gastos / Ingreso
+  - Savings Rate: R_Ahorro = Ahorro / Ingreso
+  - Debt Ratio: R_Deuda = (Gastos Deuda / Ingreso) * 100
+- **Multi-Currency Engine:** Real-time exchange rate normalization for USD, MXN, CRC, EUR, COP, ARS, CLP, and PEN.
+- **Privacy & Data Governance:** Strict Zero Data Broker policy ("Do Not Sell or Share My Personal Information" - CCPA/CPRA). Compliance with Mexican LFPDPPP (INAI) and European GDPR (Articles 12-22).
+- **OWASP Top 10 Security:** Full 10/10 vector implementation (A01 Access Control, A02 Cryptographic Failures BCrypt/HMAC-SHA256, A03 Injection Zero SQLi, A04 Insecure Design 5-rule password checklist, A05 Security Misconfiguration, A06 Vulnerable Components, A07 Identification Google OAuth 2.0, A08 Software & Data Integrity, A09 Security Logging & Monitoring /api/v1/health, A10 SSRF Prevention).
+
+## Legal Disclaimer & Non-Advisory Status
+FinanceAI operates as an educational, statistical simulator and analytical platform. It is NOT a registered financial investment advisory firm, banking institution, nor deposit-taking financial entity. Outputs do not constitute binding fiduciary investment advice.
+
+## Key Public Endpoints
+- **Landing / Access:** https://financeai.app/login
+- **Dashboard:** https://financeai.app/dashboard
+- **Financial History:** https://financeai.app/historial
+- **Terms of Service:** https://financeai.app/terminos
+- **Privacy Policy:** https://financeai.app/privacidad
+- **Sitemap:** https://financeai.app/sitemap.xml

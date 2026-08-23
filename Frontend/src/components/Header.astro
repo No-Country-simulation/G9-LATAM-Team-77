@@ -1,167 +1,560 @@
 ---
+import { API_URL } from '../lib/api';
+
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
+const isAuthPage = currentPath === 'login';
+const isLogoutPage = currentPath === 'logout';
 ---
 
-<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 px-3 py-3 shadow-sm shadow-slate-900/[0.03] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/85 sm:px-6">
-    <div class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-3">
-        <a href="/" class="group flex items-center gap-2.5 rounded-xl" aria-label="Ir al inicio de FinanceAI">
-            <span class="grid h-9 w-9 place-items-center rounded-xl bg-slate-950 shadow-md shadow-slate-950/15 transition-transform group-hover:-translate-y-0.5 dark:bg-white">
-                <span class="flex gap-1" aria-hidden="true"><span class="h-2 w-2 rounded-full bg-blue-500"></span><span class="h-2 w-2 rounded-full bg-red-500"></span><span class="h-2 w-2 rounded-full bg-yellow-400"></span></span>
-            </span>
-            <span><span class="block text-base font-extrabold tracking-tight text-slate-950 dark:text-white">FinanceAI</span><span class="hidden text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 sm:block">Salud financiera</span></span>
-        </a>
+<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 px-3 py-2.5 shadow-sm backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/90 sm:px-6 font-inter transition-colors duration-300">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-2 sm:gap-4">
 
-        <nav id="mainNav" aria-label="Navegación principal" class="order-3 mt-3 hidden w-full items-center gap-1 rounded-xl bg-slate-100/80 p-1 text-sm font-semibold dark:bg-slate-900/80 md:order-none md:mt-0 md:w-auto">
-            <a href="/dashboard" aria-current={currentPath === 'dashboard' ? 'page' : undefined} class={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 transition-all md:flex-none ${currentPath === 'dashboard' ? 'bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-300' : 'text-slate-600 hover:bg-white/70 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white'}`}>
-                <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" /></svg>Dashboard
+        <!-- Left: Brand Logo & Navigation Links -->
+        <div class="flex items-center gap-3 sm:gap-6 min-w-0 flex-shrink-0">
+            <a href="/" class="flex items-center space-x-1.5 sm:space-x-2 group flex-shrink-0" aria-label="Ir al inicio de FinanceAI">
+                <div class="flex space-x-1 group-hover:scale-105 transition-transform">
+                    <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                </div>
+                <span class="font-bold text-base sm:text-lg md:text-xl tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
             </a>
-            <a href="/historial" aria-current={currentPath === 'historial' ? 'page' : undefined} class={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 transition-all md:flex-none ${currentPath === 'historial' ? 'bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-300' : 'text-slate-600 hover:bg-white/70 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white'}`}>
-                <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-3-6.708M21 3v6h-6" /></svg>Historial
-            </a>
-        </nav>
 
-        <div class="flex items-center gap-1.5 sm:gap-2.5">
-            <div id="backendIndicator" aria-live="polite" title="Estado del Backend" class="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-2.5 text-xs font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-                <span id="backendDot" class="h-2 w-2 animate-pulse rounded-full bg-amber-400"></span><span id="backendStatusText" class="hidden lg:inline">Conectando</span>
-            </div>
-            <button id="profileButton" type="button" aria-haspopup="dialog" class="hidden h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white pl-1.5 pr-3 text-xs font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                <span id="profileInitials" class="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-[10px] font-extrabold text-white">FA</span><span id="profileButtonLabel" class="hidden max-w-24 truncate sm:block">Mi perfil</span>
-            </button>
-            {currentPath !== 'login' && <a href="/login" id="authNavBtn" class="inline-flex h-9 items-center rounded-xl bg-slate-950 px-3.5 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500">Iniciar sesión</a>}
-            <button id="themeToggle" type="button" aria-label="Cambiar tema" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:-translate-y-0.5 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800">
-                <svg aria-hidden="true" class="hidden h-4 w-4 dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>
-                <svg aria-hidden="true" class="h-4 w-4 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" /></svg>
-            </button>
+            <!-- Desktop Nav Links -->
+            {!isAuthPage && (
+                <nav id="desktopNav" aria-label="Navegación principal" class="hidden md:flex items-center space-x-4 lg:space-x-6 text-xs sm:text-sm font-semibold">
+                    <a href="/dashboard" aria-current={currentPath === 'dashboard' ? 'page' : undefined}
+                        class={`pb-0.5 sm:pb-1 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                        Dashboard
+                    </a>
+                    <a href="/historial" aria-current={currentPath === 'historial' ? 'page' : undefined}
+                        class={`pb-0.5 sm:pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                        Historial
+                    </a>
+                </nav>
+            )}
         </div>
+
+        <!-- Right Controls -->
+        {!isLogoutPage && (
+            <div id="navRightControls" class="flex items-center gap-1.5 sm:gap-2.5 md:gap-3 flex-shrink-0">
+
+                <!-- Total Ahorrado Pill (Visible en md+) -->
+                <div id="navSaldoFavorPillDesktop" class="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0" title="Total Ahorrado General (Click para mostrar u ocultar)">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
+                    <span class="hidden xl:inline text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider">Ahorro:</span>
+                    <span id="navSaldoText" class="font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm">••••••</span>
+                    <button type="button" id="btnToggleNavEye" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer" aria-label="Mostrar u ocultar saldo">
+                        <svg id="iconEyeOpen" class="w-3.5 h-3.5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg id="iconEyeClosed" class="w-3.5 h-3.5 block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                        </svg>
+                    </button>
+
+                    <span class="text-emerald-300 dark:text-emerald-700/80 font-light select-none">|</span>
+
+                    <select id="navCurrencySelect" class="bg-transparent text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none" title="Seleccionar divisa" aria-label="Seleccionar divisa">
+                        <option value="HNL" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">HNL (L)</option>
+                        <option value="USD" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">USD ($)</option>
+                        <option value="MXN" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">MXN ($)</option>
+                        <option value="EUR" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">EUR (€)</option>
+                        <option value="CRC" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">CRC (₡)</option>
+                        <option value="COP" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">COP ($)</option>
+                        <option value="ARS" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">ARS ($)</option>
+                        <option value="CLP" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">CLP ($)</option>
+                        <option value="PEN" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">PEN (S/)</option>
+                        <option value="BRL" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">BRL (R$)</option>
+                    </select>
+                </div>
+
+                <!-- Backend Status Indicator -->
+                <div id="backendIndicator" aria-live="polite" title="Estado del Backend" class="hidden lg:flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-2.5 py-1 rounded-xl">
+                    <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="backendStatusText" class="font-semibold">Backend...</span>
+                </div>
+
+                <!-- User Profile Trigger Button (Visible when logged in) -->
+                <button id="profileButton" type="button" aria-haspopup="dialog" class="hidden h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white pl-1.5 pr-3 text-xs font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 cursor-pointer">
+                    <img id="navUserAvatarImg" src="https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1" alt="Avatar" class="w-6 h-6 rounded-lg object-cover ring-1 ring-blue-500" />
+                    <span id="profileButtonLabel" class="hidden max-w-24 truncate sm:block">Mi perfil</span>
+                </button>
+
+                <!-- Login Nav Button (Visible when logged out) -->
+                {!isAuthPage && (
+                    <a href="/login" id="authNavBtn" class="inline-flex h-9 items-center rounded-xl bg-slate-950 px-3.5 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500">
+                        Iniciar sesión
+                    </a>
+                )}
+
+                <!-- Dark Mode Toggle Button -->
+                <button type="button" id="themeToggle" aria-label="Cambiar tema" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:-translate-y-0.5 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer">
+                    <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                    </svg>
+                    <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+                    </svg>
+                </button>
+            </div>
+        )}
     </div>
 </header>
 
-<dialog id="profileDialog" aria-labelledby="profileTitle" class="m-auto w-[calc(100%_-_2rem)] max-w-lg rounded-3xl border border-slate-200 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-    <div class="overflow-hidden rounded-3xl">
-        <div class="relative bg-gradient-to-br from-slate-950 via-blue-950 to-blue-700 px-6 py-6 text-white">
-            <button id="closeProfile" type="button" aria-label="Cerrar perfil" class="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-lg hover:bg-white/20">×</button>
-            <div class="flex items-center gap-4"><span id="dialogInitials" class="grid h-14 w-14 place-items-center rounded-2xl bg-white/15 text-lg font-extrabold ring-1 ring-white/20">FA</span><div class="min-w-0"><h2 id="profileTitle" class="truncate text-xl font-extrabold">Mi perfil</h2><p id="profileEmail" class="mt-1 truncate text-xs text-blue-100">Cargando información...</p></div></div>
+<!-- Modal de Perfil de Usuario y Ajustes Visuales -->
+<div id="userProfileModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/70 backdrop-blur-md animate-fade-in font-inter p-3 sm:p-4" role="dialog" aria-modal="true">
+    <div id="userProfileCard" class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-gray-200 dark:border-gray-800 text-left animate-scale-in max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center pb-3 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div>
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-josefin">Mi Perfil y Preferencias</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Personaliza tu cuenta y divisa de cálculo</p>
+            </div>
+            <button id="btnCloseProfileModal" type="button" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl sm:text-3xl font-bold w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none cursor-pointer" title="Cerrar">&times;</button>
         </div>
-        <form id="profileForm" class="space-y-5 p-5 sm:p-6">
-            <div id="profileStatus" aria-live="polite" class="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-950 dark:text-slate-300">Tus preferencias se cargan desde FinanceAI.</div>
-            <div class="grid gap-4 sm:grid-cols-2">
-                <label class="text-xs font-bold text-slate-600 dark:text-slate-300">País<select id="profileCountry" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white"><option value="">Cargando...</option></select></label>
-                <label class="text-xs font-bold text-slate-600 dark:text-slate-300">Moneda principal<select id="profileCurrency" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white"><option value="">Cargando...</option></select></label>
+
+        <div class="py-4 sm:py-6 space-y-4 sm:space-y-6">
+            <!-- User Basic Info -->
+            <div class="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
+                <img id="modalCurrentAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1" alt="Foto de perfil actual" class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-500 shadow-md flex-shrink-0" />
+                <div class="min-w-0 flex-1">
+                    <h4 id="modalUserName" class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 truncate">Usuario FinanceAI</h4>
+                    <p id="modalUserEmail" class="text-xs text-gray-500 dark:text-gray-400 truncate">usuario@correo.com</p>
+                    <span class="inline-block mt-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-md">Cuenta Autenticada</span>
+                </div>
             </div>
-            <div class="grid gap-2 sm:grid-cols-2">
-                <button id="saveProfile" type="submit" class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-500 disabled:cursor-wait disabled:opacity-60">Guardar preferencias</button>
-                <button id="exportReport" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:border-blue-800 dark:hover:bg-blue-950/40">Descargar reporte PDF</button>
+
+            <!-- Selector de Avatares -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Selecciona tu Foto de Perfil</label>
+                <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-2.5 pt-1" id="avatarGrid">
+                    <!-- Dynamic avatar grid -->
+                </div>
             </div>
-            <div class="flex flex-col gap-3 border-t border-slate-200 pt-4 text-xs dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
-                <div class="flex gap-3 text-slate-500 dark:text-slate-400"><a href="/privacidad" class="hover:text-blue-600">Privacidad</a><a href="/terminos" class="hover:text-blue-600">Términos</a></div><button id="profileLogout" type="button" class="font-bold text-red-600 hover:text-red-500 dark:text-red-400">Cerrar sesión</button>
+
+            <!-- Preferencias de País y Moneda (Catálogos Backend) -->
+            <form id="profileSettingsForm" class="space-y-4">
+                <div id="profileStatusMessage" class="hidden rounded-xl p-3 text-xs font-medium"></div>
+
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">País</label>
+                        <select id="profileCountrySelect" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white">
+                            <option value="">Cargando países...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Moneda Principal</label>
+                        <select id="profileCurrencySelect" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white">
+                            <option value="">Cargando monedas...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="btnSaveProfileSettings" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm cursor-pointer">
+                    Guardar Cambios
+                </button>
+            </form>
+
+            <!-- Acciones de Cuenta: Exportar Expediente ARCO & Cerrar Sesión -->
+            <div class="pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-2.5">
+                <button type="button" id="btnHeaderExportPdf" class="w-full py-2.5 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Descargar Expediente Financiero (PDF)
+                </button>
+
+                <div class="flex gap-2.5">
+                    <button type="button" id="btnHeaderLogout" class="flex-1 py-2.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl transition cursor-pointer">
+                        Cerrar Sesión
+                    </button>
+                    <button type="button" id="btnOpenDeleteAccountModal" class="flex-1 py-2.5 text-xs sm:text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl transition cursor-pointer">
+                        Eliminar Cuenta
+                    </button>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
-</dialog>
+</div>
 
-<script>
-    import { API_URL } from '../lib/api';
-    import { clearAuthSession } from '../lib/auth';
-    import { generateFinancialReport } from '../lib/pdfReport';
+<!-- Modal Confirmación Eliminar Cuenta -->
+<div id="deleteAccountConfirmModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/80 backdrop-blur-md font-inter p-4" role="dialog" aria-modal="true">
+    <div id="deleteAccountCard" class="bg-white dark:bg-gray-900 max-w-sm w-full rounded-3xl p-6 sm:p-8 shadow-2xl border border-red-300 dark:border-red-800 text-center animate-scale-in">
+        <div class="w-14 h-14 mx-auto bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mb-3">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </div>
+        <h4 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1.5 font-josefin">¿Eliminar tu cuenta?</h4>
+        <p class="text-xs text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
+            Se purgarán todas tus transacciones, análisis y configuraciones de forma irreversible (Derecho ARCO de Cancelación).
+        </p>
+        <div class="flex flex-col gap-2">
+            <button id="btnConfirmDeleteAccount" type="button" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm cursor-pointer">
+                Sí, eliminar definitivamente
+            </button>
+            <button id="btnCancelDeleteAccount" type="button" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm cursor-pointer">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
 
-    const token = localStorage.getItem('financeai_token');
-    const mainNav = document.getElementById('mainNav');
-    const authNavBtn = document.getElementById('authNavBtn');
-    const profileButton = document.getElementById('profileButton');
-    const dialog = document.getElementById('profileDialog') as HTMLDialogElement | null;
-    const countrySelect = document.getElementById('profileCountry') as HTMLSelectElement | null;
-    const currencySelect = document.getElementById('profileCurrency') as HTMLSelectElement | null;
-    const profileStatus = document.getElementById('profileStatus');
-    let profile: Record<string, any> | null = null;
-    let catalogsLoaded = false;
+<script define:vars={{ API_URL }}>
+    (function () {
+        const AVATAR_OPTIONS = [
+            'https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1',
+            'https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI2',
+            'https://api.dicebear.com/7.x/personas/svg?seed=Felix',
+            'https://api.dicebear.com/7.x/personas/svg?seed=Aneka',
+            'https://api.dicebear.com/7.x/adventurer/svg?seed=Lucky',
+            'https://api.dicebear.com/7.x/adventurer/svg?seed=Midnight',
+            'https://api.dicebear.com/7.x/micah/svg?seed=Sophia',
+            'https://api.dicebear.com/7.x/micah/svg?seed=Leo',
+            'https://api.dicebear.com/7.x/lorelei/svg?seed=Zoe',
+            'https://api.dicebear.com/7.x/lorelei/svg?seed=Alex',
+            'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
+            'https://api.dicebear.com/7.x/avataaars/svg?seed=Taylor'
+        ];
 
-    function logout() { clearAuthSession(); window.location.replace('/login'); }
-    function setProfileIdentity(value: Record<string, any>) {
-        const name = String(value.nombre || 'Usuario FinanceAI');
-        const email = String(value.email || '');
-        const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'FA';
-        document.getElementById('profileInitials')!.textContent = initials;
-        document.getElementById('dialogInitials')!.textContent = initials;
-        document.getElementById('profileButtonLabel')!.textContent = name.split(' ')[0];
-        document.getElementById('profileTitle')!.textContent = name;
-        document.getElementById('profileEmail')!.textContent = email;
-    }
-    function handleUnauthorized(response: Response) { if (response.status !== 401) return false; logout(); return true; }
-    async function loadProfile() {
-        if (!token) return;
-        const response = await fetch(`${API_URL}/api/v1/users/profile`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
-        if (handleUnauthorized(response)) return;
-        if (!response.ok) throw new Error('No se pudo cargar el perfil.');
-        profile = await response.json();
-        setProfileIdentity(profile!);
+        let isSaldoVisible = false;
+        let totalAhorradoCalculado = 0;
+        let activeCurrency = localStorage.getItem('financeai_preferred_currency') || 'HNL';
+
+        // ─── Referencias DOM ───
+        const themeToggle = document.getElementById('themeToggle');
+        const backendDot = document.getElementById('backendDot');
+        const backendText = document.getElementById('backendStatusText');
+        const profileButton = document.getElementById('profileButton');
+        const authNavBtn = document.getElementById('authNavBtn');
+        const navAvatarImg = document.getElementById('navUserAvatarImg');
+        const profileModal = document.getElementById('userProfileModal');
+        const btnCloseProfile = document.getElementById('btnCloseProfileModal');
+        const avatarGrid = document.getElementById('avatarGrid');
+        const modalAvatarImg = document.getElementById('modalCurrentAvatar');
+        const modalUserName = document.getElementById('modalUserName');
+        const modalUserEmail = document.getElementById('modalUserEmail');
+        const countrySelect = document.getElementById('profileCountrySelect');
+        const currencySelect = document.getElementById('profileCurrencySelect');
+        const navCurrencySelect = document.getElementById('navCurrencySelect');
+        const profileStatus = document.getElementById('profileStatusMessage');
+        const profileForm = document.getElementById('profileSettingsForm');
+        const btnLogout = document.getElementById('btnHeaderLogout');
+        const btnOpenDeleteModal = document.getElementById('btnOpenDeleteAccountModal');
+        const deleteModal = document.getElementById('deleteAccountConfirmModal');
+        const btnCancelDelete = document.getElementById('btnCancelDeleteAccount');
+        const btnConfirmDelete = document.getElementById('btnConfirmDeleteAccount');
+        const btnHeaderExportPdf = document.getElementById('btnHeaderExportPdf');
+        const navSaldoPill = document.getElementById('navSaldoFavorPillDesktop');
+        const navSaldoText = document.getElementById('navSaldoText');
+        const iconEyeOpen = document.getElementById('iconEyeOpen');
+        const iconEyeClosed = document.getElementById('iconEyeClosed');
+
+        // ─── Sincronizar Divisa Activa ───
+        if (navCurrencySelect) {
+            navCurrencySelect.value = activeCurrency;
+            navCurrencySelect.addEventListener('change', (e) => {
+                activeCurrency = e.target.value;
+                localStorage.setItem('financeai_preferred_currency', activeCurrency);
+                if (currencySelect) currencySelect.value = activeCurrency;
+                updateSaldoDisplay();
+                window.dispatchEvent(new CustomEvent('currency-changed', { detail: { currency: activeCurrency } }));
+            });
+        }
+
+        // ─── Theme Switcher ───
+        themeToggle?.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // ─── Comprobar Estado del Backend ───
+        async function checkBackend() {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/catalogos/paises`, { signal: AbortSignal.timeout(4000) });
+                if (res.ok) {
+                    if (backendDot) backendDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                    if (backendText) backendText.textContent = 'En línea';
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                if (backendDot) backendDot.className = 'w-2 h-2 rounded-full bg-red-500';
+                if (backendText) backendText.textContent = 'Sin conexión';
+            }
+        }
+        checkBackend();
+
+        // ─── Estado de Sesión JWT ───
+        const token = localStorage.getItem('financeai_token');
+        const userRaw = localStorage.getItem('financeai_user');
+        let userData = null;
         try {
-            const stored = JSON.parse(localStorage.getItem('financeai_user') || '{}');
-            localStorage.setItem('financeai_user', JSON.stringify({ ...stored, ...profile }));
-        } catch { localStorage.setItem('financeai_user', JSON.stringify(profile)); }
-    }
-    function fillCatalog(select: HTMLSelectElement, entries: Record<string, any>[], selectedId: unknown, formatter: (entry: Record<string, any>) => string) {
-        const placeholder = document.createElement('option'); placeholder.value = ''; placeholder.textContent = 'Selecciona una opción';
-        const options = entries.map((entry) => { const option = document.createElement('option'); option.value = String(entry.id); option.textContent = formatter(entry); option.selected = String(entry.id) === String(selectedId ?? ''); return option; });
-        select.replaceChildren(placeholder, ...options);
-    }
-    async function loadCatalogs() {
-        if (catalogsLoaded || !countrySelect || !currencySelect) return;
-        const [countriesResponse, currenciesResponse] = await Promise.all([fetch(`${API_URL}/api/v1/catalogos/paises`), fetch(`${API_URL}/api/v1/catalogos/monedas`)]);
-        if (!countriesResponse.ok || !currenciesResponse.ok) throw new Error('No se pudieron cargar los catálogos.');
-        const [countries, currencies] = await Promise.all([countriesResponse.json(), currenciesResponse.json()]);
-        fillCatalog(countrySelect, countries, profile?.paisId, (entry) => `${entry.nombre} (${entry.codigo})`);
-        fillCatalog(currencySelect, currencies, profile?.monedaId, (entry) => `${entry.nombre} (${entry.codigo})`);
-        catalogsLoaded = true;
-    }
-    async function openProfile() {
-        if (!dialog) return;
-        dialog.showModal(); profileStatus!.textContent = 'Cargando tus preferencias...';
-        try { await loadProfile(); await loadCatalogs(); if (countrySelect) countrySelect.value = String(profile?.paisId ?? ''); if (currencySelect) currencySelect.value = String(profile?.monedaId ?? ''); profileStatus!.textContent = 'Actualiza tu país o moneda sin perder tus movimientos.'; }
-        catch (error) { profileStatus!.textContent = error instanceof Error ? error.message : 'No se pudo cargar el perfil.'; }
-    }
+            userData = userRaw ? JSON.parse(userRaw) : null;
+        } catch {
+            userData = null;
+        }
 
-    document.getElementById('themeToggle')?.addEventListener('click', () => { const enabled = document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', enabled ? 'dark' : 'light'); });
-    if (token) {
-        mainNav?.classList.replace('hidden', 'flex');
-        authNavBtn?.classList.remove('inline-flex');
-        authNavBtn?.classList.add('hidden');
-        profileButton?.classList.replace('hidden', 'flex');
-        try { const stored = JSON.parse(localStorage.getItem('financeai_user') || '{}'); if (stored && typeof stored === 'object') setProfileIdentity(stored); } catch { /* El perfil real se carga desde el Backend. */ }
-        loadProfile().catch(() => { /* El modal muestra cualquier error al abrirse. */ });
-    } else { mainNav?.classList.add('hidden'); }
-    profileButton?.addEventListener('click', openProfile);
-    document.getElementById('closeProfile')?.addEventListener('click', () => dialog?.close());
-    document.getElementById('profileLogout')?.addEventListener('click', logout);
-    dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+        if (token) {
+            if (profileButton) profileButton.classList.remove('hidden');
+            if (profileButton) profileButton.classList.add('flex');
+            if (authNavBtn) authNavBtn.classList.add('hidden');
 
-    document.getElementById('profileForm')?.addEventListener('submit', async (event) => {
-        event.preventDefault(); if (!token || !countrySelect?.value || !currencySelect?.value) return;
-        const submit = document.getElementById('saveProfile') as HTMLButtonElement; submit.disabled = true; profileStatus!.textContent = 'Guardando preferencias...';
-        try {
-            const response = await fetch(`${API_URL}/api/v1/users/profile`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ paisId: Number(countrySelect.value), monedaId: Number(currencySelect.value) }) });
-            if (handleUnauthorized(response)) return; if (!response.ok) throw new Error('No se pudieron guardar las preferencias.');
-            profile = await response.json(); setProfileIdentity(profile!); profileStatus!.textContent = 'Preferencias actualizadas correctamente.';
-        } catch (error) { profileStatus!.textContent = error instanceof Error ? error.message : 'No se pudo actualizar el perfil.'; } finally { submit.disabled = false; }
-    });
+            const savedAvatar = localStorage.getItem('financeai_avatar') || AVATAR_OPTIONS[0];
+            if (navAvatarImg) navAvatarImg.src = savedAvatar;
+            if (modalAvatarImg) modalAvatarImg.src = savedAvatar;
 
-    document.getElementById('exportReport')?.addEventListener('click', async () => {
-        if (!token) return;
-        const button = document.getElementById('exportReport') as HTMLButtonElement; button.disabled = true; profileStatus!.textContent = 'Preparando tu reporte...';
-        try {
-            if (!profile) await loadProfile();
-            const response = await fetch(`${API_URL}/api/v1/transactions`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
-            if (handleUnauthorized(response)) return; if (!response.ok) throw new Error('No se pudieron cargar los movimientos.');
-            generateFinancialReport({ userName: String(profile?.nombre || 'Usuario FinanceAI'), userEmail: String(profile?.email || ''), currencyCode: String(profile?.codigoMoneda || 'HNL'), currencySymbol: String(profile?.simboloMoneda || 'L'), transactions: await response.json() });
-            profileStatus!.textContent = 'Reporte descargado correctamente.';
-        } catch (error) { profileStatus!.textContent = error instanceof Error ? error.message : 'No se pudo generar el reporte.'; } finally { button.disabled = false; }
-    });
+            if (userData?.nombre && modalUserName) {
+                modalUserName.textContent = userData.nombre;
+                const buttonLabel = document.getElementById('profileButtonLabel');
+                if (buttonLabel) buttonLabel.textContent = userData.nombre.split(' ')[0];
+            }
+            if (userData?.email && modalUserEmail) {
+                modalUserEmail.textContent = userData.email;
+            }
 
-    fetch(`${API_URL}/api/v1/health`).then((response) => response.json()).then((data) => {
-        const dot = document.getElementById('backendDot'); const label = document.getElementById('backendStatusText');
-        if (data.status === 'UP' && dot && label) { dot.className = 'h-2 w-2 rounded-full bg-emerald-500'; label.textContent = 'Online'; }
-    }).catch(() => {
-        const dot = document.getElementById('backendDot'); const label = document.getElementById('backendStatusText');
-        if (dot && label) { dot.className = 'h-2 w-2 rounded-full bg-red-500'; label.textContent = 'Offline'; }
-    });
+            // Calcular ahorro real desde el backend
+            loadUserTotalSavings();
+        } else {
+            if (profileButton) profileButton.classList.add('hidden');
+            if (authNavBtn) authNavBtn.classList.remove('hidden');
+        }
+
+        async function loadUserTotalSavings() {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const income = Number(data.totalIngresos || data.income || 0);
+                    const expense = Number(data.totalGastos || data.expenses || 0);
+                    totalAhorradoCalculado = Math.max(0, income - expense);
+                    updateSaldoDisplay();
+                }
+            } catch {}
+        }
+
+        function updateSaldoDisplay() {
+            if (!navSaldoText) return;
+            if (isSaldoVisible) {
+                const symbol = activeCurrency === 'HNL' ? 'L' : (activeCurrency === 'EUR' ? '€' : '$');
+                navSaldoText.textContent = `${symbol} ${totalAhorradoCalculado.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                if (iconEyeOpen) iconEyeOpen.classList.remove('hidden');
+                if (iconEyeClosed) iconEyeClosed.classList.add('hidden');
+            } else {
+                navSaldoText.textContent = '••••••';
+                if (iconEyeOpen) iconEyeOpen.classList.add('hidden');
+                if (iconEyeClosed) iconEyeClosed.classList.remove('hidden');
+            }
+        }
+
+        navSaldoPill?.addEventListener('click', () => {
+            isSaldoVisible = !isSaldoVisible;
+            updateSaldoDisplay();
+        });
+
+        // ─── Modal de Perfil ───
+        function openProfile() {
+            if (!profileModal) return;
+            profileModal.classList.remove('hidden');
+            loadCatalogsAndProfile();
+        }
+
+        function closeProfile() {
+            if (!profileModal) return;
+            profileModal.classList.add('hidden');
+        }
+
+        profileButton?.addEventListener('click', openProfile);
+        btnCloseProfile?.addEventListener('click', closeProfile);
+        profileModal?.addEventListener('click', (e) => {
+            if (e.target === profileModal) closeProfile();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && profileModal && !profileModal.classList.contains('hidden')) {
+                closeProfile();
+            }
+        });
+
+        // ─── Renderizar Grid de Avatares ───
+        if (avatarGrid) {
+            const currentSelectedAvatar = localStorage.getItem('financeai_avatar') || AVATAR_OPTIONS[0];
+            avatarGrid.innerHTML = AVATAR_OPTIONS.map((url, idx) => `
+                <button type="button" data-avatar="${url}" class="avatar-option group relative aspect-square rounded-xl p-1 border-2 transition-all cursor-pointer ${url === currentSelectedAvatar ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/50 scale-105 ring-2 ring-blue-500/20' : 'border-gray-200 dark:border-gray-700 hover:border-blue-400 bg-white dark:bg-gray-800'}">
+                    <img src="${url}" alt="Avatar ${idx + 1}" class="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform" />
+                </button>
+            `).join('');
+
+            avatarGrid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.avatar-option');
+                if (!btn) return;
+                const newAvatar = btn.getAttribute('data-avatar');
+                if (!newAvatar) return;
+
+                localStorage.setItem('financeai_avatar', newAvatar);
+                if (navAvatarImg) navAvatarImg.src = newAvatar;
+                if (modalAvatarImg) modalAvatarImg.src = newAvatar;
+
+                avatarGrid.querySelectorAll('.avatar-option').forEach(b => {
+                    b.className = 'avatar-option group relative aspect-square rounded-xl p-1 border-2 transition-all cursor-pointer border-gray-200 dark:border-gray-700 hover:border-blue-400 bg-white dark:bg-gray-800';
+                });
+                btn.className = 'avatar-option group relative aspect-square rounded-xl p-1 border-2 transition-all cursor-pointer border-blue-600 bg-blue-50 dark:bg-blue-950/50 scale-105 ring-2 ring-blue-500/20';
+
+                if (window.showToast) window.showToast('Foto Actualizada', 'Tu avatar de perfil ha sido actualizado.', '🎨');
+            });
+        }
+
+        // ─── Cargar Catálogos & Perfil del Backend ───
+        async function loadCatalogsAndProfile() {
+            if (!token) return;
+            try {
+                const [countriesRes, currenciesRes, profileRes] = await Promise.all([
+                    fetch(`${API_URL}/api/v1/catalogos/paises`),
+                    fetch(`${API_URL}/api/v1/catalogos/monedas`),
+                    fetch(`${API_URL}/api/v1/users/profile`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                if (countriesRes.ok && countrySelect) {
+                    const countries = await countriesRes.json();
+                    countrySelect.innerHTML = countries.map(c => `<option value="${c.id || c.codigo}">${c.nombre} (${c.codigo})</option>`).join('');
+                }
+
+                if (currenciesRes.ok && currencySelect) {
+                    const currencies = await currenciesRes.json();
+                    currencySelect.innerHTML = currencies.map(m => `<option value="${m.codigo}">${m.nombre} (${m.codigo}) · ${m.simbolo}</option>`).join('');
+                }
+
+                if (profileRes.ok) {
+                    const prof = await profileRes.json();
+                    if (prof.nombre && modalUserName) modalUserName.textContent = prof.nombre;
+                    if (prof.email && modalUserEmail) modalUserEmail.textContent = prof.email;
+                    if (prof.paisId && countrySelect) countrySelect.value = prof.paisId;
+                    if (prof.monedaCodigo && currencySelect) {
+                        currencySelect.value = prof.monedaCodigo;
+                        activeCurrency = prof.monedaCodigo;
+                        if (navCurrencySelect) navCurrencySelect.value = activeCurrency;
+                    }
+                }
+            } catch (err) {
+                console.warn('No fue posible cargar preferencias del perfil:', err);
+            }
+        }
+
+        // ─── Guardar Perfil en Backend ───
+        profileForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!token) return;
+
+            const saveBtn = document.getElementById('btnSaveProfileSettings');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Guardando…';
+            }
+
+            try {
+                const payload = {
+                    paisId: Number(countrySelect?.value) || 1,
+                    monedaCodigo: currencySelect?.value || 'HNL'
+                };
+
+                const res = await fetch(`${API_URL}/api/v1/users/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    activeCurrency = payload.monedaCodigo;
+                    localStorage.setItem('financeai_preferred_currency', activeCurrency);
+                    if (navCurrencySelect) navCurrencySelect.value = activeCurrency;
+                    if (window.showToast) window.showToast('Preferencias Guardadas', 'Tu país y moneda han sido actualizados con éxito.', '✅');
+                    closeProfile();
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                if (window.showToast) window.showToast('Error', 'No fue posible guardar tus preferencias.', '⚠️');
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Guardar Cambios';
+                }
+            }
+        });
+
+        // ─── Exportar PDF desde Header ───
+        btnHeaderExportPdf?.addEventListener('click', async () => {
+            if (window.showToast) window.showToast('Generando Expediente', 'Procesando transacciones para tu PDF...', '📄');
+            try {
+                let transactions = [];
+                if (token) {
+                    const res = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const summary = await res.json();
+                        transactions = summary.transacciones || [];
+                    }
+                }
+                const name = modalUserName?.textContent || 'Usuario FinanceAI';
+                const email = modalUserEmail?.textContent || 'usuario@financeai.test';
+
+                if (typeof window.generateExpedientePDF === 'function') {
+                    window.generateExpedientePDF({
+                        userName: name,
+                        userEmail: email,
+                        currencyCode: activeCurrency,
+                        transactions
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                if (window.showToast) window.showToast('Error PDF', 'No se pudo generar el expediente.', '❌');
+            }
+        });
+
+        // ─── Logout ───
+        btnLogout?.addEventListener('click', () => {
+            localStorage.removeItem('financeai_token');
+            localStorage.removeItem('financeai_user');
+            window.location.replace('/login');
+        });
+
+        // ─── Eliminar Cuenta ───
+        btnOpenDeleteModal?.addEventListener('click', () => {
+            if (deleteModal) deleteModal.classList.remove('hidden');
+        });
+
+        btnCancelDelete?.addEventListener('click', () => {
+            if (deleteModal) deleteModal.classList.add('hidden');
+        });
+
+        btnConfirmDelete?.addEventListener('click', async () => {
+            if (!token) return;
+            btnConfirmDelete.disabled = true;
+            btnConfirmDelete.textContent = 'Eliminando…';
+
+            try {
+                const res = await fetch(`${API_URL}/api/v1/users/profile`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    localStorage.clear();
+                    window.location.replace('/login');
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                if (window.showToast) window.showToast('Error', 'No fue posible eliminar la cuenta.', '❌');
+                btnConfirmDelete.disabled = false;
+                btnConfirmDelete.textContent = 'Sí, eliminar definitivamente';
+            }
+        });
+    })();
 </script>

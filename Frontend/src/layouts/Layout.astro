@@ -5,15 +5,21 @@ import Header from '../components/Header.astro';
 interface Props {
 	title: string;
 	description?: string;
+	ogImage?: string;
+	canonicalURL?: string;
 }
 
 const {
 	title,
-	description = 'Gestiona tus finanzas, analiza tus hábitos y recibe recomendaciones personalizadas con FinanceAI.',
+	description = "FinanceAI — Plataforma inteligente de diagnóstico, optimización y salud financiera personal impulsada por IA explicable.",
+	ogImage = "/og-image.svg",
+	canonicalURL = Astro.url.href
 } = Astro.props;
+
+const siteOrigin = Astro.site ? Astro.site.toString().replace(/\/$/, '') : Astro.url.origin;
+const fullOgImageUrl = `${siteOrigin}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
 const pathname = new URL(Astro.request.url).pathname;
 const privateRoute = ['/dashboard', '/historial', '/reset-password'].includes(pathname);
-const publicUrl = `https://financeai-team77.duckdns.org${pathname}`;
 ---
 
 <!doctype html>
@@ -21,30 +27,49 @@ const publicUrl = `https://financeai-team77.duckdns.org${pathname}`;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="theme-color" content="#0f172a" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)" />
+		<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="format-detection" content="telephone=no" />
 		<meta name="robots" content={privateRoute ? 'noindex, nofollow' : 'index, follow'} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		{!privateRoute && <link rel="canonical" href={canonicalURL} />}
+
+		<!-- OpenGraph / Facebook / LinkedIn / WhatsApp -->
 		<meta property="og:type" content="website" />
 		<meta property="og:locale" content="es_HN" />
+		<meta property="og:url" content={canonicalURL} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
-		<meta property="og:url" content={publicUrl} />
-		<meta property="og:image" content="https://financeai-team77.duckdns.org/og-financeai.svg" />
+		<meta property="og:image" content={fullOgImageUrl} />
+
+		<!-- Twitter Card -->
 		<meta name="twitter:card" content="summary_large_image" />
-		{!privateRoute && <link rel="canonical" href={publicUrl} />}
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="twitter:url" content={canonicalURL} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={fullOgImageUrl} />
 
 		<!-- Ciberseguridad: Meta tags de protección OWASP en el cliente -->
-		<meta http-equiv="X-Content-Type-Options" content="nosniff" />
-		<meta http-equiv="X-Frame-Options" content="DENY" />
-		<meta http-equiv="X-XSS-Protection" content="1; mode=block" />
 		<meta name="referrer" content="strict-origin-when-cross-origin" />
-		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* http://127.0.0.1:* https:;" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* http://127.0.0.1:* https:;" />
 
-		<!-- Tipografía segura -->
+		<!-- Librerías de Exportación Corporativa (jsPDF & SheetJS XLSX) -->
+		<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+		<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+		<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+		<!-- Tipografía Josefin Sans & Inter -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Josefin+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
 		<title>{title}</title>
 
 		<!-- Prevenir salto de tema y sanitizar tema inicial -->
@@ -55,26 +80,212 @@ const publicUrl = `https://financeai-team77.duckdns.org${pathname}`;
 					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 					if (saved === 'dark' || (!saved && prefersDark)) {
 						document.documentElement.classList.add('dark');
+					} else if (saved === 'light') {
+						document.documentElement.classList.remove('dark');
 					}
-				} catch (e) {
-					console.warn('Proteccion de almacenamiento activada');
-				}
+				} catch (e) {}
 			})();
 		</script>
 	</head>
-	<body class="min-h-screen overflow-x-hidden bg-slate-50 font-sans text-gray-900 antialiased selection:bg-blue-600 selection:text-white dark:bg-gray-950 dark:text-gray-100 flex flex-col transition-colors duration-300">
+	<body class="bg-gray-50 dark:bg-gray-950 min-h-screen font-sans text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300 antialiased selection:bg-blue-600 selection:text-white">
+		<!-- Toast Notification Global con adaptación móvil -->
+		<div id="globalToast" class="fixed top-4 right-4 sm:top-5 sm:right-5 left-4 sm:left-auto z-[300] hidden max-w-sm w-auto sm:w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-blue-200 dark:border-blue-900/50 shadow-2xl rounded-2xl p-3.5 sm:p-4 transition-all duration-300 transform translate-y-[-20px] opacity-0 font-inter">
+			<div class="flex items-start gap-2.5 sm:gap-3">
+				<div id="globalToastIcon" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg sm:text-xl flex-shrink-0 border border-blue-100 dark:border-blue-900/40">
+					🔔
+				</div>
+				<div class="flex-1 pr-2">
+					<h4 id="globalToastTitle" class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white font-josefin">Notificación</h4>
+					<p id="globalToastMessage" class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed"></p>
+				</div>
+				<button id="btnGlobalCloseToast" class="text-gray-400 hover:text-gray-600 dark:hover:text-white text-lg font-bold cursor-pointer">&times;</button>
+			</div>
+		</div>
+
+		<script is:inline>
+			let toastTimeout = null;
+			window.showToast = function(title, message, icon = "🔔") {
+				const toast = document.getElementById('globalToast');
+				const toastTitle = document.getElementById('globalToastTitle');
+				const toastMessage = document.getElementById('globalToastMessage');
+				const toastIcon = document.getElementById('globalToastIcon');
+
+				if (!toast) return;
+				if (toastTimeout) clearTimeout(toastTimeout);
+
+				toastTitle.textContent = title;
+				toastMessage.textContent = message;
+				toastIcon.textContent = icon || "🔔";
+
+				toast.classList.remove('hidden');
+				setTimeout(() => {
+					toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+				}, 10);
+
+				toastTimeout = setTimeout(() => {
+					toast.classList.add('translate-y-[-20px]', 'opacity-0');
+					setTimeout(() => toast.classList.add('hidden'), 300);
+				}, 4500);
+			};
+
+			document.getElementById('btnGlobalCloseToast')?.addEventListener('click', () => {
+				const toast = document.getElementById('globalToast');
+				if (toast) {
+					toast.classList.add('translate-y-[-20px]', 'opacity-0');
+					setTimeout(() => toast.classList.add('hidden'), 300);
+				}
+			});
+		</script>
+
 		<Header />
-		<main class="flex-grow flex">
+
+		<main class="flex-grow flex flex-col">
 			<slot />
 		</main>
-		<footer class="border-t border-slate-200/80 bg-white/70 px-4 py-5 text-xs text-slate-500 backdrop-blur dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-400">
-			<div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
-				<p>© {new Date().getFullYear()} FinanceAI Team 77 · Orientación financiera, no asesoría profesional.</p>
-				<nav aria-label="Información legal" class="flex items-center gap-4 font-semibold">
-					<a href="/privacidad" class="hover:text-blue-600 dark:hover:text-blue-400">Privacidad</a>
-					<a href="/terminos" class="hover:text-blue-600 dark:hover:text-blue-400">Términos</a>
+
+		<!-- Footer Corporativo con Enlaces Legales Accesibles -->
+		<footer class="border-t border-slate-200/80 bg-white/80 dark:border-slate-800 dark:bg-slate-950/80 px-4 py-6 text-xs text-slate-500 backdrop-blur dark:text-slate-400 font-inter">
+			<div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+				<div>
+					<p class="font-medium">© {new Date().getFullYear()} FinanceAI · Plataforma de Salud e Inteligencia Financiera.</p>
+					<p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Orientación financiera algorítmica. No constituye asesoramiento de inversión regulado.</p>
+				</div>
+				<nav aria-label="Información legal" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-semibold">
+					<button type="button" class="btn-open-legal hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer" data-legal="terminos">Términos de Servicio</button>
+					<button type="button" class="btn-open-legal hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer" data-legal="privacidad">Aviso de Privacidad</button>
+					<button type="button" class="btn-open-no-sale hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer">Garantía No Venta (CCPA)</button>
+					<button type="button" class="btn-open-ai-ethics hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">IA Responsable</button>
+					<button type="button" class="btn-open-owasp hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">Seguridad OWASP</button>
 				</nav>
 			</div>
 		</footer>
+
+		<!-- Modal de Información Legal y Cumplimiento -->
+		<div id="legalModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-gray-900/70 backdrop-blur-md p-3 sm:p-4 font-inter animate-fade-in" role="dialog" aria-modal="true">
+			<div class="bg-white dark:bg-gray-900 max-w-2xl w-full rounded-3xl p-5 sm:p-7 shadow-2xl border border-gray-200 dark:border-gray-800 animate-scale-in max-h-[85vh] flex flex-col">
+				<div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+					<h3 id="legalModalTitle" class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white font-josefin">Información Legal</h3>
+					<button type="button" id="btnCloseLegalModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-white text-2xl font-bold p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer">&times;</button>
+				</div>
+				<div id="legalModalBody" class="py-4 overflow-y-auto flex-1 text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-3 leading-relaxed">
+					<!-- Dinámico -->
+				</div>
+				<div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+					<a id="legalModalFullLink" href="/terminos" class="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline">Ver documento completo &rarr;</a>
+					<button type="button" id="btnDismissLegalModal" class="px-4 py-2 text-xs font-bold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition cursor-pointer">Entendido</button>
+				</div>
+			</div>
+		</div>
+
+		<script is:inline>
+			(function() {
+				const modal = document.getElementById('legalModal');
+				const title = document.getElementById('legalModalTitle');
+				const body = document.getElementById('legalModalBody');
+				const fullLink = document.getElementById('legalModalFullLink');
+				const btnClose = document.getElementById('btnCloseLegalModal');
+				const btnDismiss = document.getElementById('btnDismissLegalModal');
+
+				const legalContents = {
+					terminos: {
+						title: "Términos de Servicio & Cumplimiento",
+						url: "/terminos",
+						html: `
+							<p><strong>Uso del Servicio:</strong> FinanceAI es una herramienta interactiva diseñada para la organización y diagnóstico de hábitos financieros mediante algoritmos de inteligencia artificial explicable (XAI).</p>
+							<p><strong>No es Asesoría de Inversión:</strong> Los cálculos y sugerencias emitidos por la plataforma constituyen directrices educativas y de control de presupuestos personales, no recomendaciones formales de inversión financiera.</p>
+							<p><strong>Privacidad de tus Registros:</strong> Todas tus transacciones e historial se gestionan con cifrado y autenticación segura.</p>
+						`
+					},
+					privacidad: {
+						title: "Aviso de Privacidad y Derechos ARCO",
+						url: "/privacidad",
+						html: `
+							<p><strong>Consentimiento Expreso:</strong> Al registrarte, consientes expresamente el tratamiento de tus datos financieros bajo cifrado y estándares de alta seguridad.</p>
+							<p><strong>Cero Venta de Datos:</strong> NUNCA vendemos, alquilamos ni transferimos tus datos a terceros ni agencias de publicidad comercial.</p>
+							<p><strong>Derechos ARCO:</strong> Puedes ejercer en cualquier momento tus derechos de Acceso, Rectificación, Cancelación y Oposición directamente desde el panel de perfil.</p>
+						`
+					},
+					nosell: {
+						title: "Garantía de Cero Venta de Datos (CCPA / CPRA)",
+						url: "/privacidad",
+						html: `
+							<div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-900 dark:text-emerald-200 font-semibold mb-2">
+								Do Not Sell or Share My Personal Information
+							</div>
+							<p>En cumplimiento con la <a href="https://oag.ca.gov/privacy/ccpa" target="_blank" rel="noopener noreferrer" class="underline font-semibold">California Consumer Privacy Act (CCPA / CPRA)</a> y las regulaciones aplicables en Latinoamérica, FinanceAI garantiza que:</p>
+							<ul class="list-disc pl-5 space-y-1">
+								<li>No comercializamos tus datos con intermediarios ni corredores de datos (<em>data brokers</em>).</li>
+								<li>No compartimos tu información transaccional con redes de publicidad programática ni aseguradoras.</li>
+								<li>Tus datos financieros son tratados con la más alta categoría de Sensibilidad (<em>Sensitive Personal Information</em>).</li>
+							</ul>
+						`
+					},
+					ai: {
+						title: "Transparencia y Gobernanza de Inteligencia Artificial",
+						url: "/terminos",
+						html: `
+							<p><strong>1. Diagnósticos con IA Explicable (XAI):</strong> El análisis de salud financiera procesa 3 pilares clave (relación Gasto/Ingreso, Tasa de Ahorro y Nivel de Endeudamiento) garantizando total neutralidad de divisa, transparencia e interpretabilidad.</p>
+							<p><strong>2. Desarrollo Asistido por IA con Supervisión Humana:</strong> Bajo los marcos éticos <a href="https://www.iso.org/standard/81230.html" target="_blank" rel="noopener noreferrer" class="underline font-semibold">ISO/IEC 42001</a> y <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer" class="underline font-semibold">NIST AI RMF</a>, las herramientas de IA empleadas en la plataforma han sido supervisadas y auditadas para garantizar precisión y robustez.</p>
+							<p><strong>3. Explicabilidad Directa:</strong> Cada diagnóstico que emite el sistema te explica con palabras simples la causa de tu puntaje y los pasos prácticos para optimizar tus finanzas.</p>
+						`
+					},
+					owasp: {
+						title: "Evidencias Técnicas de Seguridad OWASP Top 10",
+						url: "/terminos",
+						html: `
+							<p class="mb-2">FinanceAI implementa controles verificables en su código fuente alineados con los estándares de seguridad:</p>
+							<ul class="list-disc pl-5 space-y-1 text-xs">
+								<li><strong>A01 Control de Acceso:</strong> Autenticación Stateless JWT por petición y aislamiento estricto por usuario.</li>
+								<li><strong>A02 Fallas Criptográficas:</strong> Cifrado de contraseñas con BCrypt y firmas seguras HMAC-SHA256.</li>
+								<li><strong>A03 Inyección (SQL & CLI):</strong> Zero SQLi mediante JPA Prepared Statements y consultas parametrizadas.</li>
+								<li><strong>A04 Diseño Seguro:</strong> Validación estricta de políticas de contraseñas y sanitización de inputs.</li>
+								<li><strong>A05 Configuración Segura:</strong> Variables sensibles centralizadas fuera del control de versiones.</li>
+								<li><strong>A06 Componentes Seguros:</strong> Stack sobre versiones estables (Java 17 LTS, Spring Boot 3, Astro 5).</li>
+								<li><strong>A07 Identificación y Autenticación:</strong> Sesiones seguras protegidas contra secuestro de tokens.</li>
+								<li><strong>A08 Integridad de Software y Datos:</strong> Validación de esquemas y rechazo <code>HTTP 400 Bad Request</code> ante tipos de datos maliciosos.</li>
+								<li><strong>A09 Registro y Monitoreo:</strong> Endpoint de disponibilidad <code>/health</code> y trazabilidad en base de datos.</li>
+								<li><strong>A10 Protección SSRF:</strong> Arquitectura de red cerrada sin consumo arbitrario de URLs externas.</li>
+							</ul>
+						`
+					}
+				};
+
+				window.openLegalModal = function(type) {
+					const data = legalContents[type] || legalContents.terminos;
+					if (title) title.textContent = data.title;
+					if (body) body.innerHTML = data.html;
+					if (fullLink) {
+						fullLink.href = data.url;
+						fullLink.textContent = `Ver documento completo en ${data.url} \u2192`;
+					}
+					if (modal) modal.classList.remove('hidden');
+				};
+
+				window.closeLegalModal = function() {
+					if (modal) modal.classList.add('hidden');
+				};
+
+				btnClose?.addEventListener('click', window.closeLegalModal);
+				btnDismiss?.addEventListener('click', window.closeLegalModal);
+				modal?.addEventListener('click', (e) => {
+					if (e.target === modal) window.closeLegalModal();
+				});
+
+				document.addEventListener('click', (e) => {
+					const target = e.target;
+					if (target && target.closest('.btn-open-legal')) {
+						const btn = target.closest('.btn-open-legal');
+						const type = btn.getAttribute('data-legal') || 'terminos';
+						window.openLegalModal(type);
+					} else if (target && target.closest('.btn-open-no-sale')) {
+						window.openLegalModal('nosell');
+					} else if (target && target.closest('.btn-open-ai-ethics')) {
+						window.openLegalModal('ai');
+					} else if (target && target.closest('.btn-open-owasp')) {
+						window.openLegalModal('owasp');
+					}
+				});
+			})();
+		</script>
 	</body>
 </html>
