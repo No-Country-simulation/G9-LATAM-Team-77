@@ -5,6 +5,7 @@ import { getSession } from 'auth-astro/server';
 
 const session = await getSession(Astro.request);
 const hasServerSession = !!session;
+const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
 ---
 
 <Layout title="Dashboard de Análisis | FinanceAI" description="Panel principal de análisis de salud financiera con IA explicable (Motor DS-08), cálculo de ratios adimensionales y simulador presupuestal.">
@@ -24,15 +25,15 @@ const hasServerSession = !!session;
         
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-200 dark:border-gray-800 pb-4">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-josefin">
-                    Dashboard de Análisis
+            <div class="space-y-0.5 sm:space-y-1">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-josefin leading-snug">
+                    <span>Bienvenido, </span><span id="dashboardUserNameHeader" class="text-blue-600 dark:text-blue-400 font-extrabold">{initialUserName ? initialUserName.replace(/^,\s*/, '') : 'Usuario'}</span>
                 </h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-inter">
                     Evaluación inteligente con IA.
                 </p>
             </div>
-            <div id="currencyBadge" class="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-300">
+            <div id="currencyBadge" class="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-300 self-start sm:self-auto">
                 <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -62,10 +63,10 @@ const hasServerSession = !!session;
                             Periodicidad
                         </label>
                         <select id="selectPeriodicity" class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="mensual" selected>Mensual (Mes)</option>
-                            <option value="quincenal">Quincenal (15 Días)</option>
-                            <option value="semanal">Semanal (7 Días)</option>
-                            <option value="diario">Diario (1 Día)</option>
+                            <option value="mensual" selected>Mensual</option>
+                            <option value="quincenal">Quincenal</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="diario">Diario</option>
                         </select>
                     </div>
 
@@ -195,9 +196,8 @@ const hasServerSession = !!session;
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                 </svg>
                             </div>
-                            <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Consejos y Recomendaciones de IA</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Consejos y Recomendaciones</h3>
                         </div>
-                        <span class="text-[10px] sm:text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-800/60">Motor DS-08: IA Explicable (XAI)</span>
                     </div>
 
                     <!-- 3 Capas de Explicabilidad -->
@@ -263,7 +263,7 @@ const hasServerSession = !!session;
                                 Aviso Legal y Descargo de Responsabilidad Financiera
                             </h4>
                             <p class="text-[11px] text-amber-800/90 dark:text-amber-300/80 leading-relaxed font-normal">
-                                FinanceAI es una plataforma analítica y educativa basada en algoritmos de Machine Learning explicable (Regla 50/30/20). Las puntuaciones de salud financiera, diagnósticos automáticos y recomendaciones <strong>no constituyen asesoría financiera personalizada, legal, contable ni de inversiones</strong>. Los resultados se fundamentan en las transacciones ingresadas por el usuario. Consulta a un asesor certificado antes de tomar decisiones patrimoniales críticas.
+                                FinanceAI es una plataforma analítica y educativa basada en algoritmos de Machine Learning explicable (Regla 50/30/20). Las puntuaciones de salud financiera, diagnósticos automáticos y recomendaciones <strong>no constituyen asesoría financiera personalizada, legal, contable ni de inversiones</strong>. Los resultados se fundamentan en las transacciones ingresadas por el usuario. Consulta a un asesor certificado antes de tomar decisiones financieras.
                             </p>
                         </div>
                     </div>
@@ -341,12 +341,33 @@ const hasServerSession = !!session;
         }).catch(err => console.error("Error en sincronizacion con Google:", err));
     }
 
+    // Sincronizar nombre de usuario en el encabezado de bienvenida
+    function setGreetingName() {
+        const nameHeader = document.getElementById('dashboardUserNameHeader');
+        if (!nameHeader) return;
+        try {
+            const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+            const fullName = cachedUser.nombre ? `${cachedUser.nombre} ${cachedUser.apellido || ''}`.trim() : (cachedUser.name || '');
+            if (fullName) {
+                nameHeader.textContent = fullName;
+            }
+        } catch (_) {}
+    }
+    setGreetingName();
+
     // Verificar perfil para pais/moneda
     const currentToken = localStorage.getItem('financeai_token');
     if (currentToken) {
         fetch(`${API_URL}/api/v1/users/profile`, {
             headers: { 'Authorization': `Bearer ${currentToken}` }
         }).then(res => res.json()).then(user => {
+            if (user) {
+                const fullName = user.nombre ? `${user.nombre} ${user.apellido || ''}`.trim() : (user.name || '');
+                const nameHeader = document.getElementById('dashboardUserNameHeader');
+                if (nameHeader && fullName) {
+                    nameHeader.textContent = fullName;
+                }
+            }
             if (!user.paisId || !user.monedaId) {
                 document.getElementById('completeProfileModal')?.classList.remove('hidden');
                 

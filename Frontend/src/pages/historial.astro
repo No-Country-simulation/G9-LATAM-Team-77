@@ -255,7 +255,7 @@ const OFFICIAL_RATES_TABLE = [
             </div>
 
             <!-- Canvas de la Gráfica de Picos -->
-            <div class="h-60 sm:h-72 w-full relative">
+            <div class="h-64 sm:h-72 lg:h-80 w-full relative">
                 <canvas id="multiLinePeaksChart"></canvas>
             </div>
         </section>
@@ -324,12 +324,25 @@ const OFFICIAL_RATES_TABLE = [
     </div>
 </Layout>
 
+<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
 <script>
     import Chart from 'chart.js/auto';
-    (window as any).Chart = Chart;
+    if (typeof (window as any).Chart === 'undefined') {
+        (window as any).Chart = Chart;
+    }
 </script>
 
 <script define:vars={{ API_URL }}>
+    function getChartLib() {
+        if (typeof window !== 'undefined' && window.Chart) {
+            return window.Chart;
+        }
+        if (typeof Chart !== 'undefined') {
+            return Chart;
+        }
+        return null;
+    }
     // Moneda base predeterminada en perfil
     const profileBaseCurrency = (localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
     let currentViewingCurrency = profileBaseCurrency;
@@ -744,6 +757,12 @@ const OFFICIAL_RATES_TABLE = [
         const ctx = document.getElementById('multiLinePeaksChart')?.getContext('2d');
         if (!ctx) return;
 
+        const ChartLib = getChartLib();
+        if (!ChartLib) {
+            setTimeout(renderMultiLinePeaksChart, 100);
+            return;
+        }
+
         if (multiLineChartInstance) multiLineChartInstance.destroy();
 
         const grouped = {};
@@ -776,7 +795,8 @@ const OFFICIAL_RATES_TABLE = [
         const dataNecesidades = labels.map(l => grouped[l].necesidades);
         const dataDeseos = labels.map(l => grouped[l].deseos);
 
-        multiLineChartInstance = new Chart(ctx, {
+        const isMobile = window.innerWidth < 640;
+        multiLineChartInstance = new ChartLib(ctx, {
             type: 'line',
             data: {
                 labels: labels.length > 0 ? labels : ['Sin datos'],
@@ -786,12 +806,12 @@ const OFFICIAL_RATES_TABLE = [
                         data: dataTotalGastos.length > 0 ? dataTotalGastos : [0],
                         borderColor: LINE_COLORS.total,
                         backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                        borderWidth: 3,
+                        borderWidth: isMobile ? 2 : 3,
                         pointBackgroundColor: LINE_COLORS.total,
                         pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
+                        pointBorderWidth: 1.5,
+                        pointRadius: isMobile ? 3 : 5,
+                        pointHoverRadius: isMobile ? 5 : 7,
                         tension: 0.35,
                         fill: false
                     },
@@ -799,13 +819,13 @@ const OFFICIAL_RATES_TABLE = [
                         label: `Ingresos (${currentViewingCurrency})`,
                         data: dataIngresos.length > 0 ? dataIngresos : [0],
                         borderColor: LINE_COLORS.ingresos,
-                        borderWidth: 2.5,
+                        borderWidth: isMobile ? 2 : 2.5,
                         borderDash: [4, 4],
                         pointBackgroundColor: LINE_COLORS.ingresos,
                         pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
+                        pointBorderWidth: 1.5,
+                        pointRadius: isMobile ? 3 : 4.5,
+                        pointHoverRadius: isMobile ? 5 : 6.5,
                         tension: 0.25,
                         fill: false
                     },
@@ -813,11 +833,11 @@ const OFFICIAL_RATES_TABLE = [
                         label: `Necesidades Básicas (${currentViewingCurrency})`,
                         data: dataNecesidades.length > 0 ? dataNecesidades : [0],
                         borderColor: LINE_COLORS.necesidades,
-                        borderWidth: 2,
+                        borderWidth: 1.75,
                         pointBackgroundColor: LINE_COLORS.necesidades,
                         pointBorderColor: '#ffffff',
                         pointBorderWidth: 1.5,
-                        pointRadius: 4,
+                        pointRadius: isMobile ? 2.5 : 4,
                         tension: 0.3,
                         fill: false
                     },
@@ -825,11 +845,11 @@ const OFFICIAL_RATES_TABLE = [
                         label: `Estilo de Vida (${currentViewingCurrency})`,
                         data: dataDeseos.length > 0 ? dataDeseos : [0],
                         borderColor: LINE_COLORS.deseos,
-                        borderWidth: 2,
+                        borderWidth: 1.75,
                         pointBackgroundColor: LINE_COLORS.deseos,
                         pointBorderColor: '#ffffff',
                         pointBorderWidth: 1.5,
-                        pointRadius: 4,
+                        pointRadius: isMobile ? 2.5 : 4,
                         tension: 0.3,
                         fill: false
                     }
@@ -843,8 +863,10 @@ const OFFICIAL_RATES_TABLE = [
                     legend: {
                         position: 'top',
                         labels: {
-                            font: { family: 'Josefin Sans', size: 11 },
-                            padding: 15
+                            font: { family: 'Josefin Sans', size: isMobile ? 10 : 11 },
+                            boxWidth: isMobile ? 10 : 14,
+                            boxHeight: isMobile ? 8 : 10,
+                            padding: isMobile ? 8 : 14
                         }
                     },
                     tooltip: {
@@ -857,13 +879,19 @@ const OFFICIAL_RATES_TABLE = [
                 scales: {
                     x: {
                         grid: { display: false },
-                        ticks: { font: { family: 'Inter', size: 10 } }
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: isMobile ? 5 : 10,
+                            maxRotation: 35,
+                            minRotation: 0,
+                            font: { family: 'Inter', size: isMobile ? 9 : 10 }
+                        }
                     },
                     y: {
                         grace: '15%',
                         grid: { color: 'rgba(156, 163, 175, 0.1)' },
                         ticks: {
-                            font: { family: 'Inter', size: 10 },
+                            font: { family: 'Inter', size: isMobile ? 9 : 10 },
                             callback: v => currentViewingCurrency + ' ' + Number(v).toLocaleString('es-MX')
                         }
                     }
@@ -876,6 +904,12 @@ const OFFICIAL_RATES_TABLE = [
     function renderCategoryDonut() {
         const ctx = document.getElementById('categoryDonutChart')?.getContext('2d');
         if (!ctx) return;
+
+        const ChartLib = getChartLib();
+        if (!ChartLib) {
+            setTimeout(renderCategoryDonut, 100);
+            return;
+        }
 
         if (categoryDonutInstance) categoryDonutInstance.destroy();
 
@@ -892,7 +926,7 @@ const OFFICIAL_RATES_TABLE = [
         const data = Object.values(catTotals);
         const palette = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#64748B'];
 
-        categoryDonutInstance = new Chart(ctx, {
+        categoryDonutInstance = new ChartLib(ctx, {
             type: 'doughnut',
             data: {
                 labels: labels.length > 0 ? labels : ['Sin gastos'],
