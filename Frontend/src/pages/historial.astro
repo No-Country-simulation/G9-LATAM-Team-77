@@ -3,418 +3,301 @@ import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
 ---
 
-<Layout title="Historial de análisis | FinanceAI">
-    <main class="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6 md:p-8">
-        <header class="ui-enter relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 px-6 py-7 text-white shadow-xl shadow-blue-950/15 sm:px-8 sm:py-9">
-            <div aria-hidden="true" class="absolute -right-20 -top-24 h-72 w-72 rounded-full border border-white/10 bg-blue-400/10 blur-2xl"></div>
-            <div class="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                <div>
-                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-200">Memoria financiera</p>
-                <h1 class="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                    Historial de análisis
+<Layout title="Historial de Análisis | FinanceAI" description="Consulta tu registro histórico de evaluaciones de salud financiera almacenadas por FinanceAI.">
+    <!-- Guardia de Protección de Ruta Seguro -->
+    <script is:inline>
+        if (!localStorage.getItem('financeai_token')) {
+            window.location.replace('/login');
+        }
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted && !localStorage.getItem('financeai_token')) {
+                window.location.replace('/login');
+            }
+        });
+    </script>
+
+    <div class="w-full max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8 flex flex-col gap-5 font-inter">
+
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-200 dark:border-gray-800 pb-4">
+            <div>
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-josefin">
+                    Historial de Evaluaciones
                 </h1>
-                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-blue-100/80">
-                    Consulta los resultados generados con tu cuenta, del más reciente al más antiguo.
+                <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-inter">
+                    Registro real de análisis de salud financiera asociados a tu cuenta.
                 </p>
             </div>
-            <a
-                href="/dashboard"
-                class="inline-flex w-fit items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-xs font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/15"
-            >
-                <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                Nuevo análisis
-            </a>
+            <div class="flex items-center gap-2">
+                <button type="button" id="btnExportHistorialCsv" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Exportar CSV
+                </button>
+                <a href="/dashboard" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition">
+                    &larr; Volver al Dashboard
+                </a>
             </div>
-        </header>
+        </div>
 
-        <section id="filterBar" class="ui-enter ui-enter-delay-1 surface-card hidden rounded-2xl p-4 sm:p-5" aria-label="Filtros del historial">
-            <div class="grid gap-3 md:grid-cols-[1fr_15rem_auto] md:items-end">
-                <label class="text-xs font-bold text-slate-600 dark:text-slate-300">
-                    Buscar en tus análisis
-                    <span class="relative mt-1.5 block">
-                        <svg aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" /></svg>
-                        <input id="historySearch" type="search" placeholder="Perfil, categoría o recomendación" class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
-                    </span>
-                </label>
-                <label class="text-xs font-bold text-slate-600 dark:text-slate-300">
-                    Perfil financiero
-                    <select id="historyProfileFilter" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                        <option value="">Todos los perfiles</option>
-                    </select>
-                </label>
-                <div class="grid grid-cols-2 gap-2 md:grid-cols-1">
-                    <button id="exportHistory" type="button" class="rounded-xl bg-slate-950 px-4 py-2.5 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500">Exportar CSV</button>
-                    <button id="resetHistoryFilters" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-900 dark:hover:bg-blue-950/40 dark:hover:text-blue-300">Limpiar filtros</button>
-                </div>
+        <!-- Metric Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Total de Evaluaciones</p>
+                <p id="totalEvaluacionesCount" class="text-2xl font-black text-gray-900 dark:text-white font-mono mt-1">0</p>
             </div>
-        </section>
-
-        <section
-            id="loadingState"
-            aria-live="polite"
-            class="surface-card ui-enter ui-enter-delay-1 rounded-2xl p-10 text-center"
-        >
-            <div class="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600 dark:border-blue-950 dark:border-t-blue-400"></div>
-            <p class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">Cargando tu historial...</p>
-        </section>
-
-        <section
-            id="emptyState"
-            class="surface-card hidden rounded-2xl border-dashed p-10 text-center"
-        >
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Aún no tienes análisis guardados</h2>
-            <p class="mx-auto mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
-                Ejecuta tu primer análisis financiero desde el dashboard y aparecerá aquí automáticamente.
-            </p>
-        </section>
-
-        <section id="filteredEmptyState" class="surface-card hidden rounded-2xl border-dashed p-10 text-center">
-            <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300">
-                <svg aria-hidden="true" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2l-7 8v5l-4 2v-7L3 6V4z" /></svg>
+            <div class="p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Salud Financiera Promedio</p>
+                <p id="promedioSaludScore" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-1">--</p>
             </div>
-            <h2 class="mt-4 text-lg font-bold text-gray-900 dark:text-white">No encontramos coincidencias</h2>
-            <p class="mx-auto mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">Prueba con otro perfil, categoría o palabra clave.</p>
-        </section>
-
-        <section
-            id="errorState"
-            role="alert"
-            class="hidden rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800 dark:border-red-900 dark:bg-red-950/50 dark:text-red-200"
-        >
-            <h2 class="font-bold">No pudimos cargar el historial</h2>
-            <p id="errorMessage" class="mt-1 text-sm"></p>
-            <button
-                id="retryButton"
-                type="button"
-                class="mt-4 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
-            >
-                Reintentar
-            </button>
-        </section>
-
-        <section id="historySection" class="hidden" aria-labelledby="historyTitle">
-            <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <h2 id="historyTitle" class="text-lg font-bold text-gray-900 dark:text-white">Tus resultados</h2>
-                <span id="historyCount" class="text-xs font-semibold text-gray-500 dark:text-gray-400"></span>
+            <div class="p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Último Estado Registrado</p>
+                <p id="ultimoEstadoBadge" class="text-sm font-bold text-blue-600 dark:text-blue-400 mt-2">Sin registros</p>
             </div>
-            <div id="historyList" class="grid grid-cols-1 gap-5"></div>
-        </section>
-    </main>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+            <div class="relative flex-1 max-w-md">
+                <input type="text" id="searchInput" placeholder="Buscar por perfil o notas…" class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white" />
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5 sm:top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <div class="flex items-center gap-2">
+                <select id="filterPerfil" class="px-3 py-2 text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-700 dark:text-gray-300 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <option value="ALL">Todos los perfiles</option>
+                    <option value="Excelente">Excelente / Saludable</option>
+                    <option value="Moderado">Moderado</option>
+                    <option value="Riesgo">En riesgo / Crítico</option>
+                </select>
+                <button id="btnReloadHistory" type="button" class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl transition cursor-pointer" title="Recargar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs sm:text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-100 dark:border-gray-800 text-[11px] uppercase font-bold text-gray-500 dark:text-gray-400">
+                        <tr>
+                            <th class="px-4 py-3">Fecha y Hora</th>
+                            <th class="px-4 py-3">Ingreso Base</th>
+                            <th class="px-4 py-3">Total Gastos</th>
+                            <th class="px-4 py-3">Ahorro Estimado</th>
+                            <th class="px-4 py-3">Endeudamiento</th>
+                            <th class="px-4 py-3 text-center">Salud Financiera</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                    <span>Cargando historial de evaluaciones…</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 </Layout>
 
 <script define:vars={{ API_URL }}>
-    const AUTH_STORAGE_KEY = 'financeai_token';
+    (function () {
+        const token = localStorage.getItem('financeai_token');
+        let historyData = [];
+        let activeCurrency = 'HNL';
+        let activeCurrencySymbol = 'L';
 
-    const loadingState = document.getElementById('loadingState');
-    const emptyState = document.getElementById('emptyState');
-    const errorState = document.getElementById('errorState');
-    const errorMessage = document.getElementById('errorMessage');
-    const historySection = document.getElementById('historySection');
-    const historyList = document.getElementById('historyList');
-    const historyCount = document.getElementById('historyCount');
-    const retryButton = document.getElementById('retryButton');
-    const filterBar = document.getElementById('filterBar');
-    const searchInput = document.getElementById('historySearch');
-    const profileFilter = document.getElementById('historyProfileFilter');
-    const resetFilters = document.getElementById('resetHistoryFilters');
-    const exportHistory = document.getElementById('exportHistory');
-    const filteredEmptyState = document.getElementById('filteredEmptyState');
-    let loadedHistory = [];
+        const tableBody = document.getElementById('historyTableBody');
+        const countDisplay = document.getElementById('totalEvaluacionesCount');
+        const avgDisplay = document.getElementById('promedioSaludScore');
+        const lastStatusDisplay = document.getElementById('ultimoEstadoBadge');
+        const searchInput = document.getElementById('searchInput');
+        const filterPerfil = document.getElementById('filterPerfil');
+        const btnReload = document.getElementById('btnReloadHistory');
+        const btnExportCsv = document.getElementById('btnExportHistorialCsv');
 
-    const numberFormatter = new Intl.NumberFormat('es-HN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
-
-    function setVisible(element, visible) {
-        element?.classList.toggle('hidden', !visible);
-    }
-
-    function formatAmount(value) {
-        const number = Number(value);
-        return Number.isFinite(number) ? numberFormatter.format(number) : '—';
-    }
-
-    function formatProbability(value) {
-        const number = Number(value);
-        return Number.isFinite(number) ? `${Math.round(number * 100)}%` : '—';
-    }
-
-    function formatDate(value) {
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return 'Fecha no disponible';
-        return new Intl.DateTimeFormat('es-HN', {
-            dateStyle: 'long',
-            timeStyle: 'short',
-        }).format(date);
-    }
-
-    function metric(label, value, tone) {
-        const wrapper = document.createElement('div');
-        wrapper.className = `metric-tile soft-lift rounded-2xl border p-3.5 ${tone}`;
-
-        const labelElement = document.createElement('p');
-        labelElement.className = 'text-[10px] font-bold uppercase tracking-wider opacity-70';
-        labelElement.textContent = label;
-
-        const valueElement = document.createElement('p');
-        valueElement.className = 'mt-1 text-base font-extrabold';
-        valueElement.textContent = value;
-
-        wrapper.append(labelElement, valueElement);
-        return wrapper;
-    }
-
-    function renderSummary(container, summary) {
-        const entries = summary && typeof summary === 'object' && !Array.isArray(summary)
-            ? Object.entries(summary)
-            : [];
-
-        if (entries.length === 0) {
-            const message = document.createElement('p');
-            message.className = 'text-sm text-gray-500 dark:text-gray-400';
-            message.textContent = 'No hay desglose de gastos disponible.';
-            container.appendChild(message);
-            return;
-        }
-
-        entries.forEach(([category, amount]) => {
-            const row = document.createElement('div');
-            row.className = 'flex items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2.5 text-sm dark:border-slate-800 dark:bg-slate-950/40';
-
-            const categoryElement = document.createElement('span');
-            categoryElement.className = 'font-medium text-gray-700 dark:text-gray-200';
-            categoryElement.textContent = category;
-
-            const amountElement = document.createElement('span');
-            amountElement.className = 'font-bold text-gray-900 dark:text-white';
-            amountElement.textContent = formatAmount(amount);
-
-            row.append(categoryElement, amountElement);
-            container.appendChild(row);
-        });
-    }
-
-    function renderRecommendations(container, recommendations) {
-        if (!Array.isArray(recommendations) || recommendations.length === 0) {
-            const message = document.createElement('p');
-            message.className = 'text-sm text-gray-500 dark:text-gray-400';
-            message.textContent = 'Este análisis no incluye recomendaciones.';
-            container.appendChild(message);
-            return;
-        }
-
-        recommendations.forEach((recommendation) => {
-            const item = document.createElement('li');
-            item.className = 'rounded-xl border border-blue-100 bg-blue-50/70 px-3.5 py-3 text-sm leading-relaxed text-blue-950 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-100';
-            item.textContent = String(recommendation);
-            container.appendChild(item);
-        });
-    }
-
-    function createHistoryCard(item) {
-        const article = document.createElement('article');
-        article.className = 'surface-card soft-lift ui-enter rounded-3xl p-5 md:p-6';
-
-        const header = document.createElement('div');
-        header.className = 'flex flex-col gap-3 border-b border-gray-100 pb-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between';
-
-        const titleGroup = document.createElement('div');
-        const title = document.createElement('h3');
-        title.className = 'text-xl font-extrabold text-gray-900 dark:text-white';
-        title.textContent = item.perfilFinanciero || 'Perfil no disponible';
-        const date = document.createElement('p');
-        date.className = 'mt-1 text-xs text-gray-500 dark:text-gray-400';
-        date.textContent = formatDate(item.fechaHora);
-        titleGroup.append(title, date);
-
-        const probability = document.createElement('span');
-        probability.className = 'w-fit rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300';
-        probability.textContent = `Confianza ${formatProbability(item.probabilidad)}`;
-        header.append(titleGroup, probability);
-
-        const metrics = document.createElement('div');
-        metrics.className = 'mt-5 grid grid-cols-2 gap-3 lg:grid-cols-5';
-        metrics.append(
-            metric('Ingreso mensual', formatAmount(item.ingresoMensual), 'border-blue-100 bg-blue-50 text-blue-800 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200'),
-            metric('Total gastos', formatAmount(item.totalGastos), 'border-red-100 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200'),
-            metric('Ahorro estimado', formatAmount(item.ahorroEstimado), 'border-emerald-100 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200'),
-            metric('Endeudamiento', `${formatAmount(item.nivelEndeudamiento)}%`, 'border-amber-100 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200'),
-            metric('Frecuencia ahorro', item.frecuenciaAhorro || '—', 'border-purple-100 bg-purple-50 text-purple-800 dark:border-purple-900 dark:bg-purple-950/40 dark:text-purple-200')
-        );
-
-        const details = document.createElement('div');
-        details.className = 'mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2';
-
-        const summarySection = document.createElement('section');
-        const summaryTitle = document.createElement('h4');
-        summaryTitle.className = 'mb-3 text-sm font-bold text-gray-900 dark:text-white';
-        summaryTitle.textContent = 'Resumen de gastos';
-        const summaryList = document.createElement('div');
-        summaryList.className = 'space-y-2';
-        renderSummary(summaryList, item.resumenGastos);
-        summarySection.append(summaryTitle, summaryList);
-
-        const recommendationsSection = document.createElement('section');
-        const recommendationsTitle = document.createElement('h4');
-        recommendationsTitle.className = 'mb-3 text-sm font-bold text-gray-900 dark:text-white';
-        recommendationsTitle.textContent = 'Recomendaciones';
-        const recommendationsList = document.createElement('ul');
-        recommendationsList.className = 'space-y-2';
-        renderRecommendations(recommendationsList, item.recomendaciones);
-        recommendationsSection.append(recommendationsTitle, recommendationsList);
-
-        details.append(summarySection, recommendationsSection);
-        article.append(header, metrics, details);
-        return article;
-    }
-
-    function updateProfileOptions(history) {
-        if (!profileFilter) return;
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Todos los perfiles';
-        const profiles = [...new Set(history
-            .map((item) => String(item.perfilFinanciero || '').trim())
-            .filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b, 'es'));
-        const options = profiles.map((profile) => {
-            const option = document.createElement('option');
-            option.value = profile;
-            option.textContent = profile;
-            return option;
-        });
-        profileFilter.replaceChildren(defaultOption, ...options);
-    }
-
-    function matchesSearch(item, query) {
-        if (!query) return true;
-        const categories = item.resumenGastos && typeof item.resumenGastos === 'object'
-            ? Object.keys(item.resumenGastos)
-            : [];
-        const recommendations = Array.isArray(item.recomendaciones) ? item.recomendaciones : [];
-        return [item.perfilFinanciero, item.frecuenciaAhorro, ...categories, ...recommendations]
-            .join(' ')
-            .toLocaleLowerCase('es')
-            .includes(query);
-    }
-
-    function getFilteredHistory() {
-        const query = String(searchInput?.value || '').trim().toLocaleLowerCase('es');
-        const selectedProfile = String(profileFilter?.value || '');
-        return loadedHistory.filter((item) =>
-            (!selectedProfile || item.perfilFinanciero === selectedProfile) && matchesSearch(item, query)
-        );
-    }
-
-    function renderFilteredHistory() {
-        const filtered = getFilteredHistory();
-
-        setVisible(filteredEmptyState, filtered.length === 0);
-        setVisible(historySection, filtered.length > 0);
-        if (filtered.length === 0) return;
-
-        historyList?.replaceChildren(...filtered.map(createHistoryCard));
-        if (historyCount) {
-            historyCount.textContent = filtered.length === loadedHistory.length
-                ? `${loadedHistory.length} análisis guardado${loadedHistory.length === 1 ? '' : 's'}`
-                : `${filtered.length} de ${loadedHistory.length} análisis`;
-        }
-    }
-
-    function showError(message) {
-        setVisible(loadingState, false);
-        setVisible(emptyState, false);
-        setVisible(filteredEmptyState, false);
-        setVisible(filterBar, false);
-        setVisible(historySection, false);
-        if (errorMessage) errorMessage.textContent = message;
-        setVisible(errorState, true);
-    }
-
-    async function loadHistory() {
-        const token = localStorage.getItem(AUTH_STORAGE_KEY);
-        if (!token) {
+        function clearSessionAndRedirect() {
+            localStorage.removeItem('financeai_token');
+            localStorage.removeItem('financeai_user');
             window.location.replace('/login');
-            return;
         }
 
-        setVisible(loadingState, true);
-        setVisible(emptyState, false);
-        setVisible(errorState, false);
-        setVisible(filteredEmptyState, false);
-        setVisible(filterBar, false);
-        setVisible(historySection, false);
+        async function loadProfile() {
+            if (!token) return;
+            const response = await fetch(`${API_URL}/api/v1/users/profile`, {
+                headers: { 'Authorization': `Bearer ${token}`, Accept: 'application/json' }
+            });
+            if (response.status === 401) return clearSessionAndRedirect();
+            if (!response.ok) return;
+            const profile = await response.json();
+            activeCurrency = profile.codigoMoneda || 'HNL';
+            activeCurrencySymbol = profile.simboloMoneda || 'L';
+        }
 
-        try {
-            const response = await fetch(`${API_URL}/api/v1/historial-analisis`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    Accept: 'application/json',
-                },
+        async function loadHistory() {
+            if (!token) return;
+            try {
+                const res = await fetch(`${API_URL}/api/v1/historial-analisis`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.status === 401) return clearSessionAndRedirect();
+                if (res.ok) {
+                    historyData = await res.json();
+                    renderTable(historyData);
+                    updateMetrics(historyData);
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                if (tableBody) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <p class="text-sm font-semibold">No se encontraron evaluaciones registradas aún.</p>
+                                <a href="/dashboard" class="mt-2 inline-block text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Realizar un análisis en el Dashboard &rarr;</a>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+        loadProfile().catch(() => {}).finally(loadHistory);
+        btnReload?.addEventListener('click', loadHistory);
+
+        function updateMetrics(items) {
+            if (!Array.isArray(items) || items.length === 0) {
+                if (countDisplay) countDisplay.textContent = '0';
+                if (avgDisplay) avgDisplay.textContent = '--';
+                if (lastStatusDisplay) lastStatusDisplay.textContent = 'Sin registros';
+                return;
+            }
+
+            if (countDisplay) countDisplay.textContent = items.length.toString();
+
+            let totalScores = 0;
+            items.forEach(it => {
+                const prob = Number(it.probabilidad || 0);
+                const score = prob > 1 ? prob : Math.round(prob * 100);
+                totalScores += score;
+            });
+            const avg = Math.round(totalScores / items.length);
+            if (avgDisplay) avgDisplay.textContent = `${avg}/100`;
+
+            const lastItem = items[0];
+            const perfil = lastItem.perfilFinanciero || 'No disponible';
+            if (lastStatusDisplay) {
+                lastStatusDisplay.textContent = perfil;
+                if (perfil.toLowerCase().includes('excelente') || perfil.toLowerCase().includes('saludable')) {
+                    lastStatusDisplay.className = 'text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-2';
+                } else if (perfil.toLowerCase().includes('moderado')) {
+                    lastStatusDisplay.className = 'text-sm font-bold text-amber-600 dark:text-amber-400 mt-2';
+                } else {
+                    lastStatusDisplay.className = 'text-sm font-bold text-red-600 dark:text-red-400 mt-2';
+                }
+            }
+        }
+
+        function renderTable(items) {
+            if (!tableBody) return;
+            if (!Array.isArray(items) || items.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                            <p class="text-sm font-semibold">No hay análisis que coincidan con la búsqueda.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const fmt = (v) => `${activeCurrencySymbol} ${Number(v || 0).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+
+            tableBody.innerHTML = items.map(item => {
+                const dateStr = item.fechaHora ? new Date(item.fechaHora).toLocaleString('es-HN') : 'Reciente';
+                const ingreso = fmt(item.ingresoMensual);
+                const gastos = fmt(item.totalGastos);
+                const ahorro = fmt(item.ahorroEstimado);
+                const endeudamiento = `${Number(item.nivelEndeudamiento || 0)}%`;
+
+                const prob = Number(item.probabilidad || 0);
+                const score = prob > 1 ? prob : Math.round(prob * 100);
+                const perfil = item.perfilFinanciero || 'No disponible';
+
+                let badgeClass = 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800';
+                if (score < 45 || perfil.toLowerCase().includes('riesgo')) {
+                    badgeClass = 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-300 dark:border-red-800';
+                } else if (score < 75 || perfil.toLowerCase().includes('moderado')) {
+                    badgeClass = 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800';
+                }
+
+                return `
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors">
+                        <td class="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">${escapeHtml(dateStr)}</td>
+                        <td class="px-4 py-3 font-mono font-semibold text-gray-900 dark:text-white">${ingreso}</td>
+                        <td class="px-4 py-3 font-mono text-red-600 dark:text-red-400">${gastos}</td>
+                        <td class="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">${ahorro}</td>
+                        <td class="px-4 py-3 font-mono text-gray-600 dark:text-gray-300">${endeudamiento}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${badgeClass}">
+                                <span>${score}/100</span>
+                                <span>·</span>
+                                <span>${escapeHtml(perfil)}</span>
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ─── Filtros & Búsqueda ───
+        function applyFilters() {
+            const query = (searchInput?.value || '').toLowerCase().trim();
+            const perfilVal = filterPerfil?.value || 'ALL';
+
+            const filtered = historyData.filter(item => {
+                const matchQuery = !query || (item.perfilFinanciero && item.perfilFinanciero.toLowerCase().includes(query)) || (item.fechaHora && item.fechaHora.includes(query));
+                let matchPerfil = true;
+                const profile = String(item.perfilFinanciero || '').toLowerCase();
+                if (perfilVal === 'Excelente') matchPerfil = profile.includes('excelente') || profile.includes('saludable');
+                else if (perfilVal === 'Moderado') matchPerfil = profile.includes('moderado');
+                else if (perfilVal === 'Riesgo') matchPerfil = profile.includes('riesgo') || profile.includes('crítico') || profile.includes('critico');
+                return matchQuery && matchPerfil;
             });
 
-            if (response.status === 401) {
-                localStorage.removeItem(AUTH_STORAGE_KEY);
-                localStorage.removeItem('financeai_user');
-                window.location.replace('/login');
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error(`El servidor respondió con estado ${response.status}.`);
-            }
-
-            const history = await response.json();
-            if (!Array.isArray(history)) {
-                throw new Error('La respuesta del servidor no tiene el formato esperado.');
-            }
-
-            setVisible(loadingState, false);
-            if (history.length === 0) {
-                loadedHistory = [];
-                setVisible(emptyState, true);
-                return;
-            }
-
-            loadedHistory = history;
-            updateProfileOptions(history);
-            if (searchInput) searchInput.value = '';
-            if (profileFilter) profileFilter.value = '';
-            setVisible(filterBar, true);
-            renderFilteredHistory();
-        } catch (error) {
-            showError(error instanceof Error ? error.message : 'Ocurrió un error inesperado.');
+            renderTable(filtered);
         }
-    }
 
-    retryButton?.addEventListener('click', loadHistory);
-    searchInput?.addEventListener('input', renderFilteredHistory);
-    profileFilter?.addEventListener('change', renderFilteredHistory);
-    resetFilters?.addEventListener('click', () => {
-        if (searchInput) searchInput.value = '';
-        if (profileFilter) profileFilter.value = '';
-        renderFilteredHistory();
-        searchInput?.focus();
-    });
-    exportHistory?.addEventListener('click', () => {
-        const rows = getFilteredHistory();
-        if (rows.length === 0) return;
-        const safeCsvCell = (value) => {
-            const text = String(value ?? '').replace(/\r?\n/g, ' ');
-            const protectedText = /^[=+\-@]/.test(text) ? `'${text}` : text;
-            return `"${protectedText.replace(/"/g, '""')}"`;
-        };
-        const header = ['Fecha', 'Perfil', 'Probabilidad', 'Ingreso mensual', 'Total gastos', 'Ahorro estimado', 'Endeudamiento', 'Frecuencia de ahorro'];
-        const csvRows = rows.map((item) => [item.fechaHora, item.perfilFinanciero, item.probabilidad, item.ingresoMensual, item.totalGastos, item.ahorroEstimado, item.nivelEndeudamiento, item.frecuenciaAhorro]);
-        const content = [header, ...csvRows].map((row) => row.map(safeCsvCell).join(',')).join('\r\n');
-        const blob = new Blob([`\uFEFF${content}`], { type: 'text/csv;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `FinanceAI_historial_${new Date().toISOString().slice(0, 10)}.csv`;
-        link.click();
-        URL.revokeObjectURL(url);
-    });
-    loadHistory();
+        searchInput?.addEventListener('input', applyFilters);
+        filterPerfil?.addEventListener('change', applyFilters);
+
+        // ─── Exportar historial real como CSV ───
+        btnExportCsv?.addEventListener('click', () => {
+            if (!historyData.length) {
+                if (window.showToast) window.showToast('Sin datos', 'No hay análisis para exportar.', 'ℹ️');
+                return;
+            }
+            const csvCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+            const headers = ['Fecha', 'Perfil', 'Score', 'Ingreso', 'Gastos', 'Ahorro', 'Endeudamiento', 'Frecuencia'];
+            const rows = historyData.map((item) => {
+                const probability = Number(item.probabilidad || 0);
+                const score = probability > 1 ? probability : Math.round(probability * 100);
+                return [item.fechaHora, item.perfilFinanciero, score, item.ingresoMensual, item.totalGastos, item.ahorroEstimado, item.nivelEndeudamiento, item.frecuenciaAhorro];
+            });
+            const csv = '\uFEFF' + [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `FinanceAI_historial_${activeCurrency}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            if (window.showToast) window.showToast('Historial exportado', 'El archivo CSV se descargó correctamente.', '✅');
+        });
+    })();
 </script>

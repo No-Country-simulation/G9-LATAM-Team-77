@@ -2,15 +2,20 @@
 
 /* Tailwind v4: dark mode via class on <html> */
 @custom-variant dark (&:where(.dark, .dark *));
+@variant dark (&:where(.dark, .dark *));
 
-/* Base font */
+/* Base font & Color Scheme */
 :root {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color-scheme: light;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color-scheme: light dark;
 }
 
-.dark {
-    color-scheme: dark;
+.font-josefin {
+    font-family: 'Josefin Sans', 'Inter', system-ui, sans-serif;
+}
+
+.font-inter {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 html {
@@ -22,6 +27,9 @@ body {
         radial-gradient(circle at 8% 4%, rgb(37 99 235 / 0.08), transparent 28rem),
         radial-gradient(circle at 92% 12%, rgb(14 165 233 / 0.06), transparent 24rem);
     background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 .dark body {
@@ -33,14 +41,13 @@ body {
 /* Smooth theme transitions */
 *, *::before, *::after {
     transition-property: background-color, border-color, color, fill, stroke;
-    transition-timing-function: ease;
-    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
 }
 
-/* Remove transition from interactive elements to avoid lag */
 button, input, select, a {
-    transition-property: background-color, border-color, color, opacity, box-shadow, transform;
-    transition-timing-function: ease;
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
 }
 
@@ -101,16 +108,16 @@ a:focus-visible {
     box-shadow: 0 22px 45px -30px rgb(15 23 42 / 0.42);
 }
 
+.dark .soft-lift:hover {
+    box-shadow: 0 22px 45px -30px rgb(0 0 0 / 0.9);
+}
+
 dialog[open] {
     animation: dialog-enter 220ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 dialog::backdrop {
     animation: backdrop-enter 180ms ease-out both;
-}
-
-.dark .soft-lift:hover {
-    box-shadow: 0 22px 45px -30px rgb(0 0 0 / 0.9);
 }
 
 @keyframes ui-enter {
@@ -128,6 +135,24 @@ dialog::backdrop {
     to { opacity: 1; }
 }
 
+@keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+    animation: scale-in 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.animate-fade-in {
+    animation: fade-in 200ms ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
@@ -137,8 +162,38 @@ dialog::backdrop {
     }
 }
 
-/* Scrollbar dark mode */
-.dark ::-webkit-scrollbar { background: #111827; }
-.dark ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+/* Cross-browser scrollbar support */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.dark * {
+    scrollbar-color: #374151 transparent;
+}
+
+/* Webkit Scrollbars (Chrome, Edge, Safari, Opera) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #374151;
+}
+
+/* Backdrop-filter fallback for older browsers */
+@supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    .backdrop-blur-md,
+    .backdrop-blur-xl,
+    .backdrop-blur-2xl {
+        background-color: rgba(17, 24, 39, 0.95) !important;
+    }
+}

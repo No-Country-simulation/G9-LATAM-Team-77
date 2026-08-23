@@ -21,9 +21,10 @@ const publicUrl = `https://financeai-team77.duckdns.org${pathname}`;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 		<meta name="theme-color" content="#0f172a" />
 		<meta name="robots" content={privateRoute ? 'noindex, nofollow' : 'index, follow'} />
+		<meta name="referrer" content="strict-origin-when-cross-origin" />
 		<meta property="og:type" content="website" />
 		<meta property="og:locale" content="es_HN" />
 		<meta property="og:title" content={title} />
@@ -33,40 +34,54 @@ const publicUrl = `https://financeai-team77.duckdns.org${pathname}`;
 		<meta name="twitter:card" content="summary_large_image" />
 		{!privateRoute && <link rel="canonical" href={publicUrl} />}
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-		<!-- Ciberseguridad: Meta tags de protección OWASP en el cliente -->
-		<meta http-equiv="X-Content-Type-Options" content="nosniff" />
-		<meta http-equiv="X-Frame-Options" content="DENY" />
-		<meta http-equiv="X-XSS-Protection" content="1; mode=block" />
-		<meta name="referrer" content="strict-origin-when-cross-origin" />
-		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* http://127.0.0.1:* https:;" />
-
-		<!-- Tipografía segura -->
+		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Josefin+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 		<title>{title}</title>
-
-		<!-- Prevenir salto de tema y sanitizar tema inicial -->
 		<script is:inline>
 			(function() {
 				try {
 					const saved = localStorage.getItem('theme');
 					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-					if (saved === 'dark' || (!saved && prefersDark)) {
-						document.documentElement.classList.add('dark');
-					}
-				} catch (e) {
-					console.warn('Proteccion de almacenamiento activada');
-				}
+					if (saved === 'dark' || (!saved && prefersDark)) document.documentElement.classList.add('dark');
+				} catch {}
 			})();
 		</script>
 	</head>
 	<body class="min-h-screen overflow-x-hidden bg-slate-50 font-sans text-gray-900 antialiased selection:bg-blue-600 selection:text-white dark:bg-gray-950 dark:text-gray-100 flex flex-col transition-colors duration-300">
+		<div id="globalToast" role="status" aria-live="polite" class="fixed left-4 right-4 top-4 z-[300] hidden max-w-sm rounded-2xl border border-blue-200 bg-white/95 p-4 opacity-0 shadow-2xl backdrop-blur-xl transition sm:left-auto dark:border-blue-900/50 dark:bg-gray-900/95">
+			<div class="flex items-start gap-3">
+				<div id="globalToastIcon" class="grid h-9 w-9 flex-shrink-0 place-items-center rounded-xl bg-blue-50 text-lg dark:bg-blue-950/60">ℹ️</div>
+				<div class="min-w-0 flex-1"><p id="globalToastTitle" class="text-sm font-bold text-gray-900 dark:text-white">FinanceAI</p><p id="globalToastMessage" class="mt-0.5 text-xs text-gray-600 dark:text-gray-400"></p></div>
+				<button id="globalToastClose" type="button" aria-label="Cerrar notificación" class="text-lg text-gray-400 hover:text-gray-700 dark:hover:text-white">×</button>
+			</div>
+		</div>
+		<script is:inline>
+			(function() {
+				let timer;
+				const toast = document.getElementById('globalToast');
+				function closeToast() {
+					if (!toast) return;
+					toast.classList.add('opacity-0');
+					window.setTimeout(() => toast.classList.add('hidden'), 180);
+				}
+				window.showToast = function(title, message, icon = 'ℹ️') {
+					if (!toast) return;
+					document.getElementById('globalToastTitle').textContent = title;
+					document.getElementById('globalToastMessage').textContent = message;
+					document.getElementById('globalToastIcon').textContent = icon;
+					window.clearTimeout(timer);
+					toast.classList.remove('hidden');
+					requestAnimationFrame(() => toast.classList.remove('opacity-0'));
+					timer = window.setTimeout(closeToast, 4500);
+				};
+				document.getElementById('globalToastClose')?.addEventListener('click', closeToast);
+			})();
+		</script>
 		<Header />
-		<main class="flex-grow flex">
-			<slot />
-		</main>
+		<main class="flex-grow flex"><slot /></main>
 		<footer class="border-t border-slate-200/80 bg-white/70 px-4 py-5 text-xs text-slate-500 backdrop-blur dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-400">
 			<div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
 				<p>© {new Date().getFullYear()} FinanceAI Team 77 · Orientación financiera, no asesoría profesional.</p>

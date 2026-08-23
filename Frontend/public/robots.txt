@@ -3,5 +3,6 @@ Allow: /
 Disallow: /dashboard
 Disallow: /historial
 Disallow: /reset-password
+Disallow: /api/
 
 Sitemap: https://financeai-team77.duckdns.org/sitemap.xml
