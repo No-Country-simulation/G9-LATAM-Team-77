@@ -1,6 +1,9 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
-# Instalar dependencias necesarias: Java 17 y Python 3
+# Evitar prompts interactivos
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar dependencias necesarias: Java 17 y Python 3 (Python 3.12 en Ubuntu 24.04)
 RUN apt-get update && apt-get install -y \
     openjdk-17-jdk \
     python3 \
