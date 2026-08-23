@@ -1,136 +1,167 @@
 ---
-import { API_URL } from '../lib/api';
-
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
 ---
 
-<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 px-4 py-3 shadow-sm shadow-slate-900/[0.03] backdrop-blur-xl transition-colors duration-300 dark:border-slate-800/80 dark:bg-slate-950/85 sm:px-6">
-    <div class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4">
-        <!-- Logo -->
-        <a href="/" class="group flex items-center gap-3 rounded-xl" aria-label="Ir al inicio de FinanceAI">
+<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 px-3 py-3 shadow-sm shadow-slate-900/[0.03] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/85 sm:px-6">
+    <div class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-3">
+        <a href="/" class="group flex items-center gap-2.5 rounded-xl" aria-label="Ir al inicio de FinanceAI">
             <span class="grid h-9 w-9 place-items-center rounded-xl bg-slate-950 shadow-md shadow-slate-950/15 transition-transform group-hover:-translate-y-0.5 dark:bg-white">
-                <span class="flex gap-1" aria-hidden="true">
-                    <span class="h-2 w-2 rounded-full bg-blue-500"></span>
-                    <span class="h-2 w-2 rounded-full bg-red-500"></span>
-                    <span class="h-2 w-2 rounded-full bg-yellow-400"></span>
-                </span>
+                <span class="flex gap-1" aria-hidden="true"><span class="h-2 w-2 rounded-full bg-blue-500"></span><span class="h-2 w-2 rounded-full bg-red-500"></span><span class="h-2 w-2 rounded-full bg-yellow-400"></span></span>
             </span>
-            <span>
-                <span class="block text-base font-extrabold tracking-tight text-slate-950 dark:text-white">FinanceAI</span>
-                <span class="hidden text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 sm:block">Salud financiera</span>
-            </span>
+            <span><span class="block text-base font-extrabold tracking-tight text-slate-950 dark:text-white">FinanceAI</span><span class="hidden text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 sm:block">Salud financiera</span></span>
         </a>
 
-        <!-- Main Nav (Only visible when user is logged in) -->
-        <nav id="mainNav" aria-label="Navegación principal" class="order-3 mt-3 hidden w-full items-center gap-1 rounded-xl bg-slate-100/80 p-1 text-sm font-semibold dark:bg-slate-900/80 sm:order-none sm:mt-0 sm:w-auto">
-            <a href="/dashboard"
-                class={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 transition-all sm:flex-none ${currentPath === 'dashboard' ? 'bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-300' : 'text-slate-600 hover:bg-white/70 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white'}`}>
-                <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" /></svg>
-                Dashboard
+        <nav id="mainNav" aria-label="Navegación principal" class="order-3 mt-3 hidden w-full items-center gap-1 rounded-xl bg-slate-100/80 p-1 text-sm font-semibold dark:bg-slate-900/80 md:order-none md:mt-0 md:w-auto">
+            <a href="/dashboard" aria-current={currentPath === 'dashboard' ? 'page' : undefined} class={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 transition-all md:flex-none ${currentPath === 'dashboard' ? 'bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-300' : 'text-slate-600 hover:bg-white/70 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white'}`}>
+                <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" /></svg>Dashboard
             </a>
-            <a href="/historial"
-                class={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 transition-all sm:flex-none ${currentPath === 'historial' ? 'bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-300' : 'text-slate-600 hover:bg-white/70 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white'}`}>
-                <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-3-6.708M21 3v6h-6" /></svg>
-                Historial
+            <a href="/historial" aria-current={currentPath === 'historial' ? 'page' : undefined} class={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 transition-all md:flex-none ${currentPath === 'historial' ? 'bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-300' : 'text-slate-600 hover:bg-white/70 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white'}`}>
+                <svg aria-hidden="true" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-3-6.708M21 3v6h-6" /></svg>Historial
             </a>
         </nav>
 
-        <!-- Right Controls -->
-        <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Backend Health Indicator -->
-        <div id="backendIndicator" aria-live="polite" class="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-2.5 text-xs font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-            <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span id="backendStatusText" class="hidden sm:inline">Conectando</span>
-        </div>
-
-        <!-- Auth Button (Hidden on /login) -->
-        {currentPath !== 'login' && (
-            <a href="/login" id="authNavBtn"
-                class="inline-flex h-9 items-center rounded-xl bg-slate-950 px-3.5 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500">
-                Iniciar Sesión
-            </a>
-        )}
-
-        <!-- Dark mode toggle -->
-        <button id="themeToggle"
-            aria-label="Cambiar tema"
-            class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:-translate-y-0.5 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800">
-            <!-- Sun icon (dark mode) -->
-            <svg id="iconSun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-            </svg>
-            <!-- Moon icon (light mode) -->
-            <svg id="iconMoon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
-            </svg>
-        </button>
+        <div class="flex items-center gap-1.5 sm:gap-2.5">
+            <div id="backendIndicator" aria-live="polite" title="Estado del Backend" class="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-2.5 text-xs font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+                <span id="backendDot" class="h-2 w-2 animate-pulse rounded-full bg-amber-400"></span><span id="backendStatusText" class="hidden lg:inline">Conectando</span>
+            </div>
+            <button id="profileButton" type="button" aria-haspopup="dialog" class="hidden h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white pl-1.5 pr-3 text-xs font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                <span id="profileInitials" class="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-[10px] font-extrabold text-white">FA</span><span id="profileButtonLabel" class="hidden max-w-24 truncate sm:block">Mi perfil</span>
+            </button>
+            {currentPath !== 'login' && <a href="/login" id="authNavBtn" class="inline-flex h-9 items-center rounded-xl bg-slate-950 px-3.5 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500">Iniciar sesión</a>}
+            <button id="themeToggle" type="button" aria-label="Cambiar tema" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:-translate-y-0.5 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800">
+                <svg aria-hidden="true" class="hidden h-4 w-4 dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>
+                <svg aria-hidden="true" class="h-4 w-4 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" /></svg>
+            </button>
         </div>
     </div>
 </header>
 
-<script define:vars={{ API_URL }}>
-    // Theme toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
-        const html = document.documentElement;
-        if (html.classList.contains('dark')) {
-            html.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        } else {
-            html.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        }
-    });
+<dialog id="profileDialog" aria-labelledby="profileTitle" class="m-auto w-[calc(100%_-_2rem)] max-w-lg rounded-3xl border border-slate-200 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+    <div class="overflow-hidden rounded-3xl">
+        <div class="relative bg-gradient-to-br from-slate-950 via-blue-950 to-blue-700 px-6 py-6 text-white">
+            <button id="closeProfile" type="button" aria-label="Cerrar perfil" class="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-lg hover:bg-white/20">×</button>
+            <div class="flex items-center gap-4"><span id="dialogInitials" class="grid h-14 w-14 place-items-center rounded-2xl bg-white/15 text-lg font-extrabold ring-1 ring-white/20">FA</span><div class="min-w-0"><h2 id="profileTitle" class="truncate text-xl font-extrabold">Mi perfil</h2><p id="profileEmail" class="mt-1 truncate text-xs text-blue-100">Cargando información...</p></div></div>
+        </div>
+        <form id="profileForm" class="space-y-5 p-5 sm:p-6">
+            <div id="profileStatus" aria-live="polite" class="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-950 dark:text-slate-300">Tus preferencias se cargan desde FinanceAI.</div>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <label class="text-xs font-bold text-slate-600 dark:text-slate-300">País<select id="profileCountry" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white"><option value="">Cargando...</option></select></label>
+                <label class="text-xs font-bold text-slate-600 dark:text-slate-300">Moneda principal<select id="profileCurrency" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white"><option value="">Cargando...</option></select></label>
+            </div>
+            <div class="grid gap-2 sm:grid-cols-2">
+                <button id="saveProfile" type="submit" class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-500 disabled:cursor-wait disabled:opacity-60">Guardar preferencias</button>
+                <button id="exportReport" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:border-blue-800 dark:hover:bg-blue-950/40">Descargar reporte PDF</button>
+            </div>
+            <div class="flex flex-col gap-3 border-t border-slate-200 pt-4 text-xs dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex gap-3 text-slate-500 dark:text-slate-400"><a href="/privacidad" class="hover:text-blue-600">Privacidad</a><a href="/terminos" class="hover:text-blue-600">Términos</a></div><button id="profileLogout" type="button" class="font-bold text-red-600 hover:text-red-500 dark:text-red-400">Cerrar sesión</button>
+            </div>
+        </form>
+    </div>
+</dialog>
 
-    // Check auth status
+<script>
+    import { API_URL } from '../lib/api';
+    import { clearAuthSession } from '../lib/auth';
+    import { generateFinancialReport } from '../lib/pdfReport';
+
     const token = localStorage.getItem('financeai_token');
-    const authNavBtn = document.getElementById('authNavBtn');
     const mainNav = document.getElementById('mainNav');
+    const authNavBtn = document.getElementById('authNavBtn');
+    const profileButton = document.getElementById('profileButton');
+    const dialog = document.getElementById('profileDialog') as HTMLDialogElement | null;
+    const countrySelect = document.getElementById('profileCountry') as HTMLSelectElement | null;
+    const currencySelect = document.getElementById('profileCurrency') as HTMLSelectElement | null;
+    const profileStatus = document.getElementById('profileStatus');
+    let profile: Record<string, any> | null = null;
+    let catalogsLoaded = false;
 
-    if (token) {
-        if (mainNav) {
-            mainNav.classList.remove('hidden');
-            mainNav.classList.add('flex');
-        }
-        if (authNavBtn) {
-            authNavBtn.textContent = 'Cerrar Sesión';
-            authNavBtn.className = 'inline-flex h-9 items-center rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-red-900 dark:hover:bg-red-950/60 dark:hover:text-red-300';
-            authNavBtn.href = '#';
-            authNavBtn.onclick = (e) => {
-                e.preventDefault();
-                localStorage.removeItem('financeai_token');
-                localStorage.removeItem('financeai_user');
-                window.location.replace('/login');
-            };
-        }
-    } else {
-        if (mainNav) {
-            mainNav.classList.add('hidden');
-            mainNav.classList.remove('flex');
-        }
+    function logout() { clearAuthSession(); window.location.replace('/login'); }
+    function setProfileIdentity(value: Record<string, any>) {
+        const name = String(value.nombre || 'Usuario FinanceAI');
+        const email = String(value.email || '');
+        const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'FA';
+        document.getElementById('profileInitials')!.textContent = initials;
+        document.getElementById('dialogInitials')!.textContent = initials;
+        document.getElementById('profileButtonLabel')!.textContent = name.split(' ')[0];
+        document.getElementById('profileTitle')!.textContent = name;
+        document.getElementById('profileEmail')!.textContent = email;
+    }
+    function handleUnauthorized(response: Response) { if (response.status !== 401) return false; logout(); return true; }
+    async function loadProfile() {
+        if (!token) return;
+        const response = await fetch(`${API_URL}/api/v1/users/profile`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
+        if (handleUnauthorized(response)) return;
+        if (!response.ok) throw new Error('No se pudo cargar el perfil.');
+        profile = await response.json();
+        setProfileIdentity(profile!);
+        try {
+            const stored = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+            localStorage.setItem('financeai_user', JSON.stringify({ ...stored, ...profile }));
+        } catch { localStorage.setItem('financeai_user', JSON.stringify(profile)); }
+    }
+    function fillCatalog(select: HTMLSelectElement, entries: Record<string, any>[], selectedId: unknown, formatter: (entry: Record<string, any>) => string) {
+        const placeholder = document.createElement('option'); placeholder.value = ''; placeholder.textContent = 'Selecciona una opción';
+        const options = entries.map((entry) => { const option = document.createElement('option'); option.value = String(entry.id); option.textContent = formatter(entry); option.selected = String(entry.id) === String(selectedId ?? ''); return option; });
+        select.replaceChildren(placeholder, ...options);
+    }
+    async function loadCatalogs() {
+        if (catalogsLoaded || !countrySelect || !currencySelect) return;
+        const [countriesResponse, currenciesResponse] = await Promise.all([fetch(`${API_URL}/api/v1/catalogos/paises`), fetch(`${API_URL}/api/v1/catalogos/monedas`)]);
+        if (!countriesResponse.ok || !currenciesResponse.ok) throw new Error('No se pudieron cargar los catálogos.');
+        const [countries, currencies] = await Promise.all([countriesResponse.json(), currenciesResponse.json()]);
+        fillCatalog(countrySelect, countries, profile?.paisId, (entry) => `${entry.nombre} (${entry.codigo})`);
+        fillCatalog(currencySelect, currencies, profile?.monedaId, (entry) => `${entry.nombre} (${entry.codigo})`);
+        catalogsLoaded = true;
+    }
+    async function openProfile() {
+        if (!dialog) return;
+        dialog.showModal(); profileStatus!.textContent = 'Cargando tus preferencias...';
+        try { await loadProfile(); await loadCatalogs(); if (countrySelect) countrySelect.value = String(profile?.paisId ?? ''); if (currencySelect) currencySelect.value = String(profile?.monedaId ?? ''); profileStatus!.textContent = 'Actualiza tu país o moneda sin perder tus movimientos.'; }
+        catch (error) { profileStatus!.textContent = error instanceof Error ? error.message : 'No se pudo cargar el perfil.'; }
     }
 
-    // Health check polling
-    fetch(`${API_URL}/api/v1/health`)
-        .then(res => res.json())
-        .then(data => {
-            const dot = document.getElementById('backendDot');
-            const text = document.getElementById('backendStatusText');
-            if (dot && text) {
-                if (data.status === 'UP') {
-                    dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-                    text.textContent = 'Online';
-                }
-            }
-        })
-        .catch(() => {
-            const dot = document.getElementById('backendDot');
-            const text = document.getElementById('backendStatusText');
-            if (dot && text) {
-                dot.className = 'w-2 h-2 rounded-full bg-red-500';
-                text.textContent = 'Offline';
-            }
-        });
+    document.getElementById('themeToggle')?.addEventListener('click', () => { const enabled = document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', enabled ? 'dark' : 'light'); });
+    if (token) {
+        mainNav?.classList.replace('hidden', 'flex');
+        authNavBtn?.classList.remove('inline-flex');
+        authNavBtn?.classList.add('hidden');
+        profileButton?.classList.replace('hidden', 'flex');
+        try { const stored = JSON.parse(localStorage.getItem('financeai_user') || '{}'); if (stored && typeof stored === 'object') setProfileIdentity(stored); } catch { /* El perfil real se carga desde el Backend. */ }
+        loadProfile().catch(() => { /* El modal muestra cualquier error al abrirse. */ });
+    } else { mainNav?.classList.add('hidden'); }
+    profileButton?.addEventListener('click', openProfile);
+    document.getElementById('closeProfile')?.addEventListener('click', () => dialog?.close());
+    document.getElementById('profileLogout')?.addEventListener('click', logout);
+    dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+
+    document.getElementById('profileForm')?.addEventListener('submit', async (event) => {
+        event.preventDefault(); if (!token || !countrySelect?.value || !currencySelect?.value) return;
+        const submit = document.getElementById('saveProfile') as HTMLButtonElement; submit.disabled = true; profileStatus!.textContent = 'Guardando preferencias...';
+        try {
+            const response = await fetch(`${API_URL}/api/v1/users/profile`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ paisId: Number(countrySelect.value), monedaId: Number(currencySelect.value) }) });
+            if (handleUnauthorized(response)) return; if (!response.ok) throw new Error('No se pudieron guardar las preferencias.');
+            profile = await response.json(); setProfileIdentity(profile!); profileStatus!.textContent = 'Preferencias actualizadas correctamente.';
+        } catch (error) { profileStatus!.textContent = error instanceof Error ? error.message : 'No se pudo actualizar el perfil.'; } finally { submit.disabled = false; }
+    });
+
+    document.getElementById('exportReport')?.addEventListener('click', async () => {
+        if (!token) return;
+        const button = document.getElementById('exportReport') as HTMLButtonElement; button.disabled = true; profileStatus!.textContent = 'Preparando tu reporte...';
+        try {
+            if (!profile) await loadProfile();
+            const response = await fetch(`${API_URL}/api/v1/transactions`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
+            if (handleUnauthorized(response)) return; if (!response.ok) throw new Error('No se pudieron cargar los movimientos.');
+            generateFinancialReport({ userName: String(profile?.nombre || 'Usuario FinanceAI'), userEmail: String(profile?.email || ''), currencyCode: String(profile?.codigoMoneda || 'HNL'), currencySymbol: String(profile?.simboloMoneda || 'L'), transactions: await response.json() });
+            profileStatus!.textContent = 'Reporte descargado correctamente.';
+        } catch (error) { profileStatus!.textContent = error instanceof Error ? error.message : 'No se pudo generar el reporte.'; } finally { button.disabled = false; }
+    });
+
+    fetch(`${API_URL}/api/v1/health`).then((response) => response.json()).then((data) => {
+        const dot = document.getElementById('backendDot'); const label = document.getElementById('backendStatusText');
+        if (data.status === 'UP' && dot && label) { dot.className = 'h-2 w-2 rounded-full bg-emerald-500'; label.textContent = 'Online'; }
+    }).catch(() => {
+        const dot = document.getElementById('backendDot'); const label = document.getElementById('backendStatusText');
+        if (dot && label) { dot.className = 'h-2 w-2 rounded-full bg-red-500'; label.textContent = 'Offline'; }
+    });
 </script>

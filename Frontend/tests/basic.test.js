@@ -11,6 +11,7 @@ import {
   validateForgotPasswordEmail,
   validateResetPassword,
 } from '../src/lib/password-reset';
+import { summarizeTransactions } from '../src/lib/pdfReport';
 
 test('Calculo basico de finanzas (Prueba de integracion UI)', () => {
   const ingresos = 5000;
@@ -80,4 +81,12 @@ test('maneja respuestas de error del Backend sin exponer detalles internos', asy
 
   await expect(readApiMessage(controlled, 'Error controlado')).resolves.toBe('El enlace de recuperación expiró.');
   await expect(readApiMessage(malformed, 'Error controlado')).resolves.toBe('Error controlado');
+});
+
+test('resume los movimientos reales para el reporte sin convertir monedas', () => {
+  expect(summarizeTransactions([
+    { type: 'INGRESO', amount: 1500 },
+    { type: 'GASTO', amount: 250 },
+    { type: 'GASTO', amount: '125.50' },
+  ])).toEqual({ income: 1500, expenses: 375.5, balance: 1124.5 });
 });

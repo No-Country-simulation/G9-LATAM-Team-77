@@ -42,7 +42,10 @@ import { API_URL } from '../lib/api';
                         <option value="">Todos los perfiles</option>
                     </select>
                 </label>
-                <button id="resetHistoryFilters" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-900 dark:hover:bg-blue-950/40 dark:hover:text-blue-300">Limpiar filtros</button>
+                <div class="grid grid-cols-2 gap-2 md:grid-cols-1">
+                    <button id="exportHistory" type="button" class="rounded-xl bg-slate-950 px-4 py-2.5 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500">Exportar CSV</button>
+                    <button id="resetHistoryFilters" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-900 dark:hover:bg-blue-950/40 dark:hover:text-blue-300">Limpiar filtros</button>
+                </div>
             </div>
         </section>
 
@@ -114,6 +117,7 @@ import { API_URL } from '../lib/api';
     const searchInput = document.getElementById('historySearch');
     const profileFilter = document.getElementById('historyProfileFilter');
     const resetFilters = document.getElementById('resetHistoryFilters');
+    const exportHistory = document.getElementById('exportHistory');
     const filteredEmptyState = document.getElementById('filteredEmptyState');
     let loadedHistory = [];
 
@@ -295,12 +299,16 @@ import { API_URL } from '../lib/api';
             .includes(query);
     }
 
-    function renderFilteredHistory() {
+    function getFilteredHistory() {
         const query = String(searchInput?.value || '').trim().toLocaleLowerCase('es');
         const selectedProfile = String(profileFilter?.value || '');
-        const filtered = loadedHistory.filter((item) =>
+        return loadedHistory.filter((item) =>
             (!selectedProfile || item.perfilFinanciero === selectedProfile) && matchesSearch(item, query)
         );
+    }
+
+    function renderFilteredHistory() {
+        const filtered = getFilteredHistory();
 
         setVisible(filteredEmptyState, filtered.length === 0);
         setVisible(historySection, filtered.length > 0);
@@ -388,6 +396,25 @@ import { API_URL } from '../lib/api';
         if (profileFilter) profileFilter.value = '';
         renderFilteredHistory();
         searchInput?.focus();
+    });
+    exportHistory?.addEventListener('click', () => {
+        const rows = getFilteredHistory();
+        if (rows.length === 0) return;
+        const safeCsvCell = (value) => {
+            const text = String(value ?? '').replace(/\r?\n/g, ' ');
+            const protectedText = /^[=+\-@]/.test(text) ? `'${text}` : text;
+            return `"${protectedText.replace(/"/g, '""')}"`;
+        };
+        const header = ['Fecha', 'Perfil', 'Probabilidad', 'Ingreso mensual', 'Total gastos', 'Ahorro estimado', 'Endeudamiento', 'Frecuencia de ahorro'];
+        const csvRows = rows.map((item) => [item.fechaHora, item.perfilFinanciero, item.probabilidad, item.ingresoMensual, item.totalGastos, item.ahorroEstimado, item.nivelEndeudamiento, item.frecuenciaAhorro]);
+        const content = [header, ...csvRows].map((row) => row.map(safeCsvCell).join(',')).join('\r\n');
+        const blob = new Blob([`\uFEFF${content}`], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `FinanceAI_historial_${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
     });
     loadHistory();
 </script>
