@@ -10,7 +10,7 @@
             <stop offset="100%" stop-color="#a855f7" />
         </linearGradient>
     </defs>
-    
+
     <!-- Background -->
     <rect width="1200" height="630" fill="url(#ogBg)"/>
     <circle cx="1100" cy="100" r="300" fill="#2563eb" opacity="0.12" filter="blur(80px)"/>

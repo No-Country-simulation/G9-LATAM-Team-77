@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
 ---
 
-<Layout title="Historial de Análisis | FinanceAI" description="Consulta tu registro histórico de evaluaciones de salud financiera y transacciones auditadas por FinanceAI.">
+<Layout title="Historial de Análisis | FinanceAI" description="Consulta tu registro histórico de evaluaciones de salud financiera almacenadas por FinanceAI.">
     <!-- Guardia de Protección de Ruta Seguro -->
     <script is:inline>
         if (!localStorage.getItem('financeai_token')) {
@@ -25,13 +25,13 @@ import { API_URL } from '../lib/api';
                     Historial de Evaluaciones
                 </h1>
                 <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-inter">
-                    Registro de análisis de salud financiera persistidos y auditados.
+                    Registro real de análisis de salud financiera asociados a tu cuenta.
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" id="btnExportHistorialPdf" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer">
+                <button type="button" id="btnExportHistorialCsv" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Exportar PDF
+                    Exportar CSV
                 </button>
                 <a href="/dashboard" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition">
                     &larr; Volver al Dashboard
@@ -109,7 +109,8 @@ import { API_URL } from '../lib/api';
     (function () {
         const token = localStorage.getItem('financeai_token');
         let historyData = [];
-        let activeCurrency = localStorage.getItem('financeai_preferred_currency') || 'HNL';
+        let activeCurrency = 'HNL';
+        let activeCurrencySymbol = 'L';
 
         const tableBody = document.getElementById('historyTableBody');
         const countDisplay = document.getElementById('totalEvaluacionesCount');
@@ -118,7 +119,25 @@ import { API_URL } from '../lib/api';
         const searchInput = document.getElementById('searchInput');
         const filterPerfil = document.getElementById('filterPerfil');
         const btnReload = document.getElementById('btnReloadHistory');
-        const btnExportPdf = document.getElementById('btnExportHistorialPdf');
+        const btnExportCsv = document.getElementById('btnExportHistorialCsv');
+
+        function clearSessionAndRedirect() {
+            localStorage.removeItem('financeai_token');
+            localStorage.removeItem('financeai_user');
+            window.location.replace('/login');
+        }
+
+        async function loadProfile() {
+            if (!token) return;
+            const response = await fetch(`${API_URL}/api/v1/users/profile`, {
+                headers: { 'Authorization': `Bearer ${token}`, Accept: 'application/json' }
+            });
+            if (response.status === 401) return clearSessionAndRedirect();
+            if (!response.ok) return;
+            const profile = await response.json();
+            activeCurrency = profile.codigoMoneda || 'HNL';
+            activeCurrencySymbol = profile.simboloMoneda || 'L';
+        }
 
         async function loadHistory() {
             if (!token) return;
@@ -127,6 +146,7 @@ import { API_URL } from '../lib/api';
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
+                if (res.status === 401) return clearSessionAndRedirect();
                 if (res.ok) {
                     historyData = await res.json();
                     renderTable(historyData);
@@ -147,7 +167,7 @@ import { API_URL } from '../lib/api';
                 }
             }
         }
-        loadHistory();
+        loadProfile().catch(() => {}).finally(loadHistory);
         btnReload?.addEventListener('click', loadHistory);
 
         function updateMetrics(items) {
@@ -164,13 +184,13 @@ import { API_URL } from '../lib/api';
             items.forEach(it => {
                 const prob = Number(it.probabilidad || 0);
                 const score = prob > 1 ? prob : Math.round(prob * 100);
-                totalScores += (score > 0 ? score : 75);
+                totalScores += score;
             });
             const avg = Math.round(totalScores / items.length);
             if (avgDisplay) avgDisplay.textContent = `${avg}/100`;
 
             const lastItem = items[0];
-            const perfil = lastItem.perfilFinanciero || 'Saludable';
+            const perfil = lastItem.perfilFinanciero || 'No disponible';
             if (lastStatusDisplay) {
                 lastStatusDisplay.textContent = perfil;
                 if (perfil.toLowerCase().includes('excelente') || perfil.toLowerCase().includes('saludable')) {
@@ -196,8 +216,8 @@ import { API_URL } from '../lib/api';
                 return;
             }
 
-            const sym = activeCurrency === 'HNL' ? 'L' : (activeCurrency === 'EUR' ? '€' : '$');
-            const fmt = (v) => `${sym} ${Number(v || 0).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const fmt = (v) => `${activeCurrencySymbol} ${Number(v || 0).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 
             tableBody.innerHTML = items.map(item => {
                 const dateStr = item.fechaHora ? new Date(item.fechaHora).toLocaleString('es-HN') : 'Reciente';
@@ -208,7 +228,7 @@ import { API_URL } from '../lib/api';
 
                 const prob = Number(item.probabilidad || 0);
                 const score = prob > 1 ? prob : Math.round(prob * 100);
-                const perfil = item.perfilFinanciero || (score >= 75 ? 'Excelente' : (score >= 45 ? 'Moderado' : 'En riesgo'));
+                const perfil = item.perfilFinanciero || 'No disponible';
 
                 let badgeClass = 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800';
                 if (score < 45 || perfil.toLowerCase().includes('riesgo')) {
@@ -219,7 +239,7 @@ import { API_URL } from '../lib/api';
 
                 return `
                     <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors">
-                        <td class="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">${dateStr}</td>
+                        <td class="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">${escapeHtml(dateStr)}</td>
                         <td class="px-4 py-3 font-mono font-semibold text-gray-900 dark:text-white">${ingreso}</td>
                         <td class="px-4 py-3 font-mono text-red-600 dark:text-red-400">${gastos}</td>
                         <td class="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">${ahorro}</td>
@@ -228,7 +248,7 @@ import { API_URL } from '../lib/api';
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${badgeClass}">
                                 <span>${score}/100</span>
                                 <span>·</span>
-                                <span>${perfil}</span>
+                                <span>${escapeHtml(perfil)}</span>
                             </span>
                         </td>
                     </tr>
@@ -244,9 +264,10 @@ import { API_URL } from '../lib/api';
             const filtered = historyData.filter(item => {
                 const matchQuery = !query || (item.perfilFinanciero && item.perfilFinanciero.toLowerCase().includes(query)) || (item.fechaHora && item.fechaHora.includes(query));
                 let matchPerfil = true;
-                if (perfilVal === 'Excelente') matchPerfil = item.perfilFinanciero && (item.perfilFinanciero.includes('Excelente') || item.perfilFinanciero.includes('Saludable'));
-                else if (perfilVal === 'Moderado') matchPerfil = item.perfilFinanciero && item.perfilFinanciero.includes('Moderado');
-                else if (perfilVal === 'Riesgo') matchPerfil = item.perfilFinanciero && (item.perfilFinanciero.includes('riesgo') || item.perfilFinanciero.includes('Crítico'));
+                const profile = String(item.perfilFinanciero || '').toLowerCase();
+                if (perfilVal === 'Excelente') matchPerfil = profile.includes('excelente') || profile.includes('saludable');
+                else if (perfilVal === 'Moderado') matchPerfil = profile.includes('moderado');
+                else if (perfilVal === 'Riesgo') matchPerfil = profile.includes('riesgo') || profile.includes('crítico') || profile.includes('critico');
                 return matchQuery && matchPerfil;
             });
 
@@ -256,38 +277,27 @@ import { API_URL } from '../lib/api';
         searchInput?.addEventListener('input', applyFilters);
         filterPerfil?.addEventListener('change', applyFilters);
 
-        // ─── Exportar Expediente PDF ───
-        btnExportPdf?.addEventListener('click', async () => {
-            if (window.showToast) window.showToast('Generando PDF', 'Exportando historial de movimientos...', '📄');
-            let transactions = [];
-            if (token) {
-                try {
-                    const res = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (res.ok) {
-                        const summary = await res.json();
-                        transactions = summary.transacciones || [];
-                    }
-                } catch {}
+        // ─── Exportar historial real como CSV ───
+        btnExportCsv?.addEventListener('click', () => {
+            if (!historyData.length) {
+                if (window.showToast) window.showToast('Sin datos', 'No hay análisis para exportar.', 'ℹ️');
+                return;
             }
-
-            let uName = 'Usuario FinanceAI';
-            let uEmail = 'usuario@financeai.test';
-            try {
-                const u = JSON.parse(localStorage.getItem('financeai_user') || '{}');
-                if (u.nombre) uName = u.nombre;
-                if (u.email) uEmail = u.email;
-            } catch {}
-
-            if (typeof window.generateExpedientePDF === 'function') {
-                window.generateExpedientePDF({
-                    userName: uName,
-                    userEmail: uEmail,
-                    currencyCode: activeCurrency,
-                    transactions
-                });
-            }
+            const csvCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+            const headers = ['Fecha', 'Perfil', 'Score', 'Ingreso', 'Gastos', 'Ahorro', 'Endeudamiento', 'Frecuencia'];
+            const rows = historyData.map((item) => {
+                const probability = Number(item.probabilidad || 0);
+                const score = probability > 1 ? probability : Math.round(probability * 100);
+                return [item.fechaHora, item.perfilFinanciero, score, item.ingresoMensual, item.totalGastos, item.ahorroEstimado, item.nivelEndeudamiento, item.frecuenciaAhorro];
+            });
+            const csv = '\uFEFF' + [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `FinanceAI_historial_${activeCurrency}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            if (window.showToast) window.showToast('Historial exportado', 'El archivo CSV se descargó correctamente.', '✅');
         });
     })();
 </script>

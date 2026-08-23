@@ -11,7 +11,7 @@
     </defs>
     <!-- Background rounded squircle -->
     <rect width="128" height="128" rx="28" fill="url(#bgGrad)" stroke="#334155" stroke-width="3"/>
-    
+
     <!-- 3 Signature Brand Dots -->
     <circle cx="44" cy="40" r="10" fill="#2563eb" />
     <circle cx="64" cy="40" r="10" fill="#ef4444" />
@@ -19,7 +19,7 @@
 
     <!-- Upward Trend AI Chart Line -->
     <path d="M34 88 L54 68 L72 78 L94 54" stroke="url(#aiGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-    
+
     <!-- Chart Arrow Head -->
     <polyline points="80 54 94 54 94 68" stroke="#6366f1" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

@@ -1,4 +1,6 @@
 import { test, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   clearAuthSession,
   setAuthSession,
@@ -89,4 +91,20 @@ test('resume los movimientos reales para el reporte sin convertir monedas', () =
     { type: 'GASTO', amount: 250 },
     { type: 'GASTO', amount: '125.50' },
   ])).toEqual({ income: 1500, expenses: 375.5, balance: 1124.5 });
+});
+
+test('conserva los contratos reales al aplicar el diseño final', () => {
+  const header = readFileSync(resolve('src/components/Header.astro'), 'utf8');
+  const dashboard = readFileSync(resolve('src/pages/dashboard.astro'), 'utf8');
+  const robots = readFileSync(resolve('public/robots.txt'), 'utf8');
+
+  expect(header).toContain("monedaId: Number(currencySelect?.value)");
+  expect(header).toContain('/api/v1/transactions');
+  expect(header).not.toMatch(/method:\s*['"]DELETE['"]/);
+  expect(header).not.toContain('monedaCodigo:');
+  expect(dashboard).toContain('data.ingresosMesActual');
+  expect(dashboard).toContain('data.gastosMesActual');
+  expect(dashboard).not.toContain('Cálculo de respaldo inteligente');
+  expect(robots).toContain('https://financeai-team77.duckdns.org/sitemap.xml');
+  expect(robots).not.toContain('financeai.app');
 });

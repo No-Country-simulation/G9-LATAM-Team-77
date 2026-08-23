@@ -41,9 +41,9 @@ const isLogoutPage = currentPath === 'logout';
             <div id="navRightControls" class="flex items-center gap-1.5 sm:gap-2.5 md:gap-3 flex-shrink-0">
 
                 <!-- Total Ahorrado Pill (Visible en md+) -->
-                <div id="navSaldoFavorPillDesktop" class="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0" title="Total Ahorrado General (Click para mostrar u ocultar)">
+                <div id="navSaldoFavorPillDesktop" class="hidden items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0" title="Balance positivo del mes (clic para mostrar u ocultar)">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
-                    <span class="hidden xl:inline text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider">Ahorro:</span>
+                    <span class="hidden xl:inline text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider">Balance mes:</span>
                     <span id="navSaldoText" class="font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm">••••••</span>
                     <button type="button" id="btnToggleNavEye" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer" aria-label="Mostrar u ocultar saldo">
                         <svg id="iconEyeOpen" class="w-3.5 h-3.5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -57,7 +57,7 @@ const isLogoutPage = currentPath === 'logout';
 
                     <span class="text-emerald-300 dark:text-emerald-700/80 font-light select-none">|</span>
 
-                    <select id="navCurrencySelect" class="bg-transparent text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none" title="Seleccionar divisa" aria-label="Seleccionar divisa">
+                    <select id="navCurrencySelect" disabled class="bg-transparent text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 pr-0.5 border-none outline-none disabled:opacity-100" title="La moneda se cambia desde Mi perfil" aria-label="Moneda principal del perfil">
                         <option value="HNL" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">HNL (L)</option>
                         <option value="USD" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">USD ($)</option>
                         <option value="MXN" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">MXN ($)</option>
@@ -159,19 +159,16 @@ const isLogoutPage = currentPath === 'logout';
                 </button>
             </form>
 
-            <!-- Acciones de Cuenta: Exportar Expediente ARCO & Cerrar Sesión -->
+            <!-- Acciones de Cuenta -->
             <div class="pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-2.5">
                 <button type="button" id="btnHeaderExportPdf" class="w-full py-2.5 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Descargar Expediente Financiero (PDF)
+                    Descargar Reporte Financiero (PDF)
                 </button>
 
-                <div class="flex gap-2.5">
-                    <button type="button" id="btnHeaderLogout" class="flex-1 py-2.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl transition cursor-pointer">
+                <div>
+                    <button type="button" id="btnHeaderLogout" class="w-full py-2.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl transition cursor-pointer">
                         Cerrar Sesión
-                    </button>
-                    <button type="button" id="btnOpenDeleteAccountModal" class="flex-1 py-2.5 text-xs sm:text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl transition cursor-pointer">
-                        Eliminar Cuenta
                     </button>
                 </div>
             </div>
@@ -179,26 +176,10 @@ const isLogoutPage = currentPath === 'logout';
     </div>
 </div>
 
-<!-- Modal Confirmación Eliminar Cuenta -->
-<div id="deleteAccountConfirmModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-gray-900/80 backdrop-blur-md font-inter p-4" role="dialog" aria-modal="true">
-    <div id="deleteAccountCard" class="bg-white dark:bg-gray-900 max-w-sm w-full rounded-3xl p-6 sm:p-8 shadow-2xl border border-red-300 dark:border-red-800 text-center animate-scale-in">
-        <div class="w-14 h-14 mx-auto bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mb-3">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-        </div>
-        <h4 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1.5 font-josefin">¿Eliminar tu cuenta?</h4>
-        <p class="text-xs text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
-            Se purgarán todas tus transacciones, análisis y configuraciones de forma irreversible (Derecho ARCO de Cancelación).
-        </p>
-        <div class="flex flex-col gap-2">
-            <button id="btnConfirmDeleteAccount" type="button" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm cursor-pointer">
-                Sí, eliminar definitivamente
-            </button>
-            <button id="btnCancelDeleteAccount" type="button" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm cursor-pointer">
-                Cancelar
-            </button>
-        </div>
-    </div>
-</div>
+<script>
+    import { generateFinancialReport } from '../lib/pdfReport';
+    (window as any).generateExpedientePDF = generateFinancialReport;
+</script>
 
 <script define:vars={{ API_URL }}>
     (function () {
@@ -219,7 +200,8 @@ const isLogoutPage = currentPath === 'logout';
 
         let isSaldoVisible = false;
         let totalAhorradoCalculado = 0;
-        let activeCurrency = localStorage.getItem('financeai_preferred_currency') || 'HNL';
+        let activeCurrency = 'HNL';
+        let activeCurrencySymbol = 'L';
 
         // ─── Referencias DOM ───
         const themeToggle = document.getElementById('themeToggle');
@@ -240,10 +222,6 @@ const isLogoutPage = currentPath === 'logout';
         const profileStatus = document.getElementById('profileStatusMessage');
         const profileForm = document.getElementById('profileSettingsForm');
         const btnLogout = document.getElementById('btnHeaderLogout');
-        const btnOpenDeleteModal = document.getElementById('btnOpenDeleteAccountModal');
-        const deleteModal = document.getElementById('deleteAccountConfirmModal');
-        const btnCancelDelete = document.getElementById('btnCancelDeleteAccount');
-        const btnConfirmDelete = document.getElementById('btnConfirmDeleteAccount');
         const btnHeaderExportPdf = document.getElementById('btnHeaderExportPdf');
         const navSaldoPill = document.getElementById('navSaldoFavorPillDesktop');
         const navSaldoText = document.getElementById('navSaldoText');
@@ -251,16 +229,7 @@ const isLogoutPage = currentPath === 'logout';
         const iconEyeClosed = document.getElementById('iconEyeClosed');
 
         // ─── Sincronizar Divisa Activa ───
-        if (navCurrencySelect) {
-            navCurrencySelect.value = activeCurrency;
-            navCurrencySelect.addEventListener('change', (e) => {
-                activeCurrency = e.target.value;
-                localStorage.setItem('financeai_preferred_currency', activeCurrency);
-                if (currencySelect) currencySelect.value = activeCurrency;
-                updateSaldoDisplay();
-                window.dispatchEvent(new CustomEvent('currency-changed', { detail: { currency: activeCurrency } }));
-            });
-        }
+        if (navCurrencySelect) navCurrencySelect.value = activeCurrency;
 
         // ─── Theme Switcher ───
         themeToggle?.addEventListener('click', () => {
@@ -296,9 +265,10 @@ const isLogoutPage = currentPath === 'logout';
         }
 
         if (token) {
+            if (navSaldoPill) navSaldoPill.classList.add('md:flex');
             if (profileButton) profileButton.classList.remove('hidden');
             if (profileButton) profileButton.classList.add('flex');
-            if (authNavBtn) authNavBtn.classList.add('hidden');
+            if (authNavBtn) authNavBtn.hidden = true;
 
             const savedAvatar = localStorage.getItem('financeai_avatar') || AVATAR_OPTIONS[0];
             if (navAvatarImg) navAvatarImg.src = savedAvatar;
@@ -315,9 +285,11 @@ const isLogoutPage = currentPath === 'logout';
 
             // Calcular ahorro real desde el backend
             loadUserTotalSavings();
+            loadCatalogsAndProfile();
         } else {
+            if (navSaldoPill) navSaldoPill.classList.remove('md:flex');
             if (profileButton) profileButton.classList.add('hidden');
-            if (authNavBtn) authNavBtn.classList.remove('hidden');
+            if (authNavBtn) authNavBtn.hidden = false;
         }
 
         async function loadUserTotalSavings() {
@@ -327,9 +299,7 @@ const isLogoutPage = currentPath === 'logout';
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    const income = Number(data.totalIngresos || data.income || 0);
-                    const expense = Number(data.totalGastos || data.expenses || 0);
-                    totalAhorradoCalculado = Math.max(0, income - expense);
+                    totalAhorradoCalculado = Math.max(0, Number(data.balanceMesActual) || 0);
                     updateSaldoDisplay();
                 }
             } catch {}
@@ -338,8 +308,7 @@ const isLogoutPage = currentPath === 'logout';
         function updateSaldoDisplay() {
             if (!navSaldoText) return;
             if (isSaldoVisible) {
-                const symbol = activeCurrency === 'HNL' ? 'L' : (activeCurrency === 'EUR' ? '€' : '$');
-                navSaldoText.textContent = `${symbol} ${totalAhorradoCalculado.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                navSaldoText.textContent = `${activeCurrencySymbol} ${totalAhorradoCalculado.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 if (iconEyeOpen) iconEyeOpen.classList.remove('hidden');
                 if (iconEyeClosed) iconEyeClosed.classList.add('hidden');
             } else {
@@ -423,18 +392,30 @@ const isLogoutPage = currentPath === 'logout';
 
                 if (currenciesRes.ok && currencySelect) {
                     const currencies = await currenciesRes.json();
-                    currencySelect.innerHTML = currencies.map(m => `<option value="${m.codigo}">${m.nombre} (${m.codigo}) · ${m.simbolo}</option>`).join('');
+                    currencySelect.innerHTML = currencies.map(m => `<option value="${m.id}" data-code="${m.codigo}" data-symbol="${m.simbolo}">${m.nombre} (${m.codigo}) · ${m.simbolo}</option>`).join('');
                 }
 
                 if (profileRes.ok) {
                     const prof = await profileRes.json();
                     if (prof.nombre && modalUserName) modalUserName.textContent = prof.nombre;
                     if (prof.email && modalUserEmail) modalUserEmail.textContent = prof.email;
+                    const buttonLabel = document.getElementById('profileButtonLabel');
+                    if (prof.nombre && buttonLabel) buttonLabel.textContent = prof.nombre.split(' ')[0];
+                    try {
+                        const stored = JSON.parse(localStorage.getItem('financeai_user') || '{}');
+                        localStorage.setItem('financeai_user', JSON.stringify({ ...stored, ...prof }));
+                    } catch {
+                        localStorage.setItem('financeai_user', JSON.stringify(prof));
+                    }
                     if (prof.paisId && countrySelect) countrySelect.value = prof.paisId;
-                    if (prof.monedaCodigo && currencySelect) {
-                        currencySelect.value = prof.monedaCodigo;
-                        activeCurrency = prof.monedaCodigo;
+                    if (prof.monedaId && currencySelect) {
+                        currencySelect.value = String(prof.monedaId);
+                        activeCurrency = prof.codigoMoneda || 'HNL';
+                        activeCurrencySymbol = prof.simboloMoneda || 'L';
                         if (navCurrencySelect) navCurrencySelect.value = activeCurrency;
+                        localStorage.setItem('financeai_preferred_currency', activeCurrency);
+                        updateSaldoDisplay();
+                        window.dispatchEvent(new CustomEvent('currency-changed', { detail: { currency: activeCurrency, symbol: activeCurrencySymbol } }));
                     }
                 }
             } catch (err) {
@@ -455,8 +436,8 @@ const isLogoutPage = currentPath === 'logout';
 
             try {
                 const payload = {
-                    paisId: Number(countrySelect?.value) || 1,
-                    monedaCodigo: currencySelect?.value || 'HNL'
+                    paisId: Number(countrySelect?.value),
+                    monedaId: Number(currencySelect?.value)
                 };
 
                 const res = await fetch(`${API_URL}/api/v1/users/profile`, {
@@ -469,9 +450,13 @@ const isLogoutPage = currentPath === 'logout';
                 });
 
                 if (res.ok) {
-                    activeCurrency = payload.monedaCodigo;
+                    const updatedProfile = await res.json();
+                    activeCurrency = updatedProfile.codigoMoneda || 'HNL';
+                    activeCurrencySymbol = updatedProfile.simboloMoneda || 'L';
                     localStorage.setItem('financeai_preferred_currency', activeCurrency);
                     if (navCurrencySelect) navCurrencySelect.value = activeCurrency;
+                    updateSaldoDisplay();
+                    window.dispatchEvent(new CustomEvent('currency-changed', { detail: { currency: activeCurrency, symbol: activeCurrencySymbol } }));
                     if (window.showToast) window.showToast('Preferencias Guardadas', 'Tu país y moneda han sido actualizados con éxito.', '✅');
                     closeProfile();
                 } else {
@@ -489,16 +474,15 @@ const isLogoutPage = currentPath === 'logout';
 
         // ─── Exportar PDF desde Header ───
         btnHeaderExportPdf?.addEventListener('click', async () => {
-            if (window.showToast) window.showToast('Generando Expediente', 'Procesando transacciones para tu PDF...', '📄');
+            if (window.showToast) window.showToast('Generando Reporte', 'Procesando transacciones para tu PDF...', '📄');
             try {
                 let transactions = [];
                 if (token) {
-                    const res = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
+                    const res = await fetch(`${API_URL}/api/v1/transactions`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (res.ok) {
-                        const summary = await res.json();
-                        transactions = summary.transacciones || [];
+                        transactions = await res.json();
                     }
                 }
                 const name = modalUserName?.textContent || 'Usuario FinanceAI';
@@ -509,6 +493,7 @@ const isLogoutPage = currentPath === 'logout';
                         userName: name,
                         userEmail: email,
                         currencyCode: activeCurrency,
+                        currencySymbol: activeCurrencySymbol,
                         transactions
                     });
                 }
@@ -525,36 +510,5 @@ const isLogoutPage = currentPath === 'logout';
             window.location.replace('/login');
         });
 
-        // ─── Eliminar Cuenta ───
-        btnOpenDeleteModal?.addEventListener('click', () => {
-            if (deleteModal) deleteModal.classList.remove('hidden');
-        });
-
-        btnCancelDelete?.addEventListener('click', () => {
-            if (deleteModal) deleteModal.classList.add('hidden');
-        });
-
-        btnConfirmDelete?.addEventListener('click', async () => {
-            if (!token) return;
-            btnConfirmDelete.disabled = true;
-            btnConfirmDelete.textContent = 'Eliminando…';
-
-            try {
-                const res = await fetch(`${API_URL}/api/v1/users/profile`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    localStorage.clear();
-                    window.location.replace('/login');
-                } else {
-                    throw new Error();
-                }
-            } catch {
-                if (window.showToast) window.showToast('Error', 'No fue posible eliminar la cuenta.', '❌');
-                btnConfirmDelete.disabled = false;
-                btnConfirmDelete.textContent = 'Sí, eliminar definitivamente';
-            }
-        });
     })();
 </script>

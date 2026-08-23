@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
 ---
 
-<Layout title="Dashboard de Análisis | FinanceAI" description="Panel principal de análisis de salud financiera con IA explicable (Motor DS-08), cálculo de ratios adimensionales y simulador presupuestal.">
+<Layout title="Dashboard de Análisis | FinanceAI" description="Panel principal de análisis de salud financiera conectado al Backend y al servicio de Data Science de FinanceAI.">
     <!-- Guardia de Protección de Ruta Seguro -->
     <script is:inline>
         if (!localStorage.getItem('financeai_token')) {
@@ -25,7 +25,7 @@ import { API_URL } from '../lib/api';
                     <span>Bienvenido, </span><span id="dashboardUserNameHeader" class="text-blue-600 dark:text-blue-400 font-extrabold">Usuario</span>
                 </h1>
                 <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-inter">
-                    Evaluación patrimonial inteligente con algoritmos de IA explicable.
+                    Evaluación financiera con datos reales y el modelo de Data Science de FinanceAI.
                 </p>
             </div>
             <div class="flex items-center gap-2 self-start sm:self-auto">
@@ -47,7 +47,7 @@ import { API_URL } from '../lib/api';
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 id="summaryTitle" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Resumen de Transacciones Persistidas</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Consolidado en tiempo real desde el Backend con tus movimientos oficiales.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Consolidado por el Backend con los movimientos de tu cuenta.</p>
                 </div>
                 <button id="retrySummaryBtn" type="button" class="hidden text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Reintentar</button>
             </div>
@@ -55,15 +55,15 @@ import { API_URL } from '../lib/api';
             <div id="summaryContent" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div class="metric-tile soft-lift rounded-2xl border border-emerald-100 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/40 p-4 text-emerald-800 dark:text-emerald-200">
                     <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Ingresos del Mes</p>
-                    <p id="summaryIncome" class="mt-1 text-xl font-black font-mono">0.00</p>
+                    <p id="summaryIncome" class="mt-1 text-xl font-black font-mono">—</p>
                 </div>
                 <div class="metric-tile soft-lift rounded-2xl border border-red-100 bg-red-50 dark:border-red-900/60 dark:bg-red-950/40 p-4 text-red-800 dark:text-red-200">
                     <p class="text-[10px] font-bold uppercase tracking-wider text-red-700 dark:text-red-300">Gastos del Mes</p>
-                    <p id="summaryExpenses" class="mt-1 text-xl font-black font-mono">0.00</p>
+                    <p id="summaryExpenses" class="mt-1 text-xl font-black font-mono">—</p>
                 </div>
                 <div class="metric-tile soft-lift rounded-2xl border border-blue-100 bg-blue-50 dark:border-blue-900/60 dark:bg-blue-950/40 p-4 text-blue-800 dark:text-blue-200">
                     <p class="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">Balance del Mes</p>
-                    <p id="summaryBalance" class="mt-1 text-xl font-black font-mono">0.00</p>
+                    <p id="summaryBalance" class="mt-1 text-xl font-black font-mono">—</p>
                 </div>
             </div>
         </section>
@@ -149,23 +149,23 @@ import { API_URL } from '../lib/api';
                         <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-josefin">Resultados del Modelo de IA</h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Diagnóstico explicable XAI y clasificación multidimensional</p>
                     </div>
-                    <span id="analysisProfileBadge" class="text-xs font-bold px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-300 dark:border-emerald-800">
-                        Excelente
+                    <span id="analysisProfileBadge" class="text-xs font-bold px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full border border-gray-300 dark:border-gray-700">
+                        Sin analizar
                     </span>
                 </div>
 
                 <!-- Score Meter Circle -->
                 <div class="flex flex-col sm:flex-row items-center gap-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800">
-                    <div class="relative w-28 h-28 flex items-center justify-center rounded-full border-[6px] border-emerald-500 shadow-sm flex-shrink-0" id="circleScoreIndicator">
+                    <div class="relative w-28 h-28 flex items-center justify-center rounded-full border-[6px] border-gray-300 dark:border-gray-700 shadow-sm flex-shrink-0" id="circleScoreIndicator">
                         <div class="text-center">
-                            <span class="text-3xl font-black text-gray-900 dark:text-white font-mono" id="scoreValueDisplay">88</span>
+                            <span class="text-3xl font-black text-gray-900 dark:text-white font-mono" id="scoreValueDisplay">--</span>
                             <span class="text-[9px] text-gray-400 font-bold block -mt-1 uppercase">Puntos</span>
                         </div>
                     </div>
                     <div class="space-y-1.5 text-center sm:text-left">
-                        <h4 class="text-sm font-bold text-gray-900 dark:text-white font-josefin" id="scoreTitle">Perfil Financiero Óptimo</h4>
+                        <h4 class="text-sm font-bold text-gray-900 dark:text-white font-josefin" id="scoreTitle">Análisis pendiente</h4>
                         <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed" id="scoreDescription">
-                            Tus ingresos cubren con holgura los gastos y el nivel de endeudamiento está por debajo de los umbrales de riesgo.
+                            Completa tus datos y ejecuta el análisis para obtener un diagnóstico real.
                         </p>
                     </div>
                 </div>
@@ -174,15 +174,15 @@ import { API_URL } from '../lib/api';
                 <div class="grid grid-cols-3 gap-2.5 text-center">
                     <div class="p-3 bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-gray-100 dark:border-gray-800">
                         <p class="text-[9px] uppercase font-bold text-gray-400">Gasto / Ingreso</p>
-                        <p id="ratioGastoIngreso" class="text-sm sm:text-base font-bold text-gray-900 dark:text-white font-mono mt-0.5">55.2%</p>
+                        <p id="ratioGastoIngreso" class="text-sm sm:text-base font-bold text-gray-900 dark:text-white font-mono mt-0.5">—</p>
                     </div>
                     <div class="p-3 bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-gray-100 dark:border-gray-800">
                         <p class="text-[9px] uppercase font-bold text-gray-400">Tasa de Ahorro</p>
-                        <p id="ratioAhorro" class="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">44.8%</p>
+                        <p id="ratioAhorro" class="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">—</p>
                     </div>
                     <div class="p-3 bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-gray-100 dark:border-gray-800">
                         <p class="text-[9px] uppercase font-bold text-gray-400">Endeudamiento</p>
-                        <p id="ratioEndeudamiento" class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 font-mono mt-0.5">20.0%</p>
+                        <p id="ratioEndeudamiento" class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 font-mono mt-0.5">—</p>
                     </div>
                 </div>
 
@@ -194,12 +194,8 @@ import { API_URL } from '../lib/api';
                     </h4>
                     <ul id="recommendationsList" class="space-y-2 text-xs text-gray-600 dark:text-gray-300">
                         <li class="p-2.5 bg-blue-50/50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900/40 flex items-start gap-2">
-                            <span class="text-blue-600 dark:text-blue-400 font-bold">1.</span>
-                            <span>Mantén un fondo para emergencias de al menos 3 a 6 meses de gastos fijos.</span>
-                        </li>
-                        <li class="p-2.5 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-900/40 flex items-start gap-2">
-                            <span class="text-emerald-600 dark:text-emerald-400 font-bold">2.</span>
-                            <span>Excelente disciplina de ahorro: considera canalizar el excedente a instrumentos de inversión seguros.</span>
+                            <span class="text-blue-600 dark:text-blue-400 font-bold">•</span>
+                            <span>Las recomendaciones del modelo aparecerán aquí después del análisis.</span>
                         </li>
                     </ul>
                 </div>
@@ -208,7 +204,7 @@ import { API_URL } from '../lib/api';
                 <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row gap-2.5 justify-between">
                     <button type="button" id="btnExportDashboardPdf" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-600/20 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Exportar Expediente PDF
+                        Exportar Reporte PDF
                     </button>
                     <a href="/historial" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition text-center">
                         Ver Historial Completo &rarr;
@@ -223,7 +219,14 @@ import { API_URL } from '../lib/api';
 <script define:vars={{ API_URL }}>
     (function () {
         const token = localStorage.getItem('financeai_token');
-        let currentCurrency = localStorage.getItem('financeai_preferred_currency') || 'HNL';
+        let currentCurrency = 'HNL';
+        let currentCurrencySymbol = 'L';
+
+        function clearSessionAndRedirect() {
+            localStorage.removeItem('financeai_token');
+            localStorage.removeItem('financeai_user');
+            window.location.replace('/login');
+        }
 
         // ─── Inicializar Usuario ───
         const userRaw = localStorage.getItem('financeai_user');
@@ -238,18 +241,31 @@ import { API_URL } from '../lib/api';
         }
 
         // ─── Sincronizar Divisa ───
-        function updateCurrencyUI(cur) {
+        function updateCurrencyUI(cur, symbol) {
             currentCurrency = cur;
+            currentCurrencySymbol = symbol || (cur === 'HNL' ? 'L' : (cur === 'EUR' ? '€' : '$'));
             const curBadge = document.getElementById('activeCurrencyDisplay');
             if (curBadge) curBadge.textContent = cur;
             const symbols = document.querySelectorAll('.currency-symbol');
-            const sym = cur === 'HNL' ? 'L' : (cur === 'EUR' ? '€' : '$');
-            symbols.forEach(s => s.textContent = sym);
+            symbols.forEach(s => s.textContent = currentCurrencySymbol);
         }
-        updateCurrencyUI(currentCurrency);
+        updateCurrencyUI(currentCurrency, currentCurrencySymbol);
+
+        async function loadProfile() {
+            if (!token) return;
+            const response = await fetch(`${API_URL}/api/v1/users/profile`, {
+                headers: { 'Authorization': `Bearer ${token}`, Accept: 'application/json' }
+            });
+            if (response.status === 401) return clearSessionAndRedirect();
+            if (!response.ok) throw new Error('No se pudo cargar el perfil.');
+            const profile = await response.json();
+            const userNameDisplay = document.getElementById('dashboardUserNameHeader');
+            if (userNameDisplay && profile.nombre) userNameDisplay.textContent = profile.nombre;
+            updateCurrencyUI(profile.codigoMoneda || 'HNL', profile.simboloMoneda || 'L');
+        }
 
         window.addEventListener('currency-changed', (e) => {
-            if (e.detail?.currency) updateCurrencyUI(e.detail.currency);
+            if (e.detail?.currency) updateCurrencyUI(e.detail.currency, e.detail.symbol);
         });
 
         // ─── Cargar Resumen del Backend ───
@@ -260,14 +276,14 @@ import { API_URL } from '../lib/api';
                 const res = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                if (res.status === 401) return clearSessionAndRedirect();
                 if (res.ok) {
                     const data = await res.json();
-                    const income = Number(data.totalIngresos || data.income || 0);
-                    const expense = Number(data.totalGastos || data.expenses || 0);
-                    const balance = income - expense;
+                    const income = Number(data.ingresosMesActual) || 0;
+                    const expense = Number(data.gastosMesActual) || 0;
+                    const balance = Number(data.balanceMesActual) || 0;
 
-                    const sym = currentCurrency === 'HNL' ? 'L' : (currentCurrency === 'EUR' ? '€' : '$');
-                    const fmt = (n) => `${sym} ${n.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    const fmt = (n) => `${currentCurrencySymbol} ${n.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
                     const elInc = document.getElementById('summaryIncome');
                     const elExp = document.getElementById('summaryExpenses');
@@ -284,7 +300,7 @@ import { API_URL } from '../lib/api';
                 if (retryBtn) retryBtn.classList.remove('hidden');
             }
         }
-        loadSummary();
+        loadProfile().catch(() => {}).finally(loadSummary);
         document.getElementById('retrySummaryBtn')?.addEventListener('click', loadSummary);
 
         // ─── Ejecutar Análisis con IA (Backend Data Science) ───
@@ -295,8 +311,8 @@ import { API_URL } from '../lib/api';
             e.preventDefault();
             if (!token) return;
 
-            const ingreso = Number(document.getElementById('inputIngresoMensual')?.value) || 25000;
-            const endeudamiento = Number(document.getElementById('inputEndeudamiento')?.value) || 20;
+            const ingreso = Number(document.getElementById('inputIngresoMensual')?.value);
+            const endeudamiento = Number(document.getElementById('inputEndeudamiento')?.value);
             const frecuencia = document.getElementById('selectFrecuencia')?.value || 'Mensual';
 
             const txDesc = document.querySelectorAll('.tx-desc');
@@ -304,10 +320,15 @@ import { API_URL } from '../lib/api';
             const transacciones = [];
 
             txDesc.forEach((descInput, i) => {
-                const val = Number(txVal[i]?.value) || 0;
-                const desc = descInput.value.trim() || `Gasto ${i + 1}`;
-                transacciones.push({ descripcion: desc, valor: val });
+                const val = Number(txVal[i]?.value);
+                const desc = descInput.value.trim();
+                if (desc && Number.isFinite(val) && val >= 0) transacciones.push({ descripcion: desc, valor: val });
             });
+
+            if (!Number.isFinite(ingreso) || ingreso <= 0 || !Number.isFinite(endeudamiento) || endeudamiento < 0 || endeudamiento > 100 || transacciones.length === 0) {
+                if (window.showToast) window.showToast('Datos incompletos', 'Revisa el ingreso, endeudamiento y movimientos antes de analizar.', '⚠️');
+                return;
+            }
 
             if (btnRun) {
                 btnRun.disabled = true;
@@ -331,20 +352,17 @@ import { API_URL } from '../lib/api';
                     body: JSON.stringify(payload)
                 });
 
+                if (res.status === 401) return clearSessionAndRedirect();
                 if (res.ok) {
                     const result = await res.json();
                     renderDiagnosis(result, ingreso, endeudamiento, transacciones);
                     if (window.showToast) window.showToast('Diagnóstico Actualizado', 'Análisis de salud financiera completado con éxito.', '🧠');
                 } else {
-                    throw new Error();
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'El análisis no pudo completarse.');
                 }
-            } catch {
-                // Cálculo de respaldo inteligente
-                const totalGastos = transacciones.reduce((acc, t) => acc + t.valor, 0);
-                const ratioGasto = ingreso > 0 ? (totalGastos / ingreso) * 100 : 50;
-                const score = Math.max(10, Math.min(100, Math.round(100 - (ratioGasto * 0.5) - (endeudamiento * 0.5))));
-                renderDiagnosis({ score: score, level: score >= 75 ? 'Excelente' : (score >= 45 ? 'Moderado' : 'En riesgo') }, ingreso, endeudamiento, transacciones);
-                if (window.showToast) window.showToast('Diagnóstico Generado', 'Evaluación financiera calculada con tus ratios.', '💡');
+            } catch (error) {
+                if (window.showToast) window.showToast('Análisis no disponible', error instanceof Error ? error.message : 'No fue posible conectar con Data Science.', '⚠️');
             } finally {
                 if (btnRun) {
                     btnRun.disabled = false;
@@ -356,8 +374,8 @@ import { API_URL } from '../lib/api';
         function renderDiagnosis(data, ingreso, endeudamiento, transacciones) {
             const score = (data.score !== undefined && data.score !== null)
                 ? data.score
-                : (data.score_financiero || (data.probabilidad ? Math.round(data.probabilidad * 100) : 75));
-            const perfil = data.level || (score >= 75 ? 'Excelente' : (score >= 45 ? 'Moderado' : 'En riesgo'));
+                : (data.score_financiero ?? (data.probabilidad != null ? Math.round(data.probabilidad * 100) : 0));
+            const perfil = data.level || data.perfil_financiero || (score >= 75 ? 'Excelente' : (score >= 45 ? 'Moderado' : 'En riesgo'));
 
             const scoreDisplay = document.getElementById('scoreValueDisplay');
             const profileBadge = document.getElementById('analysisProfileBadge');
@@ -396,40 +414,32 @@ import { API_URL } from '../lib/api';
             if (elGI) elGI.textContent = `${ratioGI}%`;
             if (elAh) elAh.textContent = `${ratioAh}%`;
             if (elEnd) elEnd.textContent = `${endeudamiento}%`;
+
+            const recommendations = Array.isArray(data.recommendations)
+                ? data.recommendations
+                : (Array.isArray(data.recomendaciones) ? data.recomendaciones : []);
+            const alerts = Array.isArray(data.alerts) ? data.alerts : [];
+            const items = [...alerts, ...recommendations];
+            const list = document.getElementById('recommendationsList');
+            if (list) {
+                const safeItems = items.length ? items : ['El modelo no devolvió recomendaciones adicionales para este análisis.'];
+                list.replaceChildren(...safeItems.map((message, index) => {
+                    const item = document.createElement('li');
+                    item.className = 'p-2.5 bg-blue-50/50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900/40 flex items-start gap-2';
+                    const number = document.createElement('span');
+                    number.className = 'text-blue-600 dark:text-blue-400 font-bold';
+                    number.textContent = `${index + 1}.`;
+                    const text = document.createElement('span');
+                    text.textContent = String(message);
+                    item.append(number, text);
+                    return item;
+                }));
+            }
         }
 
         // ─── Exportar PDF desde Dashboard ───
-        document.getElementById('btnExportDashboardPdf')?.addEventListener('click', async () => {
-            if (window.showToast) window.showToast('Generando PDF', 'Compilando tu reporte oficial...', '📄');
-            let transactions = [];
-            if (token) {
-                try {
-                    const res = await fetch(`${API_URL}/api/v1/dashboard/summary`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (res.ok) {
-                        const summary = await res.json();
-                        transactions = summary.transacciones || [];
-                    }
-                } catch {}
-            }
-
-            let uName = 'Usuario FinanceAI';
-            let uEmail = 'usuario@financeai.test';
-            try {
-                const u = JSON.parse(localStorage.getItem('financeai_user') || '{}');
-                if (u.nombre) uName = u.nombre;
-                if (u.email) uEmail = u.email;
-            } catch {}
-
-            if (typeof window.generateExpedientePDF === 'function') {
-                window.generateExpedientePDF({
-                    userName: uName,
-                    userEmail: uEmail,
-                    currencyCode: currentCurrency,
-                    transactions
-                });
-            }
+        document.getElementById('btnExportDashboardPdf')?.addEventListener('click', () => {
+            document.getElementById('btnHeaderExportPdf')?.click();
         });
     })();
 </script>

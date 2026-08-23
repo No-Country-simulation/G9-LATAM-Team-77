@@ -84,7 +84,7 @@ export function generateExpedientePDF(data: FinancialReportData): void {
     minute: '2-digit'
   });
 
-  const folioUnico = `FAI-ARCO-${Date.now().toString().slice(-6)}`;
+  const folioUnico = `FAI-REP-${Date.now().toString().slice(-6)}`;
 
   // ─── 1. HEADER / ENCABEZADO CORPORATIVO ───
   doc.setFillColor(15, 23, 42); // slate-900
@@ -99,14 +99,14 @@ export function generateExpedientePDF(data: FinancialReportData): void {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184); // slate-400
-  doc.text('Plataforma de Inteligencia Financiera & Salud Patrimonial', margin, 18);
+  doc.text('Resumen personal de movimientos y salud financiera', margin, 18);
 
   // ─── 2. TÍTULO DEL EXPEDIENTE ───
   let currentY = 36;
   doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text('Expediente del Titular y Registro de Movimientos', margin, currentY);
+  doc.text('Reporte personal de movimientos registrados', margin, currentY);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
@@ -291,12 +291,12 @@ export function generateExpedientePDF(data: FinancialReportData): void {
     doc.setFontSize(6.5);
     doc.setTextColor(148, 163, 184);
     doc.text(
-      'Documento informativo expedido conforme a lineamientos de Privacidad ARCO y LFPDPPP.',
+      'Documento informativo generado con los movimientos registrados en FinanceAI.',
       margin,
       pageHeight - 15
     );
     doc.text(
-      'FinanceAI garantiza que esta información es confidencial y no ha sido comercializada.',
+      'Las cifras se expresan en la moneda principal configurada por el usuario.',
       margin,
       pageHeight - 11
     );
