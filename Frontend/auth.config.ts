@@ -2,13 +2,13 @@ import Google from '@auth/core/providers/google';
 import Credentials from '@auth/core/providers/credentials';
 import { defineConfig } from 'auth-astro';
 
-const apiUrl = process.env.PUBLIC_API_URL || import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
+const apiUrl = process.env.INTERNAL_BACKEND_URL || 'http://backend:8080';
 
 export default defineConfig({
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || import.meta.env.GOOGLE_CLIENT_SECRET || '',
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     }),
     Credentials({
       name: 'Credentials',
@@ -38,7 +38,7 @@ export default defineConfig({
       }
     })
   ],
-  secret: process.env.AUTH_SECRET || import.meta.env.AUTH_SECRET || process.env.JWT_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.JWT_SECRET || '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
   trustHost: true,
   callbacks: {
     async redirect({ url, baseUrl }) {
