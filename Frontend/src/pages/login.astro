@@ -451,7 +451,8 @@ if (session) {
 
 	let isRegisterMode = false;
 	let pendingRegistrationData = null;
-	let simulatedVerificationCode = "123456";
+	let simulatedVerificationCode = null;
+	let verificationCodeExpiresAt = 0;
 
 	const form = document.getElementById('authForm');
 	const submitBtn = document.getElementById('submitBtn');
@@ -640,8 +641,9 @@ if (session) {
 				return;
 			}
 
-			// Generar código de 6 dígitos
+			// Generar código de 6 dígitos con vigencia de 10 minutos
 			simulatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+			verificationCodeExpiresAt = Date.now() + 10 * 60 * 1000;
 			pendingRegistrationData = { nombre, apellido, email, password, paisId, monedaId };
 
 			// Disparar envío de correo al instante vía Nodemailer
@@ -651,7 +653,7 @@ if (session) {
 				body: JSON.stringify({ email, code: simulatedVerificationCode, nombre })
 			}).catch(err => console.error("Error enviando verificación:", err));
 
-			showToast("Código Enviado", `Hemos enviado tu código de seguridad a ${email}. Revisa tu bandeja de entrada.`, "📧");
+			showToast("Código Enviado", `Hemos enviado tu código de seguridad a ${email} (válido por 10 minutos).`, "📧");
 
 			document.getElementById('verifyEmailTarget').textContent = email;
 			document.getElementById('verifyCodeInput').value = '';
@@ -693,8 +695,14 @@ if (session) {
 	// Confirmación de Verificación de Correo
 	document.getElementById('btnConfirmVerification')?.addEventListener('click', async () => {
 		const enteredCode = document.getElementById('verifyCodeInput').value.trim();
-		if (enteredCode !== simulatedVerificationCode && enteredCode !== '123456') {
-			showToast("Código Incorrecto", "El código ingresado no coincide. Revisa tu correo.", "❌");
+
+		if (!verificationCodeExpiresAt || Date.now() > verificationCodeExpiresAt) {
+			showToast("Código Expirado", "El código de seguridad ha expirado. Por favor solicita uno nuevo registrándote de nuevo.", "⏳");
+			return;
+		}
+
+		if (!simulatedVerificationCode || enteredCode !== simulatedVerificationCode) {
+			showToast("Código Incorrecto", "El código ingresado no coincide con el enviado a tu correo.", "❌");
 			return;
 		}
 
@@ -751,7 +759,8 @@ if (session) {
 	const recoveryModal = document.getElementById('recoveryModal');
 	const btnOpenRecovery = document.getElementById('btnOpenRecovery');
 	const btnCloseRecovery = document.getElementById('btnCloseRecovery');
-	let recoverySimulatedCode = "654321";
+	let recoverySimulatedCode = null;
+	let recoveryCodeExpiresAt = 0;
 	let recoveryBackendToken = null;
 
 	btnOpenRecovery?.addEventListener('click', () => {
@@ -785,6 +794,7 @@ if (session) {
 		}
 
 		recoverySimulatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+		recoveryCodeExpiresAt = Date.now() + 10 * 60 * 1000; // Válido por 10 minutos
 
 		// 1. Solicitar token temporal firmado al backend (Válido 15 mins)
 		fetch(`${API_URL}/api/v1/auth/forgot-password`, {
@@ -807,14 +817,20 @@ if (session) {
 			body: JSON.stringify({ email, code: recoverySimulatedCode })
 		}).catch(err => console.error("Error enviando recuperación:", err));
 
-		showToast("¡Código Enviado!", `Hemos enviado tu código de recuperación a ${email}. Revisa tu bandeja de entrada.`, "📩");
+		showToast("¡Código Enviado!", `Hemos enviado tu código de recuperación a ${email} (válido por 10 minutos).`, "📩");
 		showRecoveryStep(2);
 	});
 
 	document.getElementById('btnValidateRecoveryCode')?.addEventListener('click', () => {
 		const code = document.getElementById('recoveryCode').value.trim();
-		if (code !== recoverySimulatedCode && code !== '654321') {
-			showToast("Código Inválido", "El código ingresado es incorrecto o expiró.", "❌");
+
+		if (!recoveryCodeExpiresAt || Date.now() > recoveryCodeExpiresAt) {
+			showToast("Código Expirado", "El código de recuperación ha expirado. Solicita uno nuevo.", "⏳");
+			return;
+		}
+
+		if (!recoverySimulatedCode || code !== recoverySimulatedCode) {
+			showToast("Código Inválido", "El código ingresado es incorrecto.", "❌");
 			return;
 		}
 		showToast("Código Válido", "Por favor ingresa tu nueva contraseña.", "✅");
@@ -845,6 +861,13 @@ if (session) {
 		const btn = document.getElementById('btnSaveNewPassword');
 		btn.disabled = true;
 		btn.textContent = 'Actualizando contraseña en BD...';
+
+		if (!recoveryCodeExpiresAt || Date.now() > recoveryCodeExpiresAt) {
+			showToast("Tiempo Expirado", "La sesión de restablecimiento expiró. Solicita un nuevo código.", "⏳");
+			btn.disabled = false;
+			btn.textContent = 'Guardar Nueva Contraseña';
+			return;
+		}
 
 		try {
 			const res = await fetch(`${API_URL}/api/v1/auth/reset-password`, {
