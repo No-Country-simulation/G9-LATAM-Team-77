@@ -1,0 +1,84 @@
+services:
+  database:
+    image: mysql:8.0
+    container_name: financeai-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-railway}
+      MYSQL_USER: ${MYSQLUSER:-user}
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/database_schema.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financeai-backend
+    restart: always
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/${MYSQL_DATABASE:-railway}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=${MYSQLUSER:-root}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD:-RootSecurePass2026!}
+      - JWT_SECRET=${JWT_SECRET:-8a9b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3}
+      - PYTHON_COMMAND=/app/DataScient/venv/bin/python
+      - DATA_SCIENCE_SCRIPT=/app/DataScient/src/predict.py
+      - CORS_ALLOWED_ORIGINS=https://${DOMAIN_NAME:-localhost},http://localhost:4321
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_PASS=${GMAIL_PASS}
+      - ADMIN_EMAILS=${ADMIN_EMAILS}
+    depends_on:
+      - database
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: financeai-frontend
+    restart: always
+    environment:
+      - SITE_URL=https://${DOMAIN_NAME:-localhost}
+      - AUTH_URL=https://${DOMAIN_NAME:-localhost}
+      - AUTH_SECRET=${AUTH_SECRET:-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08}
+      - AUTH_TRUST_HOST=true
+      - PUBLIC_API_URL=https://${DOMAIN_NAME:-localhost}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  caddy:
+    image: caddy:latest
+    container_name: financeai-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  app-network:
+    driver: bridge
