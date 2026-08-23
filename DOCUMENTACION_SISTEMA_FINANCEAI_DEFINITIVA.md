@@ -627,6 +627,8 @@ El sistema incorpora la **matriz oficial de paridad de divisas base USD**:
 | **Peso argentino** | `ARS` | `$` | **$0.000667** | 1 USD = $1,499.25 ARS |
 | **Peso chileno** | `CLP` | `$` | **$0.001093** | 1 USD = $914.91 CLP |
 | **Sol peruano** | `PEN` | `S/` | **$0.2982** | 1 USD = S/ 3.35 PEN |
+| **Lempira hondureño** | `HNL` | `L` | **$0.0404** | 1 USD = L 24.75 HNL |
+| **Real brasileño** | `BRL` | `R$` | **$0.1770** | 1 USD = R$ 5.65 BRL |
 
 **Fórmula de Conversión Dinámica:**
 $$\text{Monto en Moneda Destino} = \frac{\text{Monto en Moneda Origen} \times \text{Valor en USD Origen}}{\text{Valor en USD Destino}}$$

@@ -14,7 +14,9 @@ const OFFICIAL_RATES_TABLE = [
     { name: 'Peso colombiano', code: 'COP', usdValue: '$0.000326', symbol: '$', rateToUSD: 0.000326, oneUSDEquiv: '$3,067.48 COP' },
     { name: 'Peso argentino', code: 'ARS', usdValue: '$0.000667', symbol: '$', rateToUSD: 0.000667, oneUSDEquiv: '$1,499.25 ARS' },
     { name: 'Peso chileno', code: 'CLP', usdValue: '$0.001093', symbol: '$', rateToUSD: 0.001093, oneUSDEquiv: '$914.91 CLP' },
-    { name: 'Sol peruano', code: 'PEN', usdValue: '$0.2982', symbol: 'S/', rateToUSD: 0.2982, oneUSDEquiv: 'S/ 3.35 PEN' }
+    { name: 'Sol peruano', code: 'PEN', usdValue: '$0.2982', symbol: 'S/', rateToUSD: 0.2982, oneUSDEquiv: 'S/ 3.35 PEN' },
+    { name: 'Lempira hondureño', code: 'HNL', usdValue: '$0.0404', symbol: 'L', rateToUSD: 0.0404, oneUSDEquiv: 'L 24.75 HNL' },
+    { name: 'Real brasileño', code: 'BRL', usdValue: '$0.1770', symbol: 'R$', rateToUSD: 0.1770, oneUSDEquiv: 'R$ 5.65 BRL' }
 ];
 ---
 
@@ -356,7 +358,9 @@ const OFFICIAL_RATES_TABLE = [
         COP: 0.000326,
         ARS: 0.000667,
         CLP: 0.001093,
-        PEN: 0.2982
+        PEN: 0.2982,
+        HNL: 0.0404,
+        BRL: 0.1770
     };
 
     // Símbolos de monedas
@@ -368,7 +372,9 @@ const OFFICIAL_RATES_TABLE = [
         COP: '$',
         ARS: '$',
         CLP: '$',
-        PEN: 'S/'
+        PEN: 'S/',
+        HNL: 'L',
+        BRL: 'R$'
     };
 
     /**

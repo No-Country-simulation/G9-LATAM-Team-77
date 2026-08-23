@@ -18,7 +18,9 @@ export const OFFICIAL_CURRENCIES: CurrencyRate[] = [
     { name: 'Peso colombiano', code: 'COP', usdValue: 0.000326, symbol: '$' },
     { name: 'Peso argentino', code: 'ARS', usdValue: 0.000667, symbol: '$' },
     { name: 'Peso chileno', code: 'CLP', usdValue: 0.001093, symbol: '$' },
-    { name: 'Sol peruano', code: 'PEN', usdValue: 0.2982, symbol: 'S/' }
+    { name: 'Sol peruano', code: 'PEN', usdValue: 0.2982, symbol: 'S/' },
+    { name: 'Lempira hondureño', code: 'HNL', usdValue: 0.0404, symbol: 'L' },
+    { name: 'Real brasileño', code: 'BRL', usdValue: 0.1770, symbol: 'R$' }
 ];
 
 export const USD_VALUES: { [code: string]: number } = {
@@ -29,7 +31,9 @@ export const USD_VALUES: { [code: string]: number } = {
     COP: 0.000326,
     ARS: 0.000667,
     CLP: 0.001093,
-    PEN: 0.2982
+    PEN: 0.2982,
+    HNL: 0.0404,
+    BRL: 0.1770
 };
 
 export const CURRENCY_SYMBOLS: { [code: string]: string } = {
@@ -40,7 +44,9 @@ export const CURRENCY_SYMBOLS: { [code: string]: string } = {
     COP: '$',
     ARS: '$',
     CLP: '$',
-    PEN: 'S/'
+    PEN: 'S/',
+    HNL: 'L',
+    BRL: 'R$'
 };
 
 /**

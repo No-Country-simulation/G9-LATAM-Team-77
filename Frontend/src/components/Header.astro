@@ -153,6 +153,8 @@ const googleEmail = session?.user?.email || '';
                     <option value="ARS">ARS ($) - Peso Argentino</option>
                     <option value="CLP">CLP ($) - Peso Chileno</option>
                     <option value="PEN">PEN (S/) - Sol Peruano</option>
+                    <option value="HNL">HNL (L) - Lempira Hondureño</option>
+                    <option value="BRL">BRL (R$) - Real Brasileño</option>
                 </select>
             </div>
 
@@ -456,7 +458,7 @@ const googleEmail = session?.user?.email || '';
         if (savedCurrency === 'USD') {
             rateTickerText.textContent = `1 USD ≈ $18.25 MXN`;
         } else {
-            const approximateRates = { 'MXN': 18.25, 'CRC': 515.0, 'EUR': 0.92, 'COP': 4050.0, 'ARS': 950.0, 'CLP': 930.0, 'PEN': 3.75 };
+            const approximateRates = { 'MXN': 18.25, 'CRC': 515.0, 'EUR': 0.92, 'COP': 4050.0, 'ARS': 950.0, 'CLP': 930.0, 'PEN': 3.75, 'HNL': 24.75, 'BRL': 5.65 };
             const rate = approximateRates[savedCurrency] || 1.0;
             rateTickerText.textContent = `1 USD ≈ ${rate} ${savedCurrency}`;
         }
@@ -481,7 +483,7 @@ const googleEmail = session?.user?.email || '';
 
         const currentTok = localStorage.getItem('financeai_token');
         if (currentTok) {
-            const currencyToId = { 'CRC': 1, 'MXN': 2, 'USD': 3, 'EUR': 4, 'COP': 5, 'ARS': 6, 'CLP': 7, 'PEN': 8 };
+            const currencyToId = { 'CRC': 1, 'MXN': 2, 'USD': 3, 'EUR': 4, 'COP': 5, 'ARS': 6, 'CLP': 7, 'PEN': 8, 'HNL': 9, 'BRL': 10 };
             try {
                 await fetch(`${API_URL}/api/v1/users/profile`, {
                     method: 'PUT',

@@ -27,7 +27,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-200 dark:border-gray-800 pb-4">
             <div class="space-y-0.5 sm:space-y-1">
                 <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-josefin leading-snug">
-                    <span>Bienvenido, </span><span id="dashboardUserNameHeader" class="text-blue-600 dark:text-blue-400 font-extrabold">{initialUserName ? initialUserName.replace(/^,\s*/, '') : 'Usuario'}</span>
+                    <span>Bienvenido, </span><span id="dashboardUserNameHeader" class="font-extrabold">{initialUserName ? initialUserName.replace(/^,\s*/, '') : 'Usuario'}</span>
                 </h1>
                 <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-inter">
                     Evaluación inteligente con IA.
@@ -294,6 +294,8 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                         <option value="6">Argentina</option>
                         <option value="7">Chile</option>
                         <option value="8">Perú</option>
+                        <option value="9">Honduras</option>
+                        <option value="10">Brasil</option>
                     </select>
                 </div>
                 <div>
@@ -307,6 +309,8 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                         <option value="6">ARS ($) - Argentina</option>
                         <option value="7">CLP ($) - Chile</option>
                         <option value="8">PEN (S/) - Perú</option>
+                        <option value="9">HNL (L) - Honduras</option>
+                        <option value="10">BRL (R$) - Brasil</option>
                     </select>
                 </div>
                 <button id="btnSaveProfile" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-sm text-sm">
@@ -378,7 +382,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                     
                     const pId = parseInt(document.getElementById('modalPaisId').value);
                     const mId = parseInt(document.getElementById('modalMonedaId').value);
-                    const currencyCodes = { 1: 'CRC', 2: 'MXN', 3: 'USD', 4: 'EUR', 5: 'COP', 6: 'ARS', 7: 'CLP', 8: 'PEN' };
+                    const currencyCodes = { 1: 'CRC', 2: 'MXN', 3: 'USD', 4: 'EUR', 5: 'COP', 6: 'ARS', 7: 'CLP', 8: 'PEN', 9: 'HNL', 10: 'BRL' };
                     localStorage.setItem('financeai_preferred_currency', currencyCodes[mId] || 'USD');
 
                     const updateRes = await fetch(`${API_URL}/api/v1/users/profile`, {
