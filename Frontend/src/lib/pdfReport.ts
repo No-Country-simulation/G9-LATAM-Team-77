@@ -29,9 +29,22 @@ export function generateExpedientePDF(data: UserExpedienteData) {
   const margin = 14;
 
   // Formateador de moneda
-  const currencySymbol = data.currency === 'EUR' ? '€' : '$';
+  const CURRENCY_SYMBOLS: Record<string, string> = {
+    USD: '$',
+    MXN: '$',
+    EUR: '€',
+    CRC: '₡',
+    COP: '$',
+    ARS: '$',
+    CLP: '$',
+    PEN: 'S/',
+    HNL: 'L',
+    BRL: 'R$'
+  };
+  const currencySymbol = CURRENCY_SYMBOLS[data.currency] || '$';
   const formatMoney = (val: number) => {
-    return `${currencySymbol}${val.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${data.currency}`;
+    const sign = val < 0 ? '-' : '';
+    return `${sign}${currencySymbol}${Math.abs(val).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${data.currency}`;
   };
 
   // Cálculos financieros
@@ -203,9 +216,9 @@ export function generateExpedientePDF(data: UserExpedienteData) {
 
     let dateStr = 'Reciente';
     if (t.date) {
-      dateStr = new Date(t.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+      dateStr = (t.date.includes('T') ? t.date.split('T')[0] : t.date).slice(0, 10);
     } else if (t.createdAt) {
-      dateStr = new Date(t.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+      dateStr = (t.createdAt.includes('T') ? t.createdAt.split('T')[0] : t.createdAt).slice(0, 10);
     }
 
     return [

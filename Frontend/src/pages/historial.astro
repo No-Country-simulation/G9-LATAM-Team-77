@@ -42,13 +42,9 @@ const OFFICIAL_RATES_TABLE = [
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Evolución temporal con picos, filtros de calendario por mes/rango y conversor multidivisa en vivo.</p>
             </div>
             
-            <!-- Actions (Solo Excel y Borrar Historial) -->
+            <!-- Actions (Borrar Historial) -->
             <div class="flex items-center flex-wrap gap-2 sm:gap-2.5">
-                <button type="button" id="btnExportExcel" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Exportar a Excel (.CSV)
-                </button>
-                <button type="button" id="btnOpenClearHistoryModal" class="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 sm:py-2.5 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">
+                <button type="button" id="btnOpenClearHistoryModal" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Borrar Historial
                 </button>
@@ -282,13 +278,13 @@ const OFFICIAL_RATES_TABLE = [
                 </div>
 
                 <div class="overflow-x-auto flex-grow max-h-[380px] overflow-y-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 shadow-sm">
+                    <table class="w-full text-left text-xs min-w-[520px]">
+                        <thead class="bg-gray-100/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 shadow-sm backdrop-blur-sm">
                             <tr>
-                                <th class="p-3.5 bg-gray-100 dark:bg-gray-900">Fecha</th>
-                                <th class="p-3.5 bg-gray-100 dark:bg-gray-900">Descripción</th>
-                                <th class="p-3.5 bg-gray-100 dark:bg-gray-900">Categoría</th>
-                                <th class="p-3.5 text-right bg-gray-100 dark:bg-gray-900">Monto</th>
+                                <th class="p-3.5 whitespace-nowrap w-28">Fecha</th>
+                                <th class="p-3.5 min-w-[140px]">Descripción</th>
+                                <th class="p-3.5 whitespace-nowrap w-32">Categoría</th>
+                                <th class="p-3.5 text-right whitespace-nowrap w-36">Monto</th>
                             </tr>
                         </thead>
                         <tbody id="txTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/60">
@@ -740,19 +736,25 @@ const OFFICIAL_RATES_TABLE = [
             const originCur = t.originalCurrency || profileBaseCurrency;
             const convertedAmt = convertAmount(rawAmt, originCur, currentViewingCurrency);
 
-            const amountFormatted = `${isIncome ? '+' : '-'}${symbol} ${convertedAmt.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currentViewingCurrency}`;
-            const colorClass = isIncome ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold';
+            const sign = isIncome ? '+' : '-';
+            const formattedVal = `${sign}${symbol}${convertedAmt.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const colorClass = isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400';
 
             return `
                 <tr class="hover:bg-gray-50/60 dark:hover:bg-gray-800/40 transition">
-                    <td class="p-3.5 text-gray-500 font-mono text-[11px]">${t.date}</td>
+                    <td class="p-3.5 text-gray-500 dark:text-gray-400 font-mono text-[11px] whitespace-nowrap">${t.date || ''}</td>
                     <td class="p-3.5 font-semibold text-gray-900 dark:text-white">${t.description || 'Sin descripción'}</td>
-                    <td class="p-3.5">
-                        <span class="inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    <td class="p-3.5 whitespace-nowrap">
+                        <span class="inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200/60 dark:border-gray-700/60">
                             ${t.category || 'Otros'}
                         </span>
                     </td>
-                    <td class="p-3.5 text-right ${colorClass}">${amountFormatted}</td>
+                    <td class="p-3.5 text-right whitespace-nowrap font-mono">
+                        <span class="inline-flex items-baseline justify-end gap-1 font-bold text-xs sm:text-sm ${colorClass}">
+                            <span class="tracking-tight">${formattedVal}</span>
+                            <span class="text-[10px] font-semibold opacity-70">${currentViewingCurrency}</span>
+                        </span>
+                    </td>
                 </tr>
             `;
         }).join('');
@@ -1041,155 +1043,9 @@ const OFFICIAL_RATES_TABLE = [
             clearHistoryModal?.classList.add('hidden');
             populateCategoryFilter();
             applyFilters();
+            window.dispatchEvent(new CustomEvent('financeai_global_balance_updated'));
 
             window.showToast?.('Historial Eliminado', 'Todas las transacciones históricas han sido borradas.', '🗑️');
-        };
-    }
-
-    // ─── EXPORTACIÓN PREMIUM A EXCEL (.CSV MULTI-SECCIÓN) ───
-    const btnExportExcel = document.getElementById('btnExportExcel');
-    if (btnExportExcel) {
-        btnExportExcel.onclick = () => {
-            if (filteredTransactions.length === 0) {
-                window.showToast?.('Exportación', 'No hay transacciones disponibles para exportar con los filtros activos.', '⚠️');
-                return;
-            }
-
-            const nowStr = new Date().toLocaleString('es-MX');
-            const usdVal = OFFICIAL_USD_VALUES[currentViewingCurrency] || 1.0;
-
-            let totalIngresos = 0;
-            let totalGastos = 0;
-            const categoryBreakdown = {};
-
-            filteredTransactions.forEach(t => {
-                const rawAmt = parseFloat(t.amount) || 0;
-                const originCur = t.originalCurrency || profileBaseCurrency;
-                const amt = convertAmount(rawAmt, originCur, currentViewingCurrency);
-
-                if (t.type === 'INCOME') {
-                    totalIngresos += amt;
-                } else {
-                    totalGastos += amt;
-                    const cat = t.category || 'Otros';
-                    categoryBreakdown[cat] = (categoryBreakdown[cat] || 0) + amt;
-                }
-            });
-
-            const balanceNeto = totalIngresos - totalGastos;
-
-            const XLSX = (window as any).XLSX;
-            if (XLSX) {
-                const wb = XLSX.utils.book_new();
-
-                // ─── HOJA 1: RESUMEN EJECUTIVO & CATEGORÍAS ───
-                const resumenData = [
-                    ['REPORTE FINANCIERO INTEGRAL — FINANCEAI'],
-                    ['Fecha de Generación:', nowStr],
-                    ['Moneda de Visualización:', currentViewingCurrency],
-                    ['Tasa Oficial de Equivalencia:', `1 ${currentViewingCurrency} = $${usdVal} USD`],
-                    ['Total de Movimientos:', filteredTransactions.length],
-                    [],
-                    ['MÉTRICA EJECUTIVA', 'MONTO', 'MONEDA'],
-                    ['Total Ingresos', Number(totalIngresos.toFixed(2)), currentViewingCurrency],
-                    ['Total Gastos', Number(totalGastos.toFixed(2)), currentViewingCurrency],
-                    ['Balance Neto', Number(balanceNeto.toFixed(2)), currentViewingCurrency],
-                    [],
-                    ['DESGLOSE DE GASTOS POR CATEGORÍA'],
-                    ['Categoría', 'Total Gastado', 'Moneda', '% del Total']
-                ];
-
-                Object.entries(categoryBreakdown).forEach(([cat, val]) => {
-                    const pct = totalGastos > 0 ? Number(((val / totalGastos) * 100).toFixed(2)) : 0;
-                    resumenData.push([cat, Number(val.toFixed(2)), currentViewingCurrency, `${pct}%`]);
-                });
-
-                const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-                wsResumen['!cols'] = [{ wch: 32 }, { wch: 18 }, { wch: 14 }, { wch: 14 }];
-                XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen Financiero');
-
-                // ─── HOJA 2: DETALLE COMPLETO DE TRANSACCIONES ───
-                const txHeader = ['ID', 'Fecha', 'Descripción / Concepto', 'Categoría', 'Tipo de Flujo', 'Monto Original', 'Moneda Origen', 'Monto Convertido', 'Moneda Visualización'];
-                const txRows = [txHeader];
-
-                filteredTransactions.forEach(t => {
-                    const rawAmt = parseFloat(t.amount) || 0;
-                    const originCur = t.originalCurrency || profileBaseCurrency;
-                    const convertedAmt = convertAmount(rawAmt, originCur, currentViewingCurrency);
-                    const tipoLabel = t.type === 'INCOME' ? 'Ingreso (+)' : 'Gasto (-)';
-
-                    txRows.push([
-                        t.id,
-                        t.date || '',
-                        t.description || 'Sin descripción',
-                        t.category || 'Otros',
-                        tipoLabel,
-                        Number(rawAmt.toFixed(2)),
-                        originCur,
-                        Number(convertedAmt.toFixed(2)),
-                        currentViewingCurrency
-                    ]);
-                });
-
-                const wsTx = XLSX.utils.aoa_to_sheet(txRows);
-                wsTx['!cols'] = [
-                    { wch: 14 },
-                    { wch: 14 },
-                    { wch: 35 },
-                    { wch: 22 },
-                    { wch: 15 },
-                    { wch: 16 },
-                    { wch: 14 },
-                    { wch: 18 },
-                    { wch: 18 }
-                ];
-                XLSX.utils.book_append_sheet(wb, wsTx, 'Detalle Transacciones');
-
-                const fileName = `Reporte_Financiero_FinanceAI_${currentViewingCurrency}_${new Date().toISOString().slice(0, 10)}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                window.showToast?.('¡Excel Descargado!', `Libro contable .XLSX generado con éxito en ${currentViewingCurrency}.`, '📊');
-            } else {
-                const csvLines = [
-                    ["REPORTE FINANCIERO INTEGRAL — FINANCEAI"],
-                    [`Fecha de Generación:,${nowStr}`],
-                    [`Moneda de Visualización:,${currentViewingCurrency}`],
-                    [`Total Ingresos:,${totalIngresos.toFixed(2)},${currentViewingCurrency}`],
-                    [`Total Gastos:,${totalGastos.toFixed(2)},${currentViewingCurrency}`],
-                    [`Balance Neto:,${balanceNeto.toFixed(2)},${currentViewingCurrency}`],
-                    [""],
-                    ["ID,Fecha,Descripción,Categoría,Tipo,Monto Original,Moneda Origen,Monto Convertido,Moneda Visualización"]
-                ];
-
-                filteredTransactions.forEach(t => {
-                    const rawAmt = parseFloat(t.amount) || 0;
-                    const originCur = t.originalCurrency || profileBaseCurrency;
-                    const convertedAmt = convertAmount(rawAmt, originCur, currentViewingCurrency);
-                    csvLines.push([
-                        t.id,
-                        t.date,
-                        `"${(t.description || '').replace(/"/g, '""')}"`,
-                        `"${(t.category || 'Otros').replace(/"/g, '""')}"`,
-                        t.type === 'INCOME' ? 'Ingreso' : 'Gasto',
-                        rawAmt.toFixed(2),
-                        originCur,
-                        convertedAmt.toFixed(2),
-                        currentViewingCurrency
-                    ]);
-                });
-
-                const csvContent = "\uFEFF" + csvLines.map(line => Array.isArray(line) ? line.join(',') : line).join('\r\n');
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Reporte_Financiero_FinanceAI_${currentViewingCurrency}_${new Date().toISOString().slice(0, 10)}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                window.showToast?.('¡Reporte Descargado!', `Reporte generado con éxito en ${currentViewingCurrency}.`, '📥');
-            }
         };
     }
 

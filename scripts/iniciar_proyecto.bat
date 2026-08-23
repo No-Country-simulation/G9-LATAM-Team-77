@@ -2,25 +2,44 @@
 title FinanceAI - Iniciador del Proyecto
 color 0B
 
-:: Configuracion de Java Home
-set JAVA_HOME=C:\Users\ferna\.jdks\ms-17.0.20.1
-set PATH=%JAVA_HOME%\bin;%PATH%
-
 echo =======================================================
 echo     Iniciando Proyecto FinanceAI - Team 77
 echo =======================================================
 echo.
 
-echo Cargando variables desde el archivo maestro .env...
-for /f "usebackq tokens=1,* delims==" %%a in ("%~dp0..\.env") do (
-    :: Ignoramos las lineas que empiezan con #
-    echo %%a | findstr /b /c:"#" >nul || (
-        set "%%a=%%~b"
+:: 1. Cargar variables desde el archivo maestro .env si existe
+if exist "%~dp0..\.env" (
+    echo Cargando variables desde el archivo maestro .env...
+    for /f "usebackq tokens=1,* delims==" %%a in ("%~dp0..\.env") do (
+        echo %%a | findstr /b /c:"#" >nul || (
+            set "%%a=%%~b"
+        )
     )
 )
 
+:: 2. Deteccion automatica y portable de JAVA_HOME para cualquier computadora
+if not defined JAVA_HOME (
+    for /d %%i in (%USERPROFILE%\.jdks\*17* %USERPROFILE%\.jdks\* "C:\Program Files\Java\jdk-17*" "C:\Program Files\Java\jdk*" "C:\Program Files\Eclipse Adoptium\jdk-17*" "C:\Program Files\Eclipse Adoptium\jdk*" "C:\Program Files\Microsoft\jdk-17*" "C:\Program Files\Microsoft\jdk*" "C:\Program Files\Amazon Corretto\jdk-17*" "C:\Program Files\Amazon Corretto\jdk*") do (
+        if not defined JAVA_HOME (
+            if exist "%%~i\bin\java.exe" set "JAVA_HOME=%%~i"
+        )
+    )
+)
+
+if defined JAVA_HOME (
+    echo Java detectado: %JAVA_HOME%
+    set "PATH=%JAVA_HOME%\bin;%PATH%"
+) else (
+    echo [INFO] Utilizando la configuracion predeterminada de Java en PATH...
+)
+
+echo.
 echo [1/2] Levantando el Backend (Spring Boot)...
-start "Backend FinanceAI (Puerto 8080)" cmd /k "cd /d %~dp0..\Backend\financeia-backend && .\mvnw spring-boot:run"
+if defined JAVA_HOME (
+    start "Backend FinanceAI (Puerto 8080)" cmd /k "cd /d %~dp0..\Backend\financeia-backend && set JAVA_HOME=%JAVA_HOME%&& set PATH=%JAVA_HOME%\bin;%%PATH%%&& .\mvnw.cmd spring-boot:run"
+) else (
+    start "Backend FinanceAI (Puerto 8080)" cmd /k "cd /d %~dp0..\Backend\financeia-backend && .\mvnw.cmd spring-boot:run"
+)
 
 :: Esperamos 5 segundos para darle ventaja al backend
 timeout /t 5 /nobreak >nul

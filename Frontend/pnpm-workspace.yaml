@@ -1,6 +1,10 @@
 allowBuilds:
-  core-js: set this to true or false
+  core-js: true
   esbuild: true
   sharp: true
+onlyBuiltDependencies:
+  - core-js
+  - esbuild
+  - sharp
 minimumReleaseAgeExclude:
   - astro@7.2.0

@@ -7,6 +7,8 @@ const hasServerSession = !!session;
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
 const isAuthPage = currentPath === 'login' || currentPath === 'logout';
+const isLegalPage = currentPath === 'terminos' || currentPath === 'privacidad';
+const hideTotalAhorrado = isAuthPage || isLegalPage;
 const isLogoutPage = currentPath === 'logout';
 
 const googleImage = session?.user?.image || '';
@@ -14,81 +16,162 @@ const googleName = session?.user?.name || '';
 const googleEmail = session?.user?.email || '';
 ---
 
-<header class="w-full flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 transition-colors">
-    <!-- Left: Brand & Nav Links -->
-    <div class="flex items-center gap-2.5 sm:gap-6 min-w-0">
-        <a href="/" class="flex items-center space-x-1.5 sm:space-x-2 group flex-shrink-0">
-            <div class="flex space-x-1 group-hover:scale-105 transition-transform">
-                <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
-                <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
-            </div>
-            <span class="font-bold text-base sm:text-xl tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
-        </a>
-
-        <!-- Main Nav (Oculto solo en Login y Logout) -->
-        {!isAuthPage && (
-            <nav id="mainNav" class="flex items-center space-x-2 sm:space-x-5 text-xs sm:text-sm font-medium font-inter flex-shrink-0">
-                <a href="/dashboard"
-                    class={`pb-0.5 sm:pb-1 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
-                    Dashboard
-                </a>
-                <a href="/historial"
-                    class={`pb-0.5 sm:pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
-                    Historial
-                </a>
-            </nav>
-        )}
-    </div>
-
-    <!-- Right Controls -->
-    {!isLogoutPage && (
-        <div class="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
+<header class="w-full border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md sticky top-0 z-50 transition-colors">
+    <div class="px-3.5 sm:px-5 md:px-6 py-2 sm:py-2.5">
+        
+        <!-- Fila 1: Logo & Desktop Navigation a la izquierda; Controles a la derecha -->
+        <div class="flex items-center justify-between gap-2 sm:gap-4">
             
-            <!-- Saldo a Favor Badge -->
-            {!isAuthPage && (
-                <div id="navSaldoFavorPill" class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm" title="Saldo a favor (Ingresos − Gastos)">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
-                    <span class="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 uppercase font-bold tracking-wider hidden xs:inline">Saldo a favor:</span>
-                    <span id="navSaldoFavorText" class="font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs">$0 USD</span>
-                </div>
-            )}
+            <!-- Left: Brand Logo & Desktop Navigation -->
+            <div class="flex items-center gap-3 sm:gap-6 min-w-0 flex-shrink-0">
+                <a href="/" class="flex items-center space-x-1.5 sm:space-x-2 group flex-shrink-0">
+                    <div class="flex space-x-1 group-hover:scale-105 transition-transform">
+                        <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                    </div>
+                    <span class="font-bold text-base sm:text-lg md:text-xl tracking-tight text-gray-900 dark:text-white font-josefin">FinanceAI</span>
+                </a>
 
-            <!-- Backend Health Indicator -->
-            <div id="backendIndicator" class="hidden md:flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
-                <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                <span id="backendStatusText" class="hidden sm:inline">Backend...</span>
+                <!-- Desktop Nav Links (Visible en pantallas medianas y grandes md+) -->
+                {!isAuthPage && (
+                    <nav id="desktopNav" class={`hidden md:flex items-center space-x-4 lg:space-x-6 text-xs sm:text-sm font-medium font-inter flex-shrink-0 ${isLegalPage && !hasServerSession ? 'hidden' : ''}`}>
+                        <a href="/dashboard"
+                            class={`pb-0.5 sm:pb-1 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                            Dashboard
+                        </a>
+                        <a href="/historial"
+                            class={`pb-0.5 sm:pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                            Historial
+                        </a>
+                    </nav>
+                )}
             </div>
 
-            <!-- Dark mode toggle -->
-            <button type="button" id="themeToggle"
-                aria-label="Cambiar tema"
-                class="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 cursor-pointer flex-shrink-0">
-                <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-                </svg>
-                <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
-                </svg>
-            </button>
+            <!-- Right Controls: Desktop All Controls, Mobile Top Action Buttons -->
+            {!isLogoutPage && (
+                <div id="navRightControls" class="flex items-center gap-1.5 sm:gap-2.5 md:gap-3 flex-shrink-0">
+                    
+                    <!-- Desktop Total Ahorrado Badge (Visible en md+) -->
+                    {!hideTotalAhorrado && (
+                        <div id="navSaldoFavorPillDesktop" class="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0" title="Total Ahorrado General (Click para mostrar u ocultar)">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 nav-saldo-dot"></span>
+                            <span class="hidden xl:inline text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider">Total Ahorrado:</span>
+                            <span class="font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm nav-saldo-text">••••••</span>
+                            <button type="button" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer btn-toggle-nav-eye" aria-label="Mostrar u ocultar saldo">
+                                <svg class="w-3.5 h-3.5 hidden icon-nav-eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <svg class="w-3.5 h-3.5 block icon-nav-eye-closed" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                                </svg>
+                            </button>
+                            
+                            <span class="text-emerald-300 dark:text-emerald-700/80 font-light select-none">|</span>
 
-            <!-- User Profile Avatar Button & Auth Button -->
-            {!isAuthPage && (
-                <div id="userProfileSection" class="relative flex items-center flex-shrink-0">
-                    <button id="btnOpenProfileModal" onclick="window.openProfileModal && window.openProfileModal()" class="flex items-center p-0.5 rounded-full ring-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none cursor-pointer" title="Mi Perfil y Ajustes">
-                        <img id="navUserAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Avatar de usuario" class="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm" />
+                            <select class="nav-currency-select bg-transparent text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none" title="Seleccionar divisa" aria-label="Seleccionar divisa" onclick="event.stopPropagation()">
+                                <option value="USD" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">USD</option>
+                                <option value="MXN" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">MXN</option>
+                                <option value="EUR" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">EUR</option>
+                                <option value="CRC" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">CRC</option>
+                                <option value="COP" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">COP</option>
+                                <option value="ARS" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">ARS</option>
+                                <option value="CLP" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">CLP</option>
+                                <option value="PEN" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">PEN</option>
+                                <option value="HNL" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">HNL</option>
+                                <option value="BRL" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">BRL</option>
+                            </select>
+                        </div>
+                    )}
+
+                    <!-- Backend Indicator (Desktop only) -->
+                    <div id="backendIndicator" class={`items-center gap-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full flex-shrink-0 ${isLegalPage && !hasServerSession ? 'hidden' : 'hidden lg:flex'}`}>
+                        <span id="backendDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span id="backendStatusText" class="hidden sm:inline">Backend...</span>
+                    </div>
+
+                    <!-- Dark mode toggle -->
+                    <button type="button" id="themeToggle"
+                        aria-label="Cambiar tema"
+                        class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 cursor-pointer flex-shrink-0">
+                        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                        </svg>
+                        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+                        </svg>
                     </button>
-                </div>
 
-                <button type="button" id="authNavBtn"
-                    onclick="window.openLogoutModal && window.openLogoutModal()"
-                    class="text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-xl transition-colors cursor-pointer flex-shrink-0">
-                    <span class="hidden xs:inline">Cerrar Sesión</span>
-                    <span class="xs:hidden">Cerrar Sesión</span>
-                </button>
+                    <!-- User Profile Avatar & Logout Button -->
+                    {!isAuthPage && (
+                        <div id="userProfileSection" class={`relative items-center flex-shrink-0 ${isLegalPage && !hasServerSession ? 'hidden' : 'flex'}`}>
+                            <button id="btnOpenProfileModal" onclick="window.openProfileModal && window.openProfileModal()" class="flex items-center p-0.5 rounded-full ring-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none cursor-pointer" title="Mi Perfil y Ajustes">
+                                <img id="navUserAvatar" src={googleImage || "https://api.dicebear.com/7.x/bottts/svg?seed=FinanceAI1"} alt="Avatar de usuario" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm" />
+                            </button>
+                        </div>
+
+                        <button type="button" id="authNavBtn"
+                            onclick="window.openLogoutModal && window.openLogoutModal()"
+                            class={`text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-2.5 sm:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-xl transition-colors cursor-pointer flex items-center gap-1 flex-shrink-0 ${isLegalPage && !hasServerSession ? 'hidden' : 'flex'}`}
+                            title="Cerrar Sesión">
+                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            <span class="hidden sm:inline">Cerrar Sesión</span>
+                        </button>
+                    )}
+                </div>
             )}
         </div>
-    )}
+
+        <!-- Fila 2 (Móviles < md): Links de navegación y Total Ahorrado -->
+        {!isAuthPage && !isLogoutPage && (
+            <div id="mobileSecondRow" class={`md:hidden flex items-center justify-between pt-2 mt-2 border-t border-gray-100 dark:border-gray-800/80 gap-2 ${isLegalPage && !hasServerSession ? 'hidden' : 'flex'}`}>
+                <!-- Navigation Tabs -->
+                <nav id="mobileNav" class="flex items-center space-x-4 text-xs font-medium font-inter flex-shrink-0">
+                    <a href="/dashboard"
+                        class={`pb-0.5 transition-colors ${currentPath === 'dashboard' || currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                        Dashboard
+                    </a>
+                    <a href="/historial"
+                        class={`pb-0.5 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                        Historial
+                    </a>
+                </nav>
+
+                <!-- Mobile Total Ahorrado Badge -->
+                {!hideTotalAhorrado && (
+                    <div id="navSaldoFavorPillMobile" class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0" title="Total Ahorrado General (Click para mostrar u ocultar)">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 nav-saldo-dot"></span>
+                        <span class="font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs nav-saldo-text">••••••</span>
+                        <button type="button" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 focus:outline-none flex items-center justify-center p-0.5 cursor-pointer btn-toggle-nav-eye" aria-label="Mostrar u ocultar saldo">
+                            <svg class="w-3.5 h-3.5 hidden icon-nav-eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg class="w-3.5 h-3.5 block icon-nav-eye-closed" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                            </svg>
+                        </button>
+                        
+                        <span class="text-emerald-300 dark:text-emerald-700/80 font-light select-none">|</span>
+
+                        <select class="nav-currency-select bg-transparent text-[10px] font-bold text-emerald-700 dark:text-emerald-300 focus:outline-none cursor-pointer pr-0.5 border-none outline-none" title="Seleccionar divisa" aria-label="Seleccionar divisa" onclick="event.stopPropagation()">
+                            <option value="USD" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">USD</option>
+                            <option value="MXN" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">MXN</option>
+                            <option value="EUR" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">EUR</option>
+                            <option value="CRC" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">CRC</option>
+                            <option value="COP" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">COP</option>
+                            <option value="ARS" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">ARS</option>
+                            <option value="CLP" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">CLP</option>
+                            <option value="PEN" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">PEN</option>
+                            <option value="HNL" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">HNL</option>
+                            <option value="BRL" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">BRL</option>
+                        </select>
+                    </div>
+                )}
+            </div>
+        )}
+    </div>
 </header>
 
 <!-- Modal Centrado de Confirmación de Cierre de Sesión (Overlay Difuminado) -->
@@ -141,9 +224,9 @@ const googleEmail = session?.user?.email || '';
                 </div>
             </div>
 
-            <!-- Selector de 12 Avatares Inclusivos -->
+            <!-- Selector de Avatares -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Selecciona tu Foto de Perfil (Avatares Inclusivos y Diversos)</label>
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Selecciona tu Foto de Perfil</label>
                 <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-2.5 pt-1" id="avatarGrid">
                     <!-- Dynamic avatar grid -->
                 </div>
@@ -267,7 +350,7 @@ const googleEmail = session?.user?.email || '';
     </div>
 </div>
 
-<script define:vars={{ API_URL, hasServerSession, googleImage, googleName, googleEmail, isLogoutPage }}>
+<script define:vars={{ API_URL, hasServerSession, googleImage, googleName, googleEmail, isLogoutPage, isLegalPage }}>
     // Theme toggle
     function updateThemeIcons() {
         const isDark = document.documentElement.classList.contains('dark');
@@ -432,9 +515,69 @@ const googleEmail = session?.user?.email || '';
         setTimeout(() => { window.location.replace('/login'); }, 600);
     };
 
+    // Listeners directos para botones del Header y Modales
+    document.getElementById('btnOpenProfileModal')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.openProfileModal();
+    });
+
+    document.getElementById('btnCloseProfileModal')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.closeProfileModal();
+    });
+
+    document.getElementById('authNavBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.openLogoutModal();
+    });
+
+    document.getElementById('btnHeaderCancelSignout')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.closeLogoutModal();
+    });
+
+    document.getElementById('btnHeaderConfirmSignout')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.confirmHeaderSignout();
+    });
+
+    document.getElementById('btnOpenDeleteAccountModal')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.openDeleteAccountModal();
+    });
+
+    document.getElementById('btnCancelDeleteAccount')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.closeDeleteAccountModal();
+    });
+
+    document.getElementById('btnConfirmDeleteAccount')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.confirmDeleteAccount();
+    });
+
+    // Cerrar modales al hacer clic en el backdrop exterior
+    window.addEventListener('click', (e) => {
+        const userProfileModal = document.getElementById('userProfileModal');
+        const headerLogoutModal = document.getElementById('headerLogoutModal');
+        const deleteAccountConfirmModal = document.getElementById('deleteAccountConfirmModal');
+
+        if (userProfileModal && e.target === userProfileModal) {
+            window.closeProfileModal();
+        }
+        if (headerLogoutModal && e.target === headerLogoutModal) {
+            window.closeLogoutModal();
+        }
+        if (deleteAccountConfirmModal && e.target === deleteAccountConfirmModal) {
+            window.closeDeleteAccountModal();
+        }
+    });
+
     const token = localStorage.getItem('financeai_token');
     const isAuthenticated = !!token || hasServerSession;
-    const mainNav = document.getElementById('mainNav');
+    const desktopNav = document.getElementById('desktopNav');
+    const mobileSecondRow = document.getElementById('mobileSecondRow');
+    const navRightControls = document.getElementById('navRightControls');
     const userProfileSection = document.getElementById('userProfileSection');
     const authNavBtn = document.getElementById('authNavBtn');
 
@@ -452,17 +595,26 @@ const googleEmail = session?.user?.email || '';
         } catch (e) {}
     }
 
-    if (isAuthenticated && !isLogoutPage) {
-        if (mainNav) {
-            mainNav.classList.remove('hidden');
-            mainNav.classList.add('flex');
+    if (isLegalPage) {
+        const backendIndicator = document.getElementById('backendIndicator');
+        if (!isAuthenticated) {
+            if (desktopNav) desktopNav.style.display = 'none';
+            if (mobileSecondRow) mobileSecondRow.style.display = 'none';
+            if (backendIndicator) backendIndicator.style.display = 'none';
+            if (userProfileSection) userProfileSection.style.display = 'none';
+            if (authNavBtn) authNavBtn.style.display = 'none';
+        } else {
+            if (desktopNav) desktopNav.style.display = '';
+            if (mobileSecondRow) mobileSecondRow.style.display = '';
+            if (backendIndicator) backendIndicator.style.display = '';
+            if (userProfileSection) userProfileSection.style.display = '';
+            if (authNavBtn) authNavBtn.style.display = '';
         }
-        if (userProfileSection) {
-            userProfileSection.classList.remove('hidden');
-        }
-        if (authNavBtn) {
-            authNavBtn.classList.remove('hidden');
-        }
+    } else if (isAuthenticated && !isLogoutPage) {
+        if (desktopNav) desktopNav.style.display = '';
+        if (mobileSecondRow) mobileSecondRow.style.display = '';
+        if (userProfileSection) userProfileSection.style.display = '';
+        if (authNavBtn) authNavBtn.style.display = '';
     }
 
     // Ticker de tipo de cambio
@@ -522,7 +674,7 @@ const googleEmail = session?.user?.email || '';
     // 1. Derecho de Acceso: Descargar Expediente de Datos en PDF
     document.getElementById('btnArcoExportData')?.addEventListener('click', async () => {
         const cachedUser = JSON.parse(localStorage.getItem('financeai_user') || '{}');
-        const preferredCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
+        const preferredCurrency = (localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
         const currentToken = localStorage.getItem('financeai_token');
         
         if (window.showToast) {
@@ -530,37 +682,61 @@ const googleEmail = session?.user?.email || '';
         }
 
         let transacciones = [];
+        let fetchedFromBackend = false;
+
         if (currentToken) {
             try {
                 const res = await fetch(`${API_URL}/api/v1/transactions`, {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 if (res.ok) {
-                    transacciones = await res.json();
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        transacciones = data;
+                        fetchedFromBackend = true;
+                    }
                 }
             } catch (_) {}
         }
 
-        try {
-            if (typeof (window as any).generateExpedientePDF === 'function') {
-                (window as any).generateExpedientePDF({
-                    userName: cachedUser.name || googleName || 'Usuario FinanceAI',
-                    userEmail: cachedUser.email || googleEmail || 'N/A',
-                    currency: preferredCurrency,
-                    transactions: transacciones
-                });
+        if (!fetchedFromBackend) {
+            const savedLocal = localStorage.getItem('financeai_all_transactions');
+            const isHistoryExplicitlyCleared = localStorage.getItem('financeai_history_cleared') === 'true';
+            if (savedLocal) {
+                try {
+                    transacciones = JSON.parse(savedLocal);
+                } catch (_) {
+                    transacciones = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                }
             } else {
-                const mod = await import('../lib/pdfReport');
-                mod.generateExpedientePDF({
+                transacciones = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+            }
+        }
+
+        // Normalizar transacciones para que coincidan con el formato esperado por PDF
+        const normalizedTx = (Array.isArray(transacciones) ? transacciones : []).map((t, idx) => ({
+            id: t.id || idx + 1,
+            description: t.description || t.descripcion || 'Transacción',
+            category: t.category || t.categoria || (t.type === 'INCOME' ? 'Ingresos' : 'General'),
+            amount: parseFloat(t.amount || t.monto || t.valor || 0) || 0,
+            originalCurrency: t.originalCurrency || t.moneda || 'USD',
+            type: t.type || (t.category === 'Ingresos' || t.categoria === 'Ingresos' ? 'INCOME' : 'EXPENSE'),
+            date: (t.date || t.fecha || new Date().toISOString()).toString().slice(0, 10)
+        }));
+
+        try {
+            if (typeof window.generateExpedientePDF === 'function') {
+                window.generateExpedientePDF({
                     userName: cachedUser.name || googleName || 'Usuario FinanceAI',
                     userEmail: cachedUser.email || googleEmail || 'N/A',
                     currency: preferredCurrency,
-                    transactions: transacciones
+                    transactions: normalizedTx
                 });
-            }
-
-            if (window.showToast) {
-                window.showToast('¡Descarga Lista!', 'Tu expediente financiero ha sido generado en PDF.', '📄');
+                if (window.showToast) {
+                    window.showToast('¡Descarga Lista!', 'Tu expediente financiero ha sido generado en PDF.', '📄');
+                }
+            } else {
+                console.error('generateExpedientePDF no está disponible en window');
             }
         } catch (pdfErr) {
             console.error('Error generando PDF:', pdfErr);
@@ -628,70 +804,232 @@ const googleEmail = session?.user?.email || '';
             });
     }
 
-    // Saldo a Favor sincronizado en Header
-    function updateNavSaldoFavor() {
-        const saldoElem = document.getElementById('navSaldoFavorText');
-        if (!saldoElem) return;
+    // ─── Saldo General Total Ahorrado (Consistente con Balance Neto Historial) ───
+    let isNavSaldoCensored = true;
+    let globalBaseNetUSD = 5090;
 
-        const preferredCurrency = localStorage.getItem('financeai_preferred_currency') || 'USD';
-        const cachedSaldo = localStorage.getItem('financeai_saldo_favor');
+    const OFFICIAL_USD_VALUES = {
+        USD: 1.00,
+        MXN: 0.0591,
+        EUR: 1.1687,
+        CRC: 0.0022,
+        COP: 0.000326,
+        ARS: 0.000667,
+        CLP: 0.001093,
+        PEN: 0.2982,
+        HNL: 0.0404,
+        BRL: 0.1770
+    };
 
-        if (cachedSaldo) {
-            try {
-                const parsed = JSON.parse(cachedSaldo);
-                const amt = typeof parsed === 'number' ? parsed : (parsed.amount || 0);
-                const cur = (parsed && parsed.currency) ? parsed.currency : preferredCurrency;
-                const sign = amt >= 0 ? '+' : '';
-                saldoElem.textContent = `${sign}$${Math.round(amt).toLocaleString('es-MX')} ${cur}`;
-                if (amt < 0) {
-                    saldoElem.className = 'font-bold font-mono text-red-600 dark:text-red-400 text-xs';
-                } else {
-                    saldoElem.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs';
+    const CURRENCY_SYMBOLS_MAP = {
+        USD: '$',
+        MXN: '$',
+        EUR: '€',
+        CRC: '₡',
+        COP: '$',
+        ARS: '$',
+        CLP: '$',
+        PEN: 'S/',
+        HNL: 'L',
+        BRL: 'R$'
+    };
+
+    function convertAmount(amount, fromCur, toCur) {
+        if (!amount || isNaN(amount)) return 0;
+        const from = (fromCur || 'USD').toUpperCase();
+        const to = (toCur || 'USD').toUpperCase();
+        if (from === to) return Number(amount);
+
+        const fromVal = OFFICIAL_USD_VALUES[from] || 1.0;
+        const toVal = OFFICIAL_USD_VALUES[to] || 1.0;
+
+        const inUSD = Number(amount) * fromVal;
+        const converted = inUSD / toVal;
+        return Math.round(converted * 100) / 100;
+    }
+
+    const INITIAL_SAMPLE_TRANSACTIONS = [
+        { id: 101, description: 'Sueldo Quincenal Base', amount: 4500, originalCurrency: 'USD', category: 'Ingresos', type: 'INCOME', date: '2026-08-01' },
+        { id: 102, description: 'Renta Depto', amount: 1200, originalCurrency: 'USD', category: 'Vivienda', type: 'EXPENSE', date: '2026-08-03' },
+        { id: 103, description: 'Supermercado Mensual', amount: 650, originalCurrency: 'USD', category: 'Alimentación', type: 'EXPENSE', date: '2026-08-06' },
+        { id: 104, description: 'Gasolina y Transporte', amount: 420, originalCurrency: 'USD', category: 'Transporte', type: 'EXPENSE', date: '2026-08-10' },
+        { id: 105, description: 'Servicios de Luz y Agua', amount: 180, originalCurrency: 'USD', category: 'Servicios', type: 'EXPENSE', date: '2026-08-13' },
+        { id: 106, description: 'Ingreso Extra Consultoría', amount: 800, originalCurrency: 'USD', category: 'Ingresos', type: 'INCOME', date: '2026-08-15' },
+        { id: 107, description: 'Cursos y Libros', amount: 500, originalCurrency: 'USD', category: 'Educación', type: 'EXPENSE', date: '2026-08-18' },
+        { id: 108, description: 'Cena y Salidas', amount: 260, originalCurrency: 'USD', category: 'Entretenimiento', type: 'EXPENSE', date: '2026-08-20' },
+        { id: 109, description: 'Farmacia y Vitaminas', amount: 140, originalCurrency: 'USD', category: 'Salud y bienestar', type: 'EXPENSE', date: '2026-07-24' },
+        { id: 110, description: 'Ropa y Accesorios', amount: 310, originalCurrency: 'USD', category: 'Compras', type: 'EXPENSE', date: '2026-07-28' },
+        { id: 111, description: 'Ingreso Nómina Julio', amount: 4200, originalCurrency: 'USD', category: 'Ingresos', type: 'INCOME', date: '2026-07-01' },
+        { id: 112, description: 'Mantenimiento Vehicular', amount: 750, originalCurrency: 'USD', category: 'Transporte', type: 'EXPENSE', date: '2026-07-15' }
+    ];
+
+    function renderNavSaldoDisplay() {
+        const saldoTexts = document.querySelectorAll('.nav-saldo-text');
+        const eyeOpens = document.querySelectorAll('.icon-nav-eye-open');
+        const eyeCloseds = document.querySelectorAll('.icon-nav-eye-closed');
+        const pillDesktop = document.getElementById('navSaldoFavorPillDesktop');
+        const pillMobile = document.getElementById('navSaldoFavorPillMobile');
+        const dots = document.querySelectorAll('.nav-saldo-dot');
+        const navCurSelects = document.querySelectorAll('.nav-currency-select');
+
+        if (saldoTexts.length === 0) return;
+
+        const activeCur = (navCurSelects[0]?.value || localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
+        navCurSelects.forEach(sel => {
+            if (sel.value !== activeCur) sel.value = activeCur;
+        });
+
+        const symbol = CURRENCY_SYMBOLS_MAP[activeCur] || '$';
+        const convertedAmt = convertAmount(globalBaseNetUSD, 'USD', activeCur);
+
+        if (isNavSaldoCensored) {
+            saldoTexts.forEach(el => {
+                el.textContent = '••••••';
+                el.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm nav-saldo-text';
+            });
+            eyeOpens.forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
+            eyeCloseds.forEach(el => { el.classList.remove('hidden'); el.classList.add('block'); });
+            
+            if (pillDesktop) {
+                pillDesktop.className = 'hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0';
+            }
+            if (pillMobile) {
+                pillMobile.className = 'flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0';
+            }
+            dots.forEach(dot => { dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 nav-saldo-dot'; });
+        } else {
+            const isNegative = convertedAmt < 0;
+            const formattedNumber = Math.abs(Math.round(convertedAmt)).toLocaleString('es-MX');
+
+            if (isNegative) {
+                saldoTexts.forEach(el => {
+                    el.textContent = `-${symbol}${formattedNumber}`;
+                    el.className = 'font-bold font-mono text-red-600 dark:text-red-400 text-xs sm:text-sm nav-saldo-text';
+                });
+                if (pillDesktop) {
+                    pillDesktop.className = 'hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 rounded-full text-xs font-semibold text-red-700 dark:text-red-300 shadow-sm cursor-pointer select-none transition hover:bg-red-100/70 dark:hover:bg-red-900/50 flex-shrink-0';
                 }
-                return;
-            } catch (_) {}
-        }
-
-        const token = localStorage.getItem('financeai_token');
-        if (token) {
-            fetch(`${API_URL}/api/v1/transactions`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(res => res.ok ? res.json() : [])
-            .then(txs => {
-                if (Array.isArray(txs)) {
-                    let inc = 0;
-                    let exp = 0;
-                    txs.forEach(t => {
-                        const a = parseFloat(t.amount) || 0;
-                        const typ = (t.type || '').toUpperCase();
-                        if (typ === 'INCOME' || typ === 'INGRESO') {
-                            inc += a;
-                        } else {
-                            exp += a;
-                        }
-                    });
-                    const net = inc - exp;
-                    localStorage.setItem('financeai_saldo_favor', JSON.stringify({ amount: net, currency: preferredCurrency }));
-                    const sign = net >= 0 ? '+' : '';
-                    saldoElem.textContent = `${sign}$${Math.round(net).toLocaleString('es-MX')} ${preferredCurrency}`;
+                if (pillMobile) {
+                    pillMobile.className = 'flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 rounded-full text-xs font-semibold text-red-700 dark:text-red-300 shadow-sm cursor-pointer select-none transition hover:bg-red-100/70 dark:hover:bg-red-900/50 flex-shrink-0';
                 }
-            })
-            .catch(() => {});
+                dots.forEach(dot => { dot.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0 nav-saldo-dot'; });
+            } else {
+                saldoTexts.forEach(el => {
+                    el.textContent = `${symbol}${formattedNumber}`;
+                    el.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm nav-saldo-text';
+                });
+                if (pillDesktop) {
+                    pillDesktop.className = 'hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0';
+                }
+                if (pillMobile) {
+                    pillMobile.className = 'flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm cursor-pointer select-none transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 flex-shrink-0';
+                }
+                dots.forEach(dot => { dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0 nav-saldo-dot'; });
+            }
+
+            eyeOpens.forEach(el => { el.classList.remove('hidden'); el.classList.add('block'); });
+            eyeCloseds.forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
         }
     }
 
-    window.addEventListener('financeai_saldo_updated', (e) => {
-        const saldoElem = document.getElementById('navSaldoFavorText');
-        if (!saldoElem || !e.detail) return;
-        const amt = e.detail.amount || 0;
-        const cur = e.detail.currency || 'USD';
-        const sign = amt >= 0 ? '+' : '';
-        saldoElem.textContent = `${sign}$${Math.round(amt).toLocaleString('es-MX')} ${cur}`;
-        if (amt < 0) {
-            saldoElem.className = 'font-bold font-mono text-red-600 dark:text-red-400 text-xs';
+    function toggleNavSaldoCensor(e) {
+        if (e) e.preventDefault();
+        isNavSaldoCensored = !isNavSaldoCensored;
+        renderNavSaldoDisplay();
+    }
+
+    document.getElementById('navSaldoFavorPillDesktop')?.addEventListener('click', toggleNavSaldoCensor);
+    document.getElementById('navSaldoFavorPillMobile')?.addEventListener('click', toggleNavSaldoCensor);
+
+    // Evento de selección de divisa en Navbar (desktop y mobile sincronizados)
+    document.querySelectorAll('.nav-currency-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+            const newCur = e.target.value;
+            localStorage.setItem('financeai_preferred_currency', newCur);
+            document.querySelectorAll('.nav-currency-select').forEach(other => {
+                if (other !== e.target) other.value = newCur;
+            });
+            const profSelect = document.getElementById('profileCurrencySelect');
+            if (profSelect) profSelect.value = newCur;
+            renderNavSaldoDisplay();
+            window.dispatchEvent(new CustomEvent('financeai_currency_changed', { detail: { currency: newCur } }));
+            window.dispatchEvent(new CustomEvent('financeai_global_balance_updated'));
+        });
+    });
+
+    // Saldo General de todos los meses sincronizado (calculado desde base de datos / historial)
+    async function updateNavSaldoFavor() {
+        const preferredCurrency = (localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
+        document.querySelectorAll('.nav-currency-select').forEach(sel => {
+            sel.value = preferredCurrency;
+        });
+
+        const token = localStorage.getItem('financeai_token');
+        let transactions = [];
+        let fetchedFromBackend = false;
+
+        if (token) {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/transactions`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        transactions = data;
+                        fetchedFromBackend = true;
+                    }
+                }
+            } catch (_) {}
+        }
+
+        if (!fetchedFromBackend) {
+            const savedLocal = localStorage.getItem('financeai_all_transactions');
+            const isHistoryExplicitlyCleared = localStorage.getItem('financeai_history_cleared') === 'true';
+            if (savedLocal) {
+                try {
+                    transactions = JSON.parse(savedLocal);
+                } catch (_) {
+                    transactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                }
+            } else {
+                transactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+            }
+        }
+
+        let incUSD = 0;
+        let expUSD = 0;
+        if (Array.isArray(transactions)) {
+            transactions.forEach(t => {
+                const a = parseFloat(t.amount || t.monto || t.valor || 0) || 0;
+                const originCur = t.originalCurrency || t.moneda || 'USD';
+                const amtInUSD = convertAmount(a, originCur, 'USD');
+                const typ = (t.type || '').toUpperCase();
+                const cat = (t.category || t.categoria || '').toUpperCase();
+                if (typ === 'INCOME' || typ === 'INGRESO' || cat === 'INGRESOS') {
+                    incUSD += amtInUSD;
+                } else {
+                    expUSD += amtInUSD;
+                }
+            });
+        }
+
+        globalBaseNetUSD = incUSD - expUSD;
+        renderNavSaldoDisplay();
+    }
+
+    // Escuchar eventos globales de sincronización de balance general
+    window.addEventListener('financeai_global_balance_updated', (e) => {
+        if (e && e.detail && typeof e.detail.balanceUSD === 'number') {
+            globalBaseNetUSD = e.detail.balanceUSD;
+            renderNavSaldoDisplay();
         } else {
-            saldoElem.className = 'font-bold font-mono text-emerald-600 dark:text-emerald-400 text-xs';
+            updateNavSaldoFavor();
+        }
+    });
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'financeai_all_transactions' || e.key === 'financeai_preferred_currency' || e.key === 'financeai_history_cleared') {
+            updateNavSaldoFavor();
         }
     });
 

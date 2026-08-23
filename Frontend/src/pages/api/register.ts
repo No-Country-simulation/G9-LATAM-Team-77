@@ -14,9 +14,8 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const backendUrl = process.env.INTERNAL_BACKEND_URL || 'http://127.0.0.1:8080';
     // Call backend API to register
-    const res = await fetch(`${backendUrl}/api/v1/auth/register`, {
+    const res = await fetch(`${API_URL}/api/v1/auth/register`, {
       method: "POST",
       body: JSON.stringify({ email, password, name }),
       headers: { "Content-Type": "application/json" }
