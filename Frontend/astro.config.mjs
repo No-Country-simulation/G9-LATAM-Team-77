@@ -28,9 +28,12 @@ if (fs.existsSync(rootEnvPath)) {
   });
 }
 
+const authSecret = process.env.AUTH_SECRET;
+const siteUrl = process.env.SITE_URL || 'https://financeai-app.duckdns.org';
+
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://financeai-app.duckdns.org',
+  site: siteUrl,
   output: 'server',
   adapter: node({
     mode: 'standalone'
@@ -40,6 +43,15 @@ export default defineConfig({
   },
   vite: {
     envDir: '../',
+    define: {
+      'import.meta.env.AUTH_TRUST_HOST': 'true',
+      'import.meta.env.AUTH_SECRET': JSON.stringify(authSecret),
+      'import.meta.env.AUTH_URL': JSON.stringify(siteUrl),
+      'process.env.AUTH_TRUST_HOST': '"true"',
+      'process.env.AUTH_URL': JSON.stringify(siteUrl),
+      'process.env.NEXTAUTH_URL': JSON.stringify(siteUrl),
+      'process.env.AUTH_SECRET': JSON.stringify(authSecret)
+    },
     build: {
       sourcemap: false
     },

@@ -7,8 +7,8 @@ const apiUrl = process.env.INTERNAL_BACKEND_URL || 'http://backend:8080';
 export default defineConfig({
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     Credentials({
       name: 'Credentials',
@@ -38,7 +38,7 @@ export default defineConfig({
       }
     })
   ],
-  secret: process.env.AUTH_SECRET || process.env.JWT_SECRET || '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
+  secret: process.env.AUTH_SECRET,
   trustHost: true,
   callbacks: {
     async redirect({ url, baseUrl }) {
