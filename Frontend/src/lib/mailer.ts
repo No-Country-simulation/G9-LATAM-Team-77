@@ -146,7 +146,7 @@ function createEmailTemplate(title: string, subtitle: string, code: string, mess
             </div>
             <div class="footer">
                 ${footerText}<br>
-                 2026 FinanceAI Technologies. Todos los derechos reservados.
+                © 2026 FinanceAI Technologies. Todos los derechos reservados.
             </div>
         </div>
     </body>
@@ -158,21 +158,24 @@ function createEmailTemplate(title: string, subtitle: string, code: string, mess
  * Enviar Código de Verificación de Cuenta
  */
 export async function sendVerificationEmail(toEmail: string, code: string, name?: string) {
-    const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '';
+    const user = (process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '').trim();
     const transporter = getTransporter();
-    const greeting = name ? `¡Hola ${name}!` : '¡Hola!';
+    const greeting = name ? `Hola ${name}` : 'Hola';
     const html = createEmailTemplate(
         'Verifica tu Cuenta',
-        `${greeting} Gracias por unirte a FinanceAI. Para completar la creación de tu cuenta y proteger tus datos, utiliza el siguiente código de seguridad.`,
+        `${greeting}, gracias por unirte a FinanceAI. Para completar la creación de tu cuenta y proteger tus datos, utiliza el siguiente código de seguridad.`,
         code,
         'Este código es válido durante los próximos 15 minutos. Si tú no solicitaste esta cuenta, puedes ignorar este mensaje de forma segura.',
         'Mensaje de seguridad generado automáticamente por el sistema de verificación.'
     );
 
+    const plainText = `${greeting},\n\nTu código de verificación para FinanceAI es: ${code}\n\nEste código es válido por 15 minutos.\n\n© 2026 FinanceAI Technologies.`;
+
     return transporter.sendMail({
-        from: `"FinanceAI Seguridad" <${user}>`,
+        from: `"FinanceAI" <${user}>`,
         to: toEmail,
-        subject: ` Tu código de verificación FinanceAI: ${code}`,
+        subject: `FinanceAI - Tu código de verificación: ${code}`,
+        text: plainText,
         html: html
     });
 }
@@ -181,7 +184,7 @@ export async function sendVerificationEmail(toEmail: string, code: string, name?
  * Enviar Código de Restablecimiento de Contraseña
  */
 export async function sendRecoveryEmail(toEmail: string, code: string) {
-    const user = process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '';
+    const user = (process.env.GMAIL_USER || import.meta.env.GMAIL_USER || '').trim();
     const transporter = getTransporter();
     const html = createEmailTemplate(
         'Recuperación de Contraseña',
@@ -191,10 +194,13 @@ export async function sendRecoveryEmail(toEmail: string, code: string) {
         'Si no solicitaste este cambio, ponte en contacto de inmediato con soporte.'
     );
 
+    const plainText = `Hemos recibido una solicitud para restablecer tu contraseña en FinanceAI.\n\nTu código de recuperación es: ${code}\n\nIntroduce este código para crear una nueva contraseña.\n\n© 2026 FinanceAI Technologies.`;
+
     return transporter.sendMail({
-        from: `"FinanceAI Soporte" <${user}>`,
+        from: `"FinanceAI" <${user}>`,
         to: toEmail,
-        subject: ` Restablece tu contraseña - Código: ${code}`,
+        subject: `FinanceAI - Código de recuperación: ${code}`,
+        text: plainText,
         html: html
     });
 }

@@ -30,6 +30,7 @@ if (fs.existsSync(rootEnvPath)) {
 
 // https://astro.build/config
 export default defineConfig({
+  site: process.env.SITE_URL || 'https://financeai-app.duckdns.org',
   output: 'server',
   adapter: node({
     mode: 'standalone'
