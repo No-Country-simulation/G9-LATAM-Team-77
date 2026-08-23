@@ -27,6 +27,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "google_subject", unique = true)
+    private String googleSubject;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pais_id")
     private Pais country;

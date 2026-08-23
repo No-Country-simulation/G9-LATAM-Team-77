@@ -1,9 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { API_URL } from '../lib/api';
+
+const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? '';
 ---
 
 <Layout title="Acceso | FinanceAI" description="Inicia sesión o regístrate en FinanceAI para gestionar y optimizar tu salud financiera con inteligencia artificial.">
+	{GOOGLE_CLIENT_ID && <script is:inline src="https://accounts.google.com/gsi/client?hl=es" async defer></script>}
 	<!-- Protección de Ruta: Si ya hay token JWT, redirigir a dashboard -->
 	<script is:inline>
 		(function() {
@@ -69,12 +72,12 @@ import { API_URL } from '../lib/api';
 						<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">DATOS REALES</div>
 					</div>
 					<div>
-						<div class="text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-400">JWT</div>
-						<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">ACCESO SEGURO</div>
+						<div class="text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight text-emerald-400">SEGURO</div>
+						<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">ACCESO PROTEGIDO</div>
 					</div>
 					<div>
-						<div class="text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight text-white">HNL</div>
-						<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">MONEDA LOCAL</div>
+						<div class="text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight text-white">MULTIMONEDA</div>
+						<div class="text-[9px] sm:text-[11px] text-slate-400 font-semibold tracking-widest mt-1 uppercase">HNL, MXN, USD Y MÁS</div>
 					</div>
 				</div>
 			</div>
@@ -153,6 +156,47 @@ import { API_URL } from '../lib/api';
 					</button>
 				</form>
 
+				{GOOGLE_CLIENT_ID && (
+					<div id="googleAuthSection" class="space-y-4 font-inter">
+						<div class="flex items-center gap-3 text-[11px] uppercase tracking-wider text-gray-400">
+							<span class="h-px flex-1 bg-gray-200 dark:bg-gray-800"></span>
+							<span>O continúa con</span>
+							<span class="h-px flex-1 bg-gray-200 dark:bg-gray-800"></span>
+						</div>
+						<div id="googleButton" class="flex min-h-11 w-full justify-center"></div>
+						<p class="text-center text-[10px] leading-relaxed text-gray-500 dark:text-gray-500">
+							Google verifica tu identidad y FinanceAI protege tu sesión.
+						</p>
+					</div>
+				)}
+
+				{GOOGLE_CLIENT_ID && (
+					<div id="googleProfilePanel" class="hidden space-y-4 rounded-2xl border border-blue-200 bg-blue-50/70 p-4 font-inter dark:border-blue-900/60 dark:bg-blue-950/30">
+						<div>
+							<h3 class="text-sm font-bold text-gray-900 dark:text-white">Completa tu perfil</h3>
+							<p class="mt-1 text-xs text-gray-600 dark:text-gray-400">Selecciona país y moneda para crear tu cuenta de Google sin asumir tu ubicación.</p>
+						</div>
+						<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+							<div>
+								<label for="googleCountrySelect" class="mb-1 block text-xs font-semibold text-gray-700 dark:text-gray-300">País</label>
+								<select id="googleCountrySelect" class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+									<option value="">Selecciona tu país</option>
+								</select>
+							</div>
+							<div>
+								<label for="googleCurrencySelect" class="mb-1 block text-xs font-semibold text-gray-700 dark:text-gray-300">Moneda</label>
+								<select id="googleCurrencySelect" class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+									<option value="">Selecciona tu moneda</option>
+								</select>
+							</div>
+						</div>
+						<div class="flex gap-2">
+							<button id="cancelGoogleProfileBtn" type="button" class="flex-1 rounded-xl border border-gray-300 px-3 py-2.5 text-xs font-semibold text-gray-700 hover:bg-white dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+							<button id="completeGoogleProfileBtn" type="button" class="flex-1 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white hover:bg-blue-700">Continuar con Google</button>
+						</div>
+					</div>
+				)}
+
 				<!-- Forgot Password Form Panel (Hidden by default) -->
 				<div id="forgotPanel" class="hidden space-y-4 font-inter">
 					<form id="forgotForm" class="space-y-4">
@@ -183,9 +227,10 @@ import { API_URL } from '../lib/api';
 	</div>
 </Layout>
 
-<script define:vars={{ API_URL }}>
+<script define:vars={{ API_URL, GOOGLE_CLIENT_ID }}>
     let registerMode = false;
     let catalogsReady = false;
+    let pendingGoogleCredential = '';
 
     const byId = (id) => document.getElementById(id);
     const form = byId('authForm');
@@ -200,6 +245,10 @@ import { API_URL } from '../lib/api';
     const forgotForm = byId('forgotForm');
     const forgotSubmitButton = byId('forgotSubmitButton');
     const modeToggle = byId('modeToggle');
+    const googleAuthSection = byId('googleAuthSection');
+    const googleProfilePanel = byId('googleProfilePanel');
+    const googleCountrySelect = byId('googleCountrySelect');
+    const googleCurrencySelect = byId('googleCurrencySelect');
 
     function showAlert(message, isError = true) {
         if (!alertBox) return;
@@ -242,6 +291,8 @@ import { API_URL } from '../lib/api';
 
             countrySelect.innerHTML = '<option value="">Selecciona tu país</option>' + countries.map(c => `<option value="${c.id || c.codigo}">${c.nombre} (${c.codigo})</option>`).join('');
             currencySelect.innerHTML = '<option value="">Selecciona tu moneda</option>' + currencies.map(m => `<option value="${m.id || m.codigo}">${m.nombre} (${m.codigo}) · ${m.simbolo}</option>`).join('');
+            if (googleCountrySelect) googleCountrySelect.innerHTML = countrySelect.innerHTML;
+            if (googleCurrencySelect) googleCurrencySelect.innerHTML = currencySelect.innerHTML;
 
             countrySelect.disabled = false;
             currencySelect.disabled = false;
@@ -268,10 +319,82 @@ import { API_URL } from '../lib/api';
         setSession(data);
     }
 
+    async function submitGoogleCredential(credential, paisId = null, monedaId = null) {
+        const response = await fetch(`${API_URL}/api/v1/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ credential, paisId, monedaId }),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (response.status === 422 && !paisId && !monedaId) {
+            pendingGoogleCredential = credential;
+            if (!catalogsReady) await loadCatalogs();
+            googleProfilePanel?.classList.remove('hidden');
+            googleAuthSection?.classList.add('hidden');
+            showAlert(data.message || 'Completa tu país y moneda para continuar.', false);
+            return;
+        }
+
+        if (!response.ok || !data.token) {
+            throw new Error(data.message || 'No fue posible iniciar sesión con Google.');
+        }
+
+        pendingGoogleCredential = '';
+        setSession(data);
+        showAlert('Sesión de Google verificada. Redirigiendo…', false);
+        window.setTimeout(() => window.location.replace('/dashboard'), 250);
+    }
+
+    async function handleGoogleCredential(response) {
+        if (!response?.credential) {
+            showAlert('Google no devolvió una credencial válida.');
+            return;
+        }
+        try {
+            await submitGoogleCredential(response.credential);
+        } catch (error) {
+            showAlert(error instanceof Error ? error.message : 'No fue posible iniciar sesión con Google.');
+        }
+    }
+
+    function initializeGoogleButton() {
+        const button = byId('googleButton');
+        if (!GOOGLE_CLIENT_ID || !button || !window.google?.accounts?.id) return;
+
+        window.google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleCredential,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+        });
+        window.google.accounts.id.renderButton(button, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'continue_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            locale: 'es',
+            width: Math.min(400, Math.max(240, button.clientWidth)),
+        });
+    }
+
+    if (GOOGLE_CLIENT_ID) {
+        if (window.google?.accounts?.id) {
+            initializeGoogleButton();
+        } else {
+            document.querySelector('script[src*="accounts.google.com/gsi/client"]')
+                ?.addEventListener('load', initializeGoogleButton, { once: true });
+        }
+    }
+
     function setForgotMode(enabled) {
         form.classList.toggle('hidden', enabled);
         forgotPanel.classList.toggle('hidden', !enabled);
         modeToggle.classList.toggle('hidden', enabled);
+        googleAuthSection?.classList.toggle('hidden', enabled);
+        if (enabled) googleProfilePanel?.classList.add('hidden');
         alertBox.classList.add('hidden');
         byId('formTitle').textContent = enabled ? 'RECUPERA TU ACCESO' : (registerMode ? 'CREA TU CUENTA' : 'TU ESPACIO FINANCIERO');
         byId('formSubtitle').textContent = enabled
@@ -325,6 +448,36 @@ import { API_URL } from '../lib/api';
     });
 
     retryCatalogs?.addEventListener('click', loadCatalogs);
+
+    byId('cancelGoogleProfileBtn')?.addEventListener('click', () => {
+        pendingGoogleCredential = '';
+        googleProfilePanel?.classList.add('hidden');
+        googleAuthSection?.classList.remove('hidden');
+        alertBox.classList.add('hidden');
+    });
+
+    byId('completeGoogleProfileBtn')?.addEventListener('click', async () => {
+        if (!pendingGoogleCredential || !googleCountrySelect?.value || !googleCurrencySelect?.value) {
+            showAlert('Selecciona tu país y moneda para continuar con Google.');
+            return;
+        }
+
+        const button = byId('completeGoogleProfileBtn');
+        button.disabled = true;
+        button.textContent = 'Verificando…';
+        try {
+            await submitGoogleCredential(
+                pendingGoogleCredential,
+                Number(googleCountrySelect.value),
+                Number(googleCurrencySelect.value),
+            );
+        } catch (error) {
+            showAlert(error instanceof Error ? error.message : 'No fue posible crear la cuenta de Google.');
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Continuar con Google';
+        }
+    });
 
     byId('togglePassword')?.addEventListener('click', () => {
         const passwordInput = byId('password');

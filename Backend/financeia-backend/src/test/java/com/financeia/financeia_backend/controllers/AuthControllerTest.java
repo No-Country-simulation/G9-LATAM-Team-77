@@ -2,6 +2,7 @@ package com.financeia.financeia_backend.controllers;
 
 import com.financeia.financeia_backend.dto.auth.LoginRequest;
 import com.financeia.financeia_backend.dto.auth.LoginResponse;
+import com.financeia.financeia_backend.dto.auth.GoogleLoginRequest;
 import com.financeia.financeia_backend.dto.auth.ForgotPasswordRequest;
 import com.financeia.financeia_backend.dto.auth.MessageResponse;
 import com.financeia.financeia_backend.dto.auth.RegistroRequest;
@@ -97,6 +98,20 @@ class AuthControllerTest {
         assertEquals(1L, result.getBody().userId());
         assertEquals("Juan", result.getBody().nombre());
         assertEquals("juan@gmail.com", result.getBody().email());
+    }
+
+    @Test
+    void deberiaIniciarSesionConGoogle() {
+        GoogleLoginRequest request = new GoogleLoginRequest("google-id-token", 1L, 1L);
+        LoginResponse response = new LoginResponse(
+                "jwt-token", 1L, "Juan", "juan@gmail.com"
+        );
+        when(authService.googleLogin(request)).thenReturn(response);
+
+        ResponseEntity<LoginResponse> result = authController.googleLogin(request);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("jwt-token", result.getBody().token());
     }
 
     @Test

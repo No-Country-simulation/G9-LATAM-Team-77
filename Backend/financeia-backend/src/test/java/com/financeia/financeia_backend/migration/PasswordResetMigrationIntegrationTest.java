@@ -29,8 +29,8 @@ class PasswordResetMigrationIntegrationTest {
     }
 
     @Test
-    void appliesFlywayFromV1ThroughV6AndCreatesSecureTokenTable() {
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("6");
+    void appliesFlywayFromV1ThroughV7AndPreservesSecureTokenTable() {
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("7");
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE LOWER(TABLE_NAME) = 'password_reset_tokens'",
                 Integer.class
@@ -38,6 +38,11 @@ class PasswordResetMigrationIntegrationTest {
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS "
                         + "WHERE LOWER(TABLE_NAME) = 'password_reset_tokens' AND LOWER(COLUMN_NAME) = 'token_hash'",
+                Integer.class
+        )).isEqualTo(1);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS "
+                        + "WHERE LOWER(TABLE_NAME) = 'usuarios' AND LOWER(COLUMN_NAME) = 'google_subject'",
                 Integer.class
         )).isEqualTo(1);
     }

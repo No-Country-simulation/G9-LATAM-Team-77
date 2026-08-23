@@ -26,7 +26,7 @@ El proyecto está estructurado en módulos especializados para garantizar escala
 El núcleo de la aplicación es una API REST robusta que gestiona la lógica de negocio y la seguridad:
 - **Framework:** Spring Boot (Java).
 - **Seguridad:** Spring Security stateless con autenticación basada en JWT.
-- **Base de Datos:** MySQL 8.4 con migraciones Flyway V1 a V6.
+- **Base de Datos:** MySQL 8.4 con migraciones Flyway V1 a V7.
 - **Documentación:** Swagger / OpenAPI para la exploración y prueba de endpoints.
 - **Módulos principales:** autenticación, usuarios, transacciones, catálogos, Dashboard, análisis financiero e historial autenticado.
 
@@ -102,6 +102,7 @@ Los valores reales deben existir únicamente en `.env.docker`:
 | `MYSQL_ROOT_PASSWORD` | Contraseña administrativa del contenedor MySQL |
 | `JWT_SECRET` | Firma de los tokens emitidos por el Backend |
 | `AUTH_SECRET` | Secreto independiente utilizado por el Frontend |
+| `GOOGLE_CLIENT_ID` | Identificador público del cliente web de Google Identity Services |
 | `PUBLIC_API_URL` | URL pública del Backend consumida por el navegador |
 | `CORS_ALLOWED_ORIGINS` | Orígenes permitidos por el Backend |
 | `DATA_SCIENCE_TIMEOUT_SECONDS` | Tiempo máximo de ejecución del proceso Python |
@@ -125,12 +126,44 @@ docker compose --env-file .env.docker down
 ```
 
 El Backend queda disponible en `http://localhost:8080` y el Frontend en
-`http://localhost:4321`. Flyway aplica automáticamente las migraciones V1 a V6
+`http://localhost:4321`. Flyway aplica automáticamente las migraciones V1 a V7
 cuando inicia el Backend después de que MySQL esté saludable.
 
 `docker compose down` elimina los contenedores y la red, pero conserva el volumen
 de MySQL. No uses `docker compose down -v` como operación normal: la opción `-v`
 elimina el volumen persistente y sus datos.
+
+## Acceso con Google
+
+FinanceAI usa Google Identity Services únicamente para comprobar la identidad.
+El navegador recibe una credencial de Google y la envía a
+`POST /api/v1/auth/google`; el Backend valida su firma, audiencia, emisor,
+expiración y correo verificado antes de emitir el JWT stateless normal de
+FinanceAI. La credencial de Google no se guarda en `localStorage` ni en la base
+de datos. Para identificar de forma estable una cuenta se conserva solamente el
+campo `sub` verificado por Google. V7 agrega este identificador opcional y único
+a `usuarios`.
+
+### Configuración de Google Cloud
+
+1. En Google Cloud crea un **OAuth 2.0 Client ID** de tipo **Web application**.
+2. Agrega como orígenes JavaScript autorizados, según el entorno:
+   - `http://localhost:4321`
+   - `https://financeai-team77.duckdns.org`
+3. No hace falta configurar una URI de redirección para el flujo popup con
+   callback JavaScript usado por esta aplicación.
+4. Copia únicamente el identificador público del cliente en
+   `GOOGLE_CLIENT_ID` dentro del `.env.docker` local ignorado por Git. FinanceAI
+   no usa ni solicita un client secret para este flujo.
+5. Reconstruye el Frontend después de cambiar el identificador, porque
+   `PUBLIC_GOOGLE_CLIENT_ID` se incorpora al bundle durante el build.
+
+Si `GOOGLE_CLIENT_ID` está vacío, el botón se oculta y el login tradicional
+continúa funcionando. Al crear una cuenta nueva con Google, FinanceAI solicita
+país y moneda explícitamente para no inferirlos por ubicación. Una cuenta Gmail
+o Google Workspace existente puede vincularse por su correo verificado; una
+colisión con un correo externo no autoritativo se rechaza para evitar apropiación
+de cuentas.
 
 ## Recuperación segura de contraseña
 
