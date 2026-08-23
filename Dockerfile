@@ -23,7 +23,8 @@ RUN cd /app/DataScient && \
 COPY Backend/financeia-backend/ /app/Backend/
 
 # Construir el backend
-RUN cd /app/Backend && \
+RUN chmod +x /app/Backend/mvnw && \
+    cd /app/Backend && \
     ./mvnw clean package -DskipTests
 
 # Variables de entorno para que Spring Boot encuentre a Python
