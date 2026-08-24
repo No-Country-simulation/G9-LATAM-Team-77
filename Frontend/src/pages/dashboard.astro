@@ -133,12 +133,12 @@ import { API_URL } from '../lib/api';
                     </div>
 
                     <div>
-                        <span class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Endeudamiento calculado</span>
+                        <span class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Endeudamiento mensual estimado</span>
                         <div class="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 dark:border-gray-700 dark:bg-gray-800" aria-live="polite">
                             <strong id="inputEndeudamiento" class="font-mono text-sm text-blue-600 dark:text-blue-400">0.0%</strong>
-                            <span id="debtAmountSummary" class="text-right text-[10px] font-medium text-gray-500 dark:text-gray-400">Sin deudas registradas</span>
+                            <span id="debtAmountSummary" class="text-right text-[10px] font-medium text-gray-500 dark:text-gray-400">Sin pagos de deuda registrados</span>
                         </div>
-                        <p class="mt-1 text-[10px] text-gray-400">Pago mensual de “Deudas” ÷ ingreso neto del período × 100.</p>
+                        <p class="mt-1 text-[10px] leading-relaxed text-gray-400">Se calcula con las cuotas mensuales de préstamos, tarjetas u otras deudas, no con todos tus gastos.</p>
                     </div>
 
                     <!-- Transacciones del período para el Motor de IA -->
@@ -148,10 +148,16 @@ import { API_URL } from '../lib/api';
                             <span id="analysisTransactionCount" class="text-[11px] text-gray-400">4 agregadas</span>
                         </div>
                         <div id="analysisTransactionList" class="max-h-72 space-y-2 overflow-y-auto pr-1 text-xs"></div>
-                        <button id="btnAddAnalysisTransaction" type="button" class="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-gray-300 py-2.5 text-xs font-semibold text-gray-500 transition hover:border-blue-500 hover:text-blue-600 dark:border-gray-700 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                            Agregar transacción
-                        </button>
+                        <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                            <button id="btnAddAnalysisTransaction" type="button" class="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-gray-300 py-2.5 text-xs font-semibold text-gray-500 transition hover:border-blue-500 hover:text-blue-600 dark:border-gray-700 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                                Agregar gasto
+                            </button>
+                            <button id="btnAddDebtPayment" type="button" class="flex w-full items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 py-2.5 text-xs font-bold text-blue-700 transition hover:border-blue-400 hover:bg-blue-100 dark:border-blue-900/70 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:border-blue-700 dark:hover:bg-blue-950/70">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m3-9.5c0-1.38-1.34-2.5-3-2.5S9 7.12 9 8.5s1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5-3-1.12-3-2.5" /></svg>
+                                Agregar pago de deuda
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Botón de Análisis -->
@@ -310,6 +316,9 @@ import { API_URL } from '../lib/api';
             'Ahorro e inversión',
             'Otros',
         ];
+        const CATEGORY_LABELS = {
+            Deudas: 'Pago mensual de deudas',
+        };
         let currentPeriodStart = '';
         let currentPeriodEnd = '';
         let calendarViewDate = new Date();
@@ -329,6 +338,10 @@ import { API_URL } from '../lib/api';
             return { debtAmount, ratio: Number(ratio.toFixed(1)) };
         }
 
+        function categoryDisplayName(category) {
+            return CATEGORY_LABELS[category] || category;
+        }
+
         function updateDebtIndicator() {
             const income = Number(document.getElementById('inputIngresoMensual')?.value);
             const { debtAmount, ratio } = calculateDebtRatio(income);
@@ -337,8 +350,8 @@ import { API_URL } from '../lib/api';
             if (ratioDisplay) ratioDisplay.textContent = `${ratio.toFixed(1)}%`;
             if (amountDisplay) {
                 amountDisplay.textContent = debtAmount > 0
-                    ? `${currentCurrencySymbol} ${debtAmount.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} en deudas`
-                    : 'Sin deudas registradas';
+                    ? `${currentCurrencySymbol} ${debtAmount.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} en pagos mensuales de deuda`
+                    : 'Sin pagos de deuda registrados';
             }
         }
 
@@ -480,7 +493,7 @@ import { API_URL } from '../lib/api';
                 <div class="grid grid-cols-12 items-center gap-1.5 rounded-2xl border border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800/80" data-transaction-id="${transaction.id}">
                     <div class="col-span-12 sm:col-span-5">
                         <select class="tx-category w-full rounded-xl border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" aria-label="Categoría de la transacción">
-                            ${OFFICIAL_CATEGORIES.map(category => `<option value="${category}" ${transaction.descripcion === category ? 'selected' : ''}>${category}</option>`).join('')}
+                            ${OFFICIAL_CATEGORIES.map(category => `<option value="${category}" ${transaction.descripcion === category ? 'selected' : ''}>${categoryDisplayName(category)}</option>`).join('')}
                         </select>
                     </div>
                     <div class="col-span-5 sm:col-span-3">
@@ -523,18 +536,28 @@ import { API_URL } from '../lib/api';
             updateDebtIndicator();
         }
 
-        document.getElementById('btnAddAnalysisTransaction')?.addEventListener('click', () => {
+        function addAnalysisTransaction(category = 'Alimentación') {
             if (analysisTransactions.length >= 12) {
                 if (window.showToast) window.showToast('Límite alcanzado', 'Puedes analizar hasta 12 transacciones por ejecución.', 'ℹ️');
                 return;
             }
             analysisTransactions.push({
                 id: nextTransactionId++,
-                descripcion: 'Alimentación',
+                descripcion: category,
                 valor: 0,
                 fecha: currentPeriodEnd,
             });
             renderAnalysisTransactions();
+            const newRow = transactionList?.querySelector(`[data-transaction-id="${nextTransactionId - 1}"]`);
+            newRow?.querySelector('.tx-amount')?.focus();
+        }
+
+        document.getElementById('btnAddAnalysisTransaction')?.addEventListener('click', () => {
+            addAnalysisTransaction();
+        });
+
+        document.getElementById('btnAddDebtPayment')?.addEventListener('click', () => {
+            addAnalysisTransaction('Deudas');
         });
 
         frequencySelect?.addEventListener('change', updateSelectedPeriod);

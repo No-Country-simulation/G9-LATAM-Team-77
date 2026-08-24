@@ -148,6 +148,9 @@ test('conserva los contratos reales al aplicar el diseño final', () => {
   expect(dashboard).toContain('id="btnAddAnalysisTransaction"');
   expect(dashboard).toContain("'Salud y bienestar'");
   expect(dashboard).toContain("transaction.descripcion === 'Deudas'");
+  expect(dashboard).toContain("Deudas: 'Pago mensual de deudas'");
+  expect(dashboard).toContain('id="btnAddDebtPayment"');
+  expect(dashboard).toContain("addAnalysisTransaction('Deudas')");
   expect(dashboard).toContain('calculateDebtRatio(ingreso).ratio');
   expect(dashboard).not.toContain('required value="20"');
   expect(dashboard).toContain('analysisTransactions.length >= 12');
