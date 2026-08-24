@@ -85,7 +85,7 @@ const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? '';
 
 		<!-- Right Panel (Auth Forms) -->
 		<div class="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-10 lg:p-16 bg-white dark:bg-gray-950">
-			<div class="max-w-md w-full mx-auto space-y-5 sm:space-y-6">
+			<div id="authContainer" class="max-w-md w-full mx-auto space-y-5 sm:space-y-6 transition-[max-width] duration-300">
 				<!-- Form Header -->
 				<div class="text-left space-y-1 sm:space-y-1.5 pb-1">
 					<h2 id="formTitle" class="text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-tight text-blue-600 dark:text-blue-400 font-josefin">TU ESPACIO FINANCIERO</h2>
@@ -148,6 +148,40 @@ const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? '';
 								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><circle cx="12" cy="12" r="3"/></svg>
 							</button>
 						</div>
+					</div>
+
+					<!-- Confirmación y consentimiento visibles solo al crear una cuenta -->
+					<div id="registrationSecurityFields" class="hidden space-y-4">
+						<div>
+							<label for="confirmPassword" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Confirmar contraseña</label>
+							<div class="relative">
+								<input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" placeholder="Repite tu contraseña" class="w-full pl-3.5 pr-11 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white" />
+								<button id="toggleConfirmPassword" type="button" aria-label="Mostrar confirmación de contraseña" class="absolute inset-y-0 right-0 grid w-11 place-items-center text-gray-400 hover:text-blue-600">
+									<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><circle cx="12" cy="12" r="3"/></svg>
+								</button>
+							</div>
+						</div>
+
+						<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs dark:border-slate-700 dark:bg-slate-900/80">
+							<p class="mb-2 font-bold text-slate-800 dark:text-slate-100">Requisitos de contraseña</p>
+							<ul class="grid gap-1.5 text-slate-500 dark:text-slate-400 sm:grid-cols-2" aria-live="polite">
+								<li data-password-requirement="length">○ Mínimo 8 caracteres</li>
+								<li data-password-requirement="uppercase">○ Una letra mayúscula</li>
+								<li data-password-requirement="lowercase">○ Una letra minúscula</li>
+								<li data-password-requirement="number">○ Un número</li>
+								<li data-password-requirement="special">○ Un carácter especial</li>
+							</ul>
+						</div>
+
+						<div class="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 text-xs leading-relaxed text-slate-600 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-slate-300">
+							<strong class="text-slate-800 dark:text-white">Tratamiento de datos financieros:</strong>
+							FinanceAI utiliza tus datos exclusivamente para administrar tu cuenta y generar diagnósticos financieros. No vendemos tu información.
+						</div>
+
+						<label class="flex cursor-pointer items-start gap-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+							<input id="acceptTerms" type="checkbox" class="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600" />
+							<span>He leído y acepto los <a href="/terminos" class="font-bold text-blue-600 hover:underline dark:text-blue-400">Términos de Servicio</a> y el <a href="/privacidad" class="font-bold text-blue-600 hover:underline dark:text-blue-400">Aviso de Privacidad</a>.</span>
+						</label>
 					</div>
 
 					<!-- Submit Button -->
@@ -236,6 +270,8 @@ const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? '';
     const form = byId('authForm');
     const submitButton = byId('submitButton');
     const registerFields = byId('registerFields');
+    const registrationSecurityFields = byId('registrationSecurityFields');
+    const authContainer = byId('authContainer');
     const countrySelect = byId('paisSelect');
     const currencySelect = byId('monedaSelect');
     const catalogStatus = byId('catalogStatus');
@@ -438,8 +474,14 @@ const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? '';
     byId('toggleModeBtn')?.addEventListener('click', () => {
         registerMode = !registerMode;
         registerFields.classList.toggle('hidden', !registerMode);
-        byId('formTitle').textContent = registerMode ? 'CREA TU CUENTA' : 'TU ESPACIO FINANCIERO';
-        byId('formSubtitle').textContent = registerMode ? 'Regístrate para optimizar tus finanzas' : 'Accede a tu cuenta';
+        registrationSecurityFields?.classList.toggle('hidden', !registerMode);
+        authContainer?.classList.toggle('max-w-2xl', registerMode);
+        authContainer?.classList.toggle('max-w-md', !registerMode);
+        byId('confirmPassword').required = registerMode;
+        byId('acceptTerms').required = registerMode;
+        googleAuthSection?.classList.toggle('hidden', registerMode);
+        byId('formTitle').textContent = registerMode ? 'Crear cuenta nueva' : 'TU ESPACIO FINANCIERO';
+        byId('formSubtitle').textContent = registerMode ? 'Ingresa tus datos para registrarte en FinanceAI' : 'Accede a tu cuenta';
         byId('toggleQuestion').textContent = registerMode ? '¿Ya tienes cuenta?' : '¿Aún no tienes cuenta?';
         byId('toggleModeBtn').textContent = registerMode ? 'Inicia sesión' : 'Regístrate';
         submitButton.textContent = registerMode ? 'Crear cuenta' : 'Iniciar sesión';
@@ -486,6 +528,34 @@ const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? '';
         byId('togglePassword').setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
     });
 
+    byId('toggleConfirmPassword')?.addEventListener('click', () => {
+        const input = byId('confirmPassword');
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        byId('toggleConfirmPassword').setAttribute('aria-label', showing ? 'Mostrar confirmación de contraseña' : 'Ocultar confirmación de contraseña');
+    });
+
+    const registrationPasswordStatus = (password) => ({
+        length: password.length >= 8,
+        uppercase: /[A-ZÁÉÍÓÚÑ]/.test(password),
+        lowercase: /[a-záéíóúñ]/.test(password),
+        number: /\d/.test(password),
+        special: /[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]/.test(password),
+    });
+
+    function refreshPasswordRequirements() {
+        const status = registrationPasswordStatus(byId('password')?.value || '');
+        Object.entries(status).forEach(([requirement, valid]) => {
+            const item = document.querySelector(`[data-password-requirement="${requirement}"]`);
+            if (!item) return;
+            item.className = valid ? 'font-semibold text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400';
+            item.textContent = `${valid ? '✓' : '○'} ${item.textContent.replace(/^[✓○]\s*/, '')}`;
+        });
+        return Object.values(status).every(Boolean);
+    }
+
+    byId('password')?.addEventListener('input', refreshPasswordRequirements);
+
     form?.addEventListener('submit', async (event) => {
         event.preventDefault();
         const email = byId('email').value.trim();
@@ -502,6 +572,15 @@ const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? '';
                 const apellido = byId('apellido').value.trim();
                 if (!nombre || !apellido) {
                     throw new Error('Por favor ingresa tu nombre y apellido.');
+                }
+                if (!refreshPasswordRequirements()) {
+                    throw new Error('La contraseña debe cumplir todos los requisitos de seguridad.');
+                }
+                if (password !== byId('confirmPassword').value) {
+                    throw new Error('Las contraseñas no coinciden.');
+                }
+                if (!byId('acceptTerms').checked) {
+                    throw new Error('Debes aceptar los Términos de Servicio y el Aviso de Privacidad.');
                 }
 
                 const registerRes = await fetch(`${API_URL}/api/v1/auth/register`, {

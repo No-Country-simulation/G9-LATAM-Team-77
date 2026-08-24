@@ -12,8 +12,10 @@ export interface RegisterPayload {
   apellido: string;
   email: string;
   password: string;
+  confirmPassword: string;
   paisId: number;
   monedaId: number;
+  acceptedTerms: boolean;
 }
 
 export interface LoginPayload {
@@ -63,9 +65,14 @@ export function validateRegisterInput(payload: RegisterPayload): { valid: boolea
   if (!payload.apellido || !payload.apellido.trim()) {
     return { valid: false, error: 'El apellido es requerido.' };
   }
-  const loginValidation = validateLoginInput({ email: payload.email, password: payload.password });
-  if (!loginValidation.valid) {
-    return loginValidation;
+  if (!payload.email || !payload.email.trim() || !payload.email.includes('@')) {
+    return { valid: false, error: 'Ingresa un correo electrónico válido.' };
+  }
+  if (!passwordRequirementStatus(payload.password).valid) {
+    return { valid: false, error: 'La contraseña debe cumplir todos los requisitos de seguridad.' };
+  }
+  if (payload.password !== payload.confirmPassword) {
+    return { valid: false, error: 'Las contraseñas no coinciden.' };
   }
   if (!payload.paisId || payload.paisId <= 0) {
     return { valid: false, error: 'Debe seleccionar un país válido.' };
@@ -73,5 +80,24 @@ export function validateRegisterInput(payload: RegisterPayload): { valid: boolea
   if (!payload.monedaId || payload.monedaId <= 0) {
     return { valid: false, error: 'Debe seleccionar una moneda válida.' };
   }
+  if (!payload.acceptedTerms) {
+    return { valid: false, error: 'Debes aceptar los Términos de Servicio y el Aviso de Privacidad.' };
+  }
   return { valid: true };
+}
+
+export function passwordRequirementStatus(password: string) {
+  const value = password || '';
+  const requirements = {
+    length: value.length >= 8,
+    uppercase: /[A-ZÁÉÍÓÚÑ]/.test(value),
+    lowercase: /[a-záéíóúñ]/.test(value),
+    number: /\d/.test(value),
+    special: /[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]/.test(value),
+  };
+
+  return {
+    ...requirements,
+    valid: Object.values(requirements).every(Boolean),
+  };
 }

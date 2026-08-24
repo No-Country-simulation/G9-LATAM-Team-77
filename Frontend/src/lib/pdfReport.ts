@@ -114,13 +114,7 @@ export function generateExpedientePDF(data: FinancialReportData): void {
   doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text(
-    data.analysis
-      ? 'Expediente de Análisis Financiero con IA'
-      : 'Expediente del Titular y Registro de Transacciones',
-    margin,
-    currentY,
-  );
+  doc.text('Expediente del Titular y Registro de Transacciones', margin, currentY);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
@@ -359,7 +353,7 @@ export function generateExpedientePDF(data: FinancialReportData): void {
     doc.setFontSize(6.5);
     doc.setTextColor(148, 163, 184);
     doc.text(
-      'Documento informativo generado con los movimientos registrados en FinanceAI.',
+      'Documento informativo generado por FinanceAI. No constituye asesoría financiera.',
       margin,
       pageHeight - 15
     );

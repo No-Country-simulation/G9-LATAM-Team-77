@@ -765,6 +765,10 @@ import { API_URL } from '../lib/api';
                     recommendations: safeItems.map(String),
                 },
             };
+
+            window.dispatchEvent(new CustomEvent('financeai:analysis-completed', {
+                detail: { estimatedSavings: Math.max(0, ingreso - totalGastos) },
+            }));
         }
 
         // ─── Exportar PDF desde Dashboard ───
