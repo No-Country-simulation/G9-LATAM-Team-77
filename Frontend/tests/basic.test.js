@@ -6,6 +6,7 @@ import {
   setAuthSession,
   validateLoginInput,
   validateRegisterInput,
+  passwordRequirementStatus,
 } from '../src/lib/auth';
 import {
   FORGOT_PASSWORD_CONFIRMATION,
@@ -14,6 +15,7 @@ import {
   validateResetPassword,
 } from '../src/lib/password-reset';
 import { summarizeTransactions } from '../src/lib/pdfReport';
+import { selectHeaderBalance } from '../src/lib/financialSummary';
 
 test('Calculo basico de finanzas (Prueba de integracion UI)', () => {
   const ingresos = 5000;
@@ -45,19 +47,26 @@ test('valida login y seleccion dinamica de catalogos', () => {
     nombre: 'Ana',
     apellido: 'López',
     email: 'ana@financeai.test',
-    password: '123456',
+    password: 'Clave#2026',
+    confirmPassword: 'Clave#2026',
     paisId: 47,
     monedaId: 83,
+    acceptedTerms: true,
   })).toEqual({ valid: true });
 
   expect(validateRegisterInput({
     nombre: 'Ana',
     apellido: 'López',
     email: 'ana@financeai.test',
-    password: '123456',
+    password: 'Clave#2026',
+    confirmPassword: 'Clave#2026',
     paisId: 0,
     monedaId: 83,
+    acceptedTerms: true,
   }).valid).toBe(false);
+
+  expect(passwordRequirementStatus('Clave#2026').valid).toBe(true);
+  expect(passwordRequirementStatus('sin-seguridad').valid).toBe(false);
 });
 
 test('valida el formulario de solicitud sin enumerar cuentas', () => {
@@ -93,6 +102,23 @@ test('resume los movimientos reales para el reporte sin convertir monedas', () =
   ])).toEqual({ income: 1500, expenses: 375.5, balance: 1124.5 });
 });
 
+test('muestra balance mensual o el ahorro persistido del último análisis', () => {
+  expect(selectHeaderBalance(
+    { ingresosMesActual: 25000, gastosMesActual: 13800, balanceMesActual: 11200 },
+    [{ ahorroEstimado: 9000, fechaHora: '2026-08-22T10:00:00Z' }],
+  )).toEqual({ amount: 11200, label: 'Balance mes:', source: 'monthly-transactions' });
+
+  expect(selectHeaderBalance(
+    { ingresosMesActual: 0, gastosMesActual: 0, balanceMesActual: 0 },
+    [
+      { ahorroEstimado: 8000, fechaHora: '2026-08-21T10:00:00Z' },
+      { ahorroEstimado: 11200, fechaHora: '2026-08-23T10:00:00Z' },
+    ],
+  )).toEqual({ amount: 11200, label: 'Ahorro estimado:', source: 'latest-analysis' });
+
+  expect(selectHeaderBalance(null, [])).toEqual({ amount: 0, label: 'Sin movimientos:', source: 'empty' });
+});
+
 test('conserva los contratos reales al aplicar el diseño final', () => {
   const header = readFileSync(resolve('src/components/Header.astro'), 'utf8');
   const dashboard = readFileSync(resolve('src/pages/dashboard.astro'), 'utf8');
@@ -104,6 +130,9 @@ test('conserva los contratos reales al aplicar el diseño final', () => {
 
   expect(header).toContain("monedaId: Number(currencySelect?.value)");
   expect(header).toContain('/api/v1/transactions');
+  expect(header).toContain('/api/v1/historial-analisis');
+  expect(header).toContain("navBalanceLabel.textContent = 'Ahorro estimado:'");
+  expect(header).toContain('financeai:analysis-completed');
   expect(header).not.toMatch(/method:\s*['"]DELETE['"]/);
   expect(header).not.toContain('monedaCodigo:');
   expect(dashboard).toContain('data.ingresosMesActual');
@@ -126,6 +155,7 @@ test('conserva los contratos reales al aplicar el diseño final', () => {
   expect(dashboard).toContain("iso >= currentPeriodStart && iso <= currentPeriodEnd");
   expect(dashboard).toContain('latestAnalysisExport');
   expect(dashboard).toContain('window.generateExpedientePDF({');
+  expect(dashboard).toContain("new CustomEvent('financeai:analysis-completed'");
   expect(pdfReport).toContain('DIAGNÓSTICO FINANCIERO CON IA');
   expect(pdfReport).toContain('Recomendaciones principales');
   expect(pdfReport).toContain('Expediente del Titular y Registro de Transacciones');
@@ -155,6 +185,10 @@ test('conserva los contratos reales al aplicar el diseño final', () => {
   expect(login).toContain('/api/v1/auth/google');
   expect(login).toContain('PUBLIC_GOOGLE_CLIENT_ID');
   expect(login).toContain('Selecciona país y moneda para crear tu cuenta de Google');
+  expect(login).toContain('Crear cuenta nueva');
+  expect(login).toContain('id="confirmPassword"');
+  expect(login).toContain('Requisitos de contraseña');
+  expect(login).toContain('id="acceptTerms"');
   expect(robots).toContain('https://financeai-team77.duckdns.org/sitemap.xml');
   expect(robots).not.toContain('financeai.app');
 });
