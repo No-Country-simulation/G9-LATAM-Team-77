@@ -1,219 +1,46 @@
-# 📊 FinanceAI - Asistente Inteligente de Salud Financiera
+# 📊 FinanceAI - Plataforma Integral de Salud Financiera[cite: 2]
 
-![Status](https://img.shields.io/badge/Status-MVP%20Validado-brightgreen)
-![Fase](https://img.shields.io/badge/Fase-Entrega-blue)
-![Backend](https://img.shields.io/badge/Backend-Spring%20Boot-brightgreen)
-![Data Science](https://img.shields.io/badge/AI%2FML-Python-blue)
+> **Plataforma Integral de Salud Financiera con Inteligencia Artificial, Arquitectura Multi-Moneda y Monitoreo en Tiempo Real.**[cite: 2]
+> *Versión Corporativa Oficial Extendida y Definitiva — G9-LATAM-Team-77*[cite: 2]
 
-> **Nota:** Este repositorio contiene el Producto Mínimo Viable (MVP) de **FinanceAI**. El Frontend, el Backend, la base de datos y los modelos de Machine Learning están implementados e integrados.
+![Status](https://img.shields.io/badge/Status-En%20Desarrollo-yellow)
+![Fase](https://img.shields.io/badge/Fase-Implementación-blue)
+![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203-brightgreen)[cite: 2]
+![Frontend](https://img.shields.io/badge/Frontend-Astro%205-orange)[cite: 2]
+![AI](https://img.shields.io/badge/AI-Python%203-blue)[cite: 2]
 
-## 🎯 El Desafío
-En la actualidad, el mercado de fintechs, bancos digitales y plataformas de educación financiera está en constante expansión. Muchas personas tienen acceso a los datos brutos de sus transacciones, pero **tienen gran dificultad para transformar esa información en conocimiento útil** para la toma de decisiones financieras a nivel personal.
+## 👥 Equipo de Desarrollo (G9-LATAM-Team-77)[cite: 2]
+- **Data Scientists:** Luisa Fernanda Bedoya, Edmar Mario Urquiza Quispe, Giselle Jacqueline Morales de la Cruz, Kevin Aron Sumire Ccahuana[cite: 2].
+- **Backend Developers:** Fernando Jose Reynosa Vidal, Justin Alejandro Aguirre Navarro, Irwing Jonathan Ramirez Paz[cite: 2].
 
-## 💡 Nuestro Objetivo
-**FinanceAI** es una solución inteligente orientada a usuarios de carteras digitales e instituciones financieras. Nuestro objetivo principal es **analizar el comportamiento financiero de un usuario a partir de sus transacciones para generar una visión completa y clara de su salud financiera.**
+## 🎯 Visión General[cite: 2]
+FinanceAI soluciona la dificultad de los usuarios para entender sus hábitos financieros y diagnosticar su nivel de sobreendeudamiento[cite: 2]. El sistema automatiza la ingesta y clasificación de gastos mediante Procesamiento de Lenguaje Natural (NLP) y genera recomendaciones personalizadas con un motor de Inteligencia Artificial Explicable (XAI)[cite: 2]. Actúa como un habilitador para la inclusión financiera mediante una arquitectura multi-moneda que elimina fronteras[cite: 2].
 
-Buscamos transformar datos financieros aislados en información procesable que permita a los usuarios:
-- Organizar y categorizar automáticamente sus gastos e ingresos.
-- Entender exactamente hacia dónde se está dirigiendo su dinero mediante dashboards interactivos.
-- Identificar hábitos financieros y perfiles de usuario (ej. *Saludable, En riesgo*).
-- Recibir recomendaciones simples y objetivas de mejora.
+## 🛠️ Arquitectura del Sistema[cite: 2]
+El sistema está construido bajo un enfoque modular y fuertemente desacoplado[cite: 2]. El entorno oficial está estandarizado en Java 17 LTS, Spring Boot 3 y Node.js 22 LTS[cite: 2]. Se utiliza una arquitectura centralizada de variables de entorno (archivo `.env` único) para evitar desincronizaciones entre todas las capas[cite: 2].
 
-## 🛠️ Arquitectura y Tecnologías
-El proyecto está estructurado en módulos especializados para garantizar escalabilidad, seguridad y eficiencia:
+- **Frontend:** Renderizado del lado del servidor (SSR) desarrollado en Astro 5 y Tailwind CSS[cite: 2].
+- **Backend:** API REST con Spring Boot 3 y persistencia en MySQL 8.0 gestionada con migraciones Flyway[cite: 2].
+- **Data Science:** Scripts en Python 3 utilizando Scikit-Learn, Pandas y Numpy[cite: 2].
+- **Integración IA-Backend:** Ejecución segura de subprocesos mediante `ProcessBuilder` que emite JSON a través de `stdout`[cite: 2].
 
-### ⚙️ Backend (Java / Spring Boot)
-El núcleo de la aplicación es una API REST robusta que gestiona la lógica de negocio y la seguridad:
-- **Framework:** Spring Boot (Java).
-- **Seguridad:** Spring Security stateless con autenticación basada en JWT.
-- **Base de Datos:** MySQL 8.4 con migraciones Flyway V1 a V7.
-- **Documentación:** Swagger / OpenAPI para la exploración y prueba de endpoints.
-- **Módulos principales:** autenticación, usuarios, transacciones, catálogos, Dashboard, análisis financiero e historial autenticado.
+## 🧠 Capa de Inteligencia Artificial y Ciencia de Datos[cite: 2]
+- **Clasificador NLP Jerárquico:** Utiliza `LinearSVC` con vectorización `TfidfVectorizer` para categorizar transacciones, alcanzando un Macro F1 de 0.9781 en pruebas externas reales[cite: 2].
+- **Perfilador Financiero:** Emplea `RandomForestClassifier` para calcular la etiqueta de riesgo (Saludable, Riesgo, Crítico) con una precisión superior al 0.98[cite: 2].
+- **Motor XAI (Explicabilidad):** Arquitectura de 3 capas que diagnostica el puntaje, identifica la causa raíz evaluando pilares de gasto/ahorro/deuda, y provee una acción recomendada[cite: 2].
+- **Neutralidad Multidivisa:** Transforma los datos financieros en ratios adimensionales para garantizar equidad predictiva sin importar la moneda de origen[cite: 2].
 
-### 🖥️ Frontend (Astro)
-La interfaz consume la API real y ofrece:
-- Registro e inicio de sesión con Honduras/HNL disponibles en los catálogos.
-- Dashboard financiero, análisis mediante Data Science e historial por usuario.
-- Recuperación de contraseña, cierre de sesión y protección de rutas privadas.
-- Estados de carga, error y contenido vacío, además de diseño responsive.
+## ⚙️ Backend y API REST[cite: 2]
+- **Catálogo de Endpoints:** Exposición de 13 endpoints principales protegidos mediante tokens JWT (Stateless)[cite: 2].
+- **Gestión de Usuarios:** Soporta flujos de registro, sincronización OAuth2 de Google, y recuperación de contraseñas mediante tokens OTP temporales[cite: 2].
+- **Transacciones y Divisas:** El sistema normaliza automáticamente la divisa aplicando conversiones por matriz de paridad al momento de persistir los datos[cite: 2].
 
-### 🧠 Motor de Clasificación (Data Science)
-Procesamiento de datos y modelado predictivo:
-- **Runtime oficial:** `financeai-data-science` con Python 3.12.
-- **Machine Learning:** modelos serializados para categorizar transacciones y determinar el perfil financiero.
-- **Integración:** el Backend ejecuta `src/predict.py` mediante un proceso con timeout y manejo seguro de errores.
+## 💻 Frontend y Experiencia de Usuario[cite: 2]
+- **Motor Multidivisa en Tiempo Real:** Las conversiones se procesan en memoria (base USD) para actualizar dinámicamente KPIs, gráficas Chart.js y tablas sin saturar al servidor[cite: 2].
+- **Seguridad UI y Feedback:** Implementación de una regla estricta Anti-Emojis mediante Regex para prevenir inyecciones, validación de contraseñas con 5 reglas de complejidad visualizadas en tiempo real, y notificaciones Toast semánticas[cite: 2].
+- **Danger Zone:** Capacidad para que el usuario elimine su cuenta permanentemente, activando un borrado atómico en cascada en la base de datos[cite: 2].
 
-### 🐳 Infraestructura local
-- Docker Compose ejecuta Frontend, Backend con el runtime de Data Science y MySQL.
-- MySQL utiliza un volumen persistente y Flyway actualiza el esquema al iniciar.
-- El despliegue en **Oracle Cloud Infrastructure (OCI)** permanece como una etapa posterior y no forma parte de este cierre del MVP.
-
-## 🚀 Módulos de la API
-Actualmente, la API expone los siguientes controladores principales:
-- `AuthController`: registro, inicio de sesión y recuperación segura de contraseña.
-- `TransactionController`: Registro y consulta del historial de transacciones.
-- `AnalisisController`: Evaluación del perfil financiero y categorización de gastos mediante IA.
-- `DashboardController`: Generación de métricas y resúmenes para la interfaz de usuario.
-- `UserController`: Administración de perfiles de usuario.
-- `CatalogoController`: Consulta de países y monedas disponibles.
-- `HistorialAnalisisController`: Consulta autenticada del historial propio de análisis.
-
-## 🗓️ Roadmap del Proyecto
-- [x] Construcción y recolección de los conjuntos de datos (Datasets).
-- [x] Análisis Exploratorio de Datos (EDA) y limpieza.
-- [x] Entrenamiento del modelo de clasificación de transacciones y perfiles financieros.
-- [x] Diseño y desarrollo de los endpoints de la API REST (Spring Boot).
-- [x] Implementación de capa de seguridad con JWT.
-- [x] Documentación de la API con OpenAPI/Swagger.
-- [x] Integración del Frontend con la API REST.
-- [x] Integración del runtime de Data Science.
-- [x] Historial autenticado, Honduras/HNL y recuperación de contraseña.
-- [x] Entorno reproducible con Docker Compose.
-- [x] Despliegue e integración en la nube (OCI).
-
-## Ejecución local con Docker Compose
-
-La composición oficial usa únicamente `Frontend`, `Backend/financeia-backend` y
-`financeai-data-science`. Levanta tres servicios: Frontend Astro, Backend Spring
-Boot con Python 3.12 y MySQL 8.4.7. MySQL conserva sus datos en el volumen
-`financeai_mysql_data` y no publica el puerto 3306 al equipo anfitrión.
-
-### Configuración
-
-1. Copia `.env.docker.example` como `.env.docker`.
-2. Reemplaza todos los valores `change-me` con secretos independientes y seguros.
-3. Conserva `PUBLIC_API_URL=http://localhost:8080` para que el navegador pueda
-   acceder al Backend y `CORS_ALLOWED_ORIGINS=http://localhost:4321` para el
-   Frontend local.
-
-`.env.docker` está ignorado por Git y no debe compartirse ni incorporarse a las
-imágenes. `AUTH_SECRET` pertenece al Frontend; `JWT_SECRET` pertenece al Backend.
-
-### Variables de entorno principales
-
-El archivo `.env.docker.example` documenta la configuración de la composición.
-Los valores reales deben existir únicamente en `.env.docker`:
-
-| Variable | Uso |
-| --- | --- |
-| `MYSQL_DATABASE` | Nombre de la base de datos |
-| `MYSQL_USER` | Usuario de aplicación de MySQL |
-| `MYSQL_PASSWORD` | Contraseña del usuario de aplicación |
-| `MYSQL_ROOT_PASSWORD` | Contraseña administrativa del contenedor MySQL |
-| `JWT_SECRET` | Firma de los tokens emitidos por el Backend |
-| `AUTH_SECRET` | Secreto independiente utilizado por el Frontend |
-| `GOOGLE_CLIENT_ID` | Identificador público del cliente web de Google Identity Services |
-| `PUBLIC_API_URL` | URL pública del Backend consumida por el navegador |
-| `CORS_ALLOWED_ORIGINS` | Orígenes permitidos por el Backend |
-| `DATA_SCIENCE_TIMEOUT_SECONDS` | Tiempo máximo de ejecución del proceso Python |
-
-Para ejecutar el Backend sin Docker también deben configurarse `DB_URL`,
-`DB_USERNAME`, `DB_PASSWORD`, `PYTHON_COMMAND` y `DATA_SCIENCE_SCRIPT` de acuerdo
-con las rutas y credenciales del entorno local.
-
-### Comandos
-
-Ejecuta todos los comandos desde la raíz del repositorio:
-
-```powershell
-docker compose --env-file .env.docker config
-docker compose --env-file .env.docker build
-docker compose --env-file .env.docker up -d
-docker compose --env-file .env.docker ps
-docker compose --env-file .env.docker logs
-docker compose --env-file .env.docker restart
-docker compose --env-file .env.docker down
-```
-
-El Backend queda disponible en `http://localhost:8080` y el Frontend en
-`http://localhost:4321`. Flyway aplica automáticamente las migraciones V1 a V7
-cuando inicia el Backend después de que MySQL esté saludable.
-
-`docker compose down` elimina los contenedores y la red, pero conserva el volumen
-de MySQL. No uses `docker compose down -v` como operación normal: la opción `-v`
-elimina el volumen persistente y sus datos.
-
-## Acceso con Google
-
-FinanceAI usa Google Identity Services únicamente para comprobar la identidad.
-El navegador recibe una credencial de Google y la envía a
-`POST /api/v1/auth/google`; el Backend valida su firma, audiencia, emisor,
-expiración y correo verificado antes de emitir el JWT stateless normal de
-FinanceAI. La credencial de Google no se guarda en `localStorage` ni en la base
-de datos. Para identificar de forma estable una cuenta se conserva solamente el
-campo `sub` verificado por Google. V7 agrega este identificador opcional y único
-a `usuarios`.
-
-### Configuración de Google Cloud
-
-1. En Google Cloud crea un **OAuth 2.0 Client ID** de tipo **Web application**.
-2. Agrega como orígenes JavaScript autorizados, según el entorno:
-   - `http://localhost:4321`
-   - `https://financeai-team77.duckdns.org`
-3. No hace falta configurar una URI de redirección para el flujo popup con
-   callback JavaScript usado por esta aplicación.
-4. Copia únicamente el identificador público del cliente en
-   `GOOGLE_CLIENT_ID` dentro del `.env.docker` local ignorado por Git. FinanceAI
-   no usa ni solicita un client secret para este flujo.
-5. Reconstruye el Frontend después de cambiar el identificador, porque
-   `PUBLIC_GOOGLE_CLIENT_ID` se incorpora al bundle durante el build.
-
-Si `GOOGLE_CLIENT_ID` está vacío, el botón se oculta y el login tradicional
-continúa funcionando. Al crear una cuenta nueva con Google, FinanceAI solicita
-país y moneda explícitamente para no inferirlos por ubicación. Una cuenta Gmail
-o Google Workspace existente puede vincularse por su correo verificado; una
-colisión con un correo externo no autoritativo se rechaza para evitar apropiación
-de cuentas.
-
-## Recuperación segura de contraseña
-
-El flujo oficial se inicia desde **¿Olvidaste tu contraseña?** en `/login`:
-
-1. El Frontend envía el correo a `POST /api/v1/auth/forgot-password`.
-2. El Backend devuelve siempre la misma confirmación pública, exista o no la
-   cuenta, para evitar enumeración de usuarios.
-3. Para una cuenta existente genera 32 bytes con `SecureRandom`, guarda solo su
-   hash SHA-256 y envía por SMTP un enlace a
-   `/reset-password?token=<TOKEN>`.
-4. `POST /api/v1/auth/reset-password` consume el token bajo bloqueo de base de
-   datos, comprueba expiración y uso, cifra la nueva contraseña con BCrypt e
-   invalida los tokens activos del usuario.
-
-Los tokens expiran en 30 minutos de forma predeterminada, son de un solo uso y
-nunca se registran ni se almacenan en texto plano. V6 crea
-`password_reset_tokens`, su relación con `usuarios` y los índices de consulta.
-Existe además un enfriamiento básico por hash de correo y por instancia. Para un
-despliegue horizontal debe sustituirse por rate limiting centralizado (por
-ejemplo, Redis o un API gateway) que también considere IP.
-
-### Variables SMTP
-
-Configura estas variables en un `.env` local del Backend o en `.env.docker`:
-
-| Variable | Uso |
-| --- | --- |
-| `MAIL_HOST` | Servidor SMTP |
-| `MAIL_PORT` | Puerto SMTP, normalmente 587 con STARTTLS |
-| `MAIL_USERNAME` | Usuario de una cuenta SMTP dedicada |
-| `MAIL_PASSWORD` | Contraseña o App Password SMTP |
-| `MAIL_FROM` | Remitente visible autorizado por el proveedor |
-| `MAIL_SMTP_AUTH` | Activa autenticación SMTP |
-| `MAIL_STARTTLS` | Activa STARTTLS |
-| `FRONTEND_URL` | Base pública usada para construir el enlace |
-| `PASSWORD_RESET_EXPIRATION_MINUTES` | Vigencia del token; predeterminado 30 |
-| `PASSWORD_RESET_COOLDOWN_SECONDS` | Pausa por correo/instancia; predeterminado 60 |
-
-Para una demostración con Gmail debe usarse una App Password nueva y exclusiva,
-nunca una contraseña personal ni una credencial encontrada en otra rama. Los
-archivos `.env` y `.env.docker` reales están ignorados por Git; los archivos
-`*.example` contienen únicamente placeholders.
-
-En Docker Compose las variables se pasan solo al Backend. Si SMTP no está
-configurado, los servicios pueden iniciar, pero el envío real no funcionará. La
-prueba automatizada sustituye el servicio de correo y jamás contacta un servidor
-externo. La validación manual de entrega requiere configurar SMTP localmente,
-solicitar el enlace, cambiar la contraseña, comprobar que la anterior falla y
-confirmar que el enlace no puede reutilizarse.
-
----
-*Desarrollado por el Equipo 77 - Hackathon LATAM G9.*
+## 🛡️ Cumplimiento Legal, Seguridad y Despliegue[cite: 2]
+- **Marcos Legales y Privacidad:** Cumplimiento de leyes LFPDPPP, derechos ARCO (con botón para descargar expediente JSON), GDPR (Art. 22 cubierto por el motor XAI) y CCPA[cite: 2].
+- **Seguridad OWASP:** Mitigación de riesgos del OWASP Top 10, incluyendo aislamiento estricto por `userId`, contraseñas con BCrypt, y prevención de inyecciones SQL y CLI[cite: 2].
+- **Infraestructura (OCI):** Despliegue en Oracle Cloud Infrastructure utilizando contenedores orquestados con Docker Compose y un proxy inverso Caddy Server para la renovación automática de certificados SSL[cite: 2].
