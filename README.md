@@ -1,46 +1,145 @@
-# 📊 FinanceAI - Plataforma Integral de Salud Financiera[cite: 2]
+# 📊 FinanceAI - Asistente Inteligente de Salud Financiera
 
-> **Plataforma Integral de Salud Financiera con Inteligencia Artificial, Arquitectura Multi-Moneda y Monitoreo en Tiempo Real.**[cite: 2]
-> *Versión Corporativa Oficial Extendida y Definitiva — G9-LATAM-Team-77*[cite: 2]
+![Status](https://img.shields.io/badge/Status-Completado-brightgreen)
+![Fase](https://img.shields.io/badge/Fase-Producción-blue)
+![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203-brightgreen)
+![Frontend](https://img.shields.io/badge/Frontend-Astro%205-orange)
+![AI](https://img.shields.io/badge/AI%2FML-Python%203.12-blue)
 
-![Status](https://img.shields.io/badge/Status-En%20Desarrollo-yellow)
-![Fase](https://img.shields.io/badge/Fase-Implementación-blue)
-![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203-brightgreen)[cite: 2]
-![Frontend](https://img.shields.io/badge/Frontend-Astro%205-orange)[cite: 2]
-![AI](https://img.shields.io/badge/AI-Python%203-blue)[cite: 2]
+> **Nota:** Este repositorio contiene la Versión Corporativa Oficial Extendida y Definitiva de **FinanceAI**. La arquitectura, los modelos de Machine Learning, la API REST y la interfaz de usuario se encuentran totalmente implementados e integrados en un entorno cloud.
 
-## 👥 Equipo de Desarrollo (G9-LATAM-Team-77)[cite: 2]
-- **Data Scientists:** Luisa Fernanda Bedoya, Edmar Mario Urquiza Quispe, Giselle Jacqueline Morales de la Cruz, Kevin Aron Sumire Ccahuana[cite: 2].
-- **Backend Developers:** Fernando Jose Reynosa Vidal, Justin Alejandro Aguirre Navarro, Irwing Jonathan Ramirez Paz[cite: 2].
+## 👥 Equipo de Desarrollo (G9-LATAM-Team-77)
+- **Luisa Fernanda Bedoya** - Data Scientist
+- **Edmar Mario Urquiza Quispe** - Data Scientist
+- **Giselle Jacqueline Morales de la Cruz** - Data Scientist
+- **Kevin Aron Sumire Ccahuana** - Data Scientist
+- **Fernando Jose Reynosa Vidal** - Backend Developer
+- **Justin Alejandro Aguirre Navarro** - Backend Developer
+- **Irwing Jonathan Ramirez Paz** - Backend Developer
 
-## 🎯 Visión General[cite: 2]
-FinanceAI soluciona la dificultad de los usuarios para entender sus hábitos financieros y diagnosticar su nivel de sobreendeudamiento[cite: 2]. El sistema automatiza la ingesta y clasificación de gastos mediante Procesamiento de Lenguaje Natural (NLP) y genera recomendaciones personalizadas con un motor de Inteligencia Artificial Explicable (XAI)[cite: 2]. Actúa como un habilitador para la inclusión financiera mediante una arquitectura multi-moneda que elimina fronteras[cite: 2].
+## 🎯 El Desafío
+En la actualidad, el mercado de fintechs, bancos digitales y plataformas de educación financiera está en constante expansión. Muchas personas tienen acceso a los datos brutos de sus transacciones, pero **tienen gran dificultad para transformar esa información en conocimiento útil** para la toma de decisiones. Existe una marcada dificultad técnica y cognitiva para entender hábitos financieros, categorizar flujos de caja y diagnosticar el nivel de sobreendeudamiento, lo cual fomenta el estrés financiero y reduce la capacidad de ahorro.
 
-## 🛠️ Arquitectura del Sistema[cite: 2]
-El sistema está construido bajo un enfoque modular y fuertemente desacoplado[cite: 2]. El entorno oficial está estandarizado en Java 17 LTS, Spring Boot 3 y Node.js 22 LTS[cite: 2]. Se utiliza una arquitectura centralizada de variables de entorno (archivo `.env` único) para evitar desincronizaciones entre todas las capas[cite: 2].
+## 💡 Nuestro Objetivo
+**FinanceAI** nace como una solución inteligente orientada a usuarios de carteras digitales e instituciones financieras. Nuestro objetivo principal es **analizar el comportamiento financiero de un usuario a partir de sus transacciones para generar una visión completa y clara de su salud financiera.**
 
-- **Frontend:** Renderizado del lado del servidor (SSR) desarrollado en Astro 5 y Tailwind CSS[cite: 2].
-- **Backend:** API REST con Spring Boot 3 y persistencia en MySQL 8.0 gestionada con migraciones Flyway[cite: 2].
-- **Data Science:** Scripts en Python 3 utilizando Scikit-Learn, Pandas y Numpy[cite: 2].
-- **Integración IA-Backend:** Ejecución segura de subprocesos mediante `ProcessBuilder` que emite JSON a través de `stdout`[cite: 2].
+Buscamos transformar datos financieros aislados en información procesable que permita a los usuarios:
+- Organizar automáticamente sus gastos e ingresos mediante Procesamiento de Lenguaje Natural (NLP).
+- Entender exactamente hacia dónde se está dirigiendo su dinero a través de una arquitectura multi-moneda que elimina fronteras.
+- Identificar hábitos financieros y recibir explicaciones claras mediante Inteligencia Artificial Explicable (XAI).
+- Recibir recomendaciones simples y objetivas de mejora, previniendo el sobreendeudamiento.
 
-## 🧠 Capa de Inteligencia Artificial y Ciencia de Datos[cite: 2]
-- **Clasificador NLP Jerárquico:** Utiliza `LinearSVC` con vectorización `TfidfVectorizer` para categorizar transacciones, alcanzando un Macro F1 de 0.9781 en pruebas externas reales[cite: 2].
-- **Perfilador Financiero:** Emplea `RandomForestClassifier` para calcular la etiqueta de riesgo (Saludable, Riesgo, Crítico) con una precisión superior al 0.98[cite: 2].
-- **Motor XAI (Explicabilidad):** Arquitectura de 3 capas que diagnostica el puntaje, identifica la causa raíz evaluando pilares de gasto/ahorro/deuda, y provee una acción recomendada[cite: 2].
-- **Neutralidad Multidivisa:** Transforma los datos financieros en ratios adimensionales para garantizar equidad predictiva sin importar la moneda de origen[cite: 2].
+## 🛠️ Arquitectura y Tecnologías
+El proyecto está estructurado en módulos especializados bajo un enfoque fuertemente desacoplado y una única fuente de verdad (Single Source of Truth) para variables de entorno.
 
-## ⚙️ Backend y API REST[cite: 2]
-- **Catálogo de Endpoints:** Exposición de 13 endpoints principales protegidos mediante tokens JWT (Stateless)[cite: 2].
-- **Gestión de Usuarios:** Soporta flujos de registro, sincronización OAuth2 de Google, y recuperación de contraseñas mediante tokens OTP temporales[cite: 2].
-- **Transacciones y Divisas:** El sistema normaliza automáticamente la divisa aplicando conversiones por matriz de paridad al momento de persistir los datos[cite: 2].
+### Arquitectura General del Sistema
+```mermaid
+graph TD
+    ClientBrowser[Cliente / Navegador Web] <--> |HTTP/SSR Port 4321| AstroFrontend[Frontend: Astro 5 + Tailwind CSS]
+    AstroFrontend <--> |REST API + JWT Port 8080| SpringBootBackend[Backend: Spring Boot 3 + Java 17 LTS]
+    SpringBootBackend <--> |JDBC / HikariCP| MySQLDatabase[(Base de Datos MySQL - Railway / Local)]
+    SpringBootBackend <--> |Subprocess ProcessBuilder JSON CLI| PythonEngine[Motor IA: Python 3 + Scikit-Learn]
+```
 
-## 💻 Frontend y Experiencia de Usuario[cite: 2]
-- **Motor Multidivisa en Tiempo Real:** Las conversiones se procesan en memoria (base USD) para actualizar dinámicamente KPIs, gráficas Chart.js y tablas sin saturar al servidor[cite: 2].
-- **Seguridad UI y Feedback:** Implementación de una regla estricta Anti-Emojis mediante Regex para prevenir inyecciones, validación de contraseñas con 5 reglas de complejidad visualizadas en tiempo real, y notificaciones Toast semánticas[cite: 2].
-- **Danger Zone:** Capacidad para que el usuario elimine su cuenta permanentemente, activando un borrado atómico en cascada en la base de datos[cite: 2].
+### ⚙️ Backend (Java / Spring Boot)
+- **Framework:** Spring Boot 3 con Java 17 LTS.
+- **Seguridad:** Spring Security con autenticación basada en tokens JWT (Stateless).
+- **Base de Datos:** MySQL 8.0 con migraciones inmutables gestionadas por Flyway.
 
-## 🛡️ Cumplimiento Legal, Seguridad y Despliegue[cite: 2]
-- **Marcos Legales y Privacidad:** Cumplimiento de leyes LFPDPPP, derechos ARCO (con botón para descargar expediente JSON), GDPR (Art. 22 cubierto por el motor XAI) y CCPA[cite: 2].
-- **Seguridad OWASP:** Mitigación de riesgos del OWASP Top 10, incluyendo aislamiento estricto por `userId`, contraseñas con BCrypt, y prevención de inyecciones SQL y CLI[cite: 2].
-- **Infraestructura (OCI):** Despliegue en Oracle Cloud Infrastructure utilizando contenedores orquestados con Docker Compose y un proxy inverso Caddy Server para la renovación automática de certificados SSL[cite: 2].
+#### Diagrama Entidad-Relación
+```mermaid
+erDiagram
+    USUARIOS ||--o{ TRANSACCIONES : "registra"
+    USUARIOS ||--o{ HISTORIAL_ANALISIS : "genera"
+    PAISES ||--o{ USUARIOS : "pertenece"
+    MONEDAS ||--o{ USUARIOS : "moneda_base"
+
+    USUARIOS {
+        bigint id PK
+        varchar email UK
+        varchar password
+        varchar nombre
+        bigint pais_id FK
+        bigint moneda_id FK
+        datetime created_at
+    }
+
+    TRANSACCIONES {
+        bigint id PK
+        bigint usuario_id FK
+        varchar descripcion
+        decimal amount
+        varchar original_currency
+        varchar category
+        varchar type
+        date date
+    }
+
+    HISTORIAL_ANALISIS {
+        bigint id PK
+        bigint usuario_id FK
+        decimal ingreso_mensual
+        decimal total_gastos
+        decimal score_financiero
+        varchar perfil_financiero
+        text resumen_categorias
+        datetime fecha_analisis
+    }
+```
+
+### 🧠 Motor de Clasificación (Data Science)
+- **Lenguaje:** Python 3.12 (scikit-learn, pandas, numpy).
+- **Machine Learning:** Modelo LinearSVC para clasificación jerárquica de transacciones y RandomForestClassifier para perfilado financiero.
+- **Integración:** Comunicación segura Backend-IA mediante `ProcessBuilder`.
+
+### 🖥️ Frontend (Astro / Tailwind)
+- **Framework:** Astro 5 (SSR - Server-Side Rendering) y Node.js 22 LTS.
+- **UI/UX:** Tailwind CSS con diseño Mobile-First y gráficas con Chart.js.
+
+### ☁️ Infraestructura y Despliegue (OCI)
+- **Despliegue:** Oracle Cloud Infrastructure (OCI).
+- **Orquestación:** Docker Compose para manejar contenedores de base de datos, backend, frontend y proxy.
+
+#### Topología de Red y Servidor OCI
+```text
+                            [ Internet / Usuarios ]
+                                       │ (HTTPS :443 / HTTP :80)
+                                       ▼
+                       ┌───────────────────────────────┐
+                       │  Caddy Server (SSL Let's Enc.) │
+                       └──────────────┬────────────────┘
+                                      │
+              ┌───────────────────────┴───────────────────────┐
+              │ (Rutas Frontend /*)                           │ (Rutas API /api/v1/*)
+              ▼                                               ▼
+   ┌──────────────────────┐                       ┌──────────────────────────────┐
+   │ Astro SSR (Node.js)  │                       │ Spring Boot 3 (Java 17)      │
+   │ Puerto Interno: 4321 │                       │ Puerto Interno: 8080         │
+   └──────────┬───────────┘                       └──────────────┬───────────────┘
+              │                                                  │
+              │ (Auth / Nodemailer)               ┌──────────────┴───────────────┐
+              ▼                                   ▼                              ▼
+      [ Gmail / Google OAuth ]          [ Python 3.12 (DS-08) ]         [ MySQL 8.0 (OCI VM) ]
+                                        (scikit-learn, pandas)          (Persistencia /init.sql)
+```
+
+## 🚀 Módulos de la API
+Actualmente, la API expone 13 endpoints principales:
+- **`AuthController`:** Registro con validación, inicio de sesión, sincronización de Google OAuth2 y recuperación de contraseñas.
+- **`TransactionController`:** Registro, normalización de divisas y consulta del historial.
+- **`AnalisisController`:** Puente de inferencia para diagnóstico con IA y explicabilidad (XAI).
+- **`DashboardController`:** Generación de métricas, KPIs y series temporales.
+- **`UserController`:** Administración de perfiles y Danger Zone.
+
+## 🗓️ Roadmap del Proyecto
+- [x] Construcción y recolección de los conjuntos de datos (Datasets).
+- [x] Análisis Exploratorio de Datos (EDA) con mitigación de Data Leakage.
+- [x] Entrenamiento del modelo de clasificación (NLP) y perfiles financieros.
+- [x] Diseño de los endpoints de la API y modelo de datos relacional.
+- [x] Integración de seguridad JWT, encriptación BCrypt y cumplimiento legal (LFPDPPP, GDPR).
+- [x] Desarrollo del cliente web SSR con Astro 5 y tailwindcss.
+- [x] Integración de conversor multidivisa y motor de IA.
+- [x] Despliegue en la nube (OCI) con Docker Compose y Caddy.
+
+---
+*Desarrollado por el Equipo 77 - Hackathon LATAM G9.*
