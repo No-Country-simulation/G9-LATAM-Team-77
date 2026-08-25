@@ -79,7 +79,7 @@ import Layout from '../layouts/Layout.astro';
 					1. Identidad y Domicilio del Responsable del Tratamiento
 				</h2>
 				<p>
-					En cumplimiento con la <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 underline font-semibold">Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</a> de los Estados Unidos Mexicanos, su Reglamento, y el <a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 underline font-semibold">Reglamento General de Protección de Datos (GDPR - Reglamento UE 2016/679)</a>, <strong>FinanceAI</strong> (en lo sucesivo, el "Responsable"), con domicilio fiscal en Ciudad de México, México, y portal web oficial <code>https://financeai.app</code>, es el responsable del uso, almacenamiento y protección de tus datos personales a través de los mecanismos y paneles de configuración provistos en la plataforma.
+					En cumplimiento con la <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 underline font-semibold">Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</a> de los Estados Unidos Mexicanos, su Reglamento, y el <a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 underline font-semibold">Reglamento General de Protección de Datos (GDPR - Reglamento UE 2016/679)</a>, <strong>FinanceAI</strong> (en lo sucesivo, el "Responsable"), con domicilio fiscal en Ciudad de México, México, y portal web oficial <code>https://financeai-app.duckdns.org/</code>, es el responsable del uso, almacenamiento y protección de tus datos personales a través de los mecanismos y paneles de configuración provistos en la plataforma.
 				</p>
 			</section>
 
@@ -96,7 +96,7 @@ import Layout from '../layouts/Layout.astro';
 						<ul class="list-disc pl-5 text-xs space-y-1 text-gray-600 dark:text-gray-300">
 							<li>Nombre completo y apellidos.</li>
 							<li>Dirección de correo electrónico.</li>
-							<li>País y divisa base seleccionada (USD, MXN, EUR, etc.).</li>
+							<li>País y divisa base (USD, MXN, EUR, etc.).</li>
 							<li>Identificador de usuario de Google OAuth 2.0 (si se autentica mediante Google).</li>
 							<li>Hash criptográfico de contraseña (BCrypt unidireccional).</li>
 						</ul>
@@ -114,7 +114,7 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 
 				<div class="p-4 bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-2xl text-xs text-red-900 dark:text-red-200">
-					FinanceAI <strong>NO solicita, no almacena ni tiene acceso a números de tarjetas de crédito o débito, códigos de seguridad (CVV/CVC), fechas de expiración, claves bancarias interbancarias, contraseñas de banca digital ni tokens bancarios dinámicos</strong>.
+					FinanceAI <strong>NO solicita, no almacena ni tiene acceso a números de tarjetas de crédito o débito, códigos de seguridad, fechas de expiración, claves bancarias interbancarias, contraseñas de banca digital ni tokens bancarios dinámicos</strong>.
 				</div>
 			</section>
 
@@ -153,13 +153,6 @@ import Layout from '../layouts/Layout.astro';
 					<li>Ejecución de los modelos de Machine Learning (Scikit-Learn) y reglas 50-30-20 para emitir tu score de salud financiera y sugerencias presupuestarias.</li>
 					<li>Generación y exportación de tus reportes en formatos estructurados (CSV / Excel con codificación UTF-8 BOM).</li>
 					<li>Envío de códigos de seguridad de un solo uso (OTP) para verificación y recuperación de contraseña vía SMTP seguro.</li>
-				</ul>
-
-				<p class="pt-2">
-					<strong>4.2. Finalidades Secundarias (Opcionales):</strong>
-				</p>
-				<ul class="list-disc pl-6 space-y-1 text-xs text-gray-600 dark:text-gray-300">
-					<li>Elaboración de métricas estadísticas globales agregadas e irreversiblemente anonimizadas.</li>
 				</ul>
 			</section>
 
@@ -206,7 +199,7 @@ import Layout from '../layouts/Layout.astro';
 				</p>
 				<ul class="list-disc pl-6 space-y-1 text-xs text-gray-600 dark:text-gray-300">
 					<li><strong>Explicabilidad algorítmica:</strong> Puedes consultar en la pantalla de análisis el desglose de los 3 ratios que sustentan tu resultado (gasto/ingreso, tasa de ahorro y nivel de endeudamiento).</li>
-					<li><strong>Supervisión Humana y Auditoría:</strong> Los modelos y reglas de diagnóstico han sido programados, auditados y testeados bajo supervisión de los integrantes del equipo, garantizando neutralidad y ausencia de sesgos arbitrarios.</li>
+					<li><strong>Supervisión Humana y Auditoría:</strong> Los modelos y reglas de diagnóstico han sido programados, auditados y testeados bajo supervisión del equipo de FinanciAI, garantizando neutralidad y ausencia de sesgos arbitrarios.</li>
 				</ul>
 			</section>
 
@@ -236,17 +229,6 @@ import Layout from '../layouts/Layout.astro';
 					<li><strong><a href="https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/" target="_blank" rel="noopener noreferrer" class="hover:underline">A10 Protección SSRF:</a></strong> Arquitectura cerrada sin ejecución de peticiones externas no autenticadas.</li>
 				</ul>
 			</section>
-
-			<!-- Sección 8 -->
-			<section class="space-y-3">
-				<h2 class="text-xl font-bold text-gray-900 dark:text-white font-josefin border-l-4 border-emerald-600 pl-3">
-					8. Autoridad Garante (INAI)
-				</h2>
-				<p class="text-xs text-gray-600 dark:text-gray-300">
-					Si consideras que tu derecho a la protección de datos personales ha sido vulnerado, tienes el derecho de acudir ante el <strong>Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (INAI)</strong> en su sitio web oficial: <a href="https://home.inai.org.mx" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 underline font-semibold">www.inai.org.mx</a>.
-				</p>
-			</section>
-
 		</div>
 	</div>
 </Layout>

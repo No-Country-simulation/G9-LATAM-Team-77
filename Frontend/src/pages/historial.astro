@@ -39,7 +39,7 @@ const OFFICIAL_RATES_TABLE = [
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-josefin">Historial Financiero</h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Evolución temporal con picos, filtros de calendario por mes/rango y conversor multidivisa en vivo.</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Evolución temporal, filtros de calendario por mes y rango de tiempo.</p>
             </div>
             
             <!-- Actions (Borrar Historial) -->
@@ -469,7 +469,7 @@ const OFFICIAL_RATES_TABLE = [
             if (savedLocal) {
                 try {
                     const parsed = JSON.parse(savedLocal);
-                    rawTransactions = parsed.map(t => ({
+                    rawTransactions = Array.isArray(parsed) ? parsed.map(t => ({
                         id: t.id,
                         description: t.description || t.descripcion || 'Transacción',
                         amount: parseFloat(t.amount || t.monto || t.valor || 0),
@@ -477,15 +477,12 @@ const OFFICIAL_RATES_TABLE = [
                         category: t.category || t.categoria || t.descripcion || 'Otros',
                         type: t.type || (t.category === 'Ingresos' || t.categoria === 'Ingresos' ? 'INCOME' : 'EXPENSE'),
                         date: (t.date || t.fecha || todayISO).toString().slice(0, 10)
-                    }));
+                    })) : [];
                 } catch (_) {
-                    rawTransactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                    rawTransactions = [];
                 }
             } else {
-                rawTransactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
-                if (!isHistoryExplicitlyCleared) {
-                    localStorage.setItem('financeai_all_transactions', JSON.stringify(INITIAL_SAMPLE_TRANSACTIONS));
-                }
+                rawTransactions = [];
             }
         }
 

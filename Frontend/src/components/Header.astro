@@ -207,7 +207,7 @@ const googleEmail = session?.user?.email || '';
         <div class="flex justify-between items-center pb-3 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
             <div>
                 <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-josefin">Mi Perfil y Ajustes</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Personaliza tu cuenta y moneda predeterminada</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Personaliza tu cuenta</p>
             </div>
             <!-- Botón de Cerrar Grande -->
             <button id="btnCloseProfileModal" onclick="window.closeProfileModal && window.closeProfileModal()" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl sm:text-3xl font-bold w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all leading-none cursor-pointer" title="Cerrar">&times;</button>
@@ -234,7 +234,7 @@ const googleEmail = session?.user?.email || '';
 
             <!-- Selector de Moneda Predeterminada -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Moneda Base Predeterminada</label>
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Moneda Base</label>
                 <p class="text-[11px] text-gray-500 mb-2">Tus análisis y presupuestos se calcularán automáticamente en esta divisa.</p>
                 <select id="profileCurrencySelect" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white">
                     <option value="USD">USD ($) - Dólar Estadounidense</option>
@@ -262,11 +262,8 @@ const googleEmail = session?.user?.email || '';
                         <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>
-                        Privacidad y Derechos ARCO
+                        Privacidad y Derechos
                     </h5>
-                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-md">
-                        Gobernanza Activa
-                    </span>
                 </div>
                 
                 <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -285,29 +282,6 @@ const googleEmail = session?.user?.email || '';
                             <span class="text-[10px] text-gray-500 dark:text-gray-400">Descargar expediente (.PDF)</span>
                         </div>
                     </button>
-
-                    <!-- 2. Rectificación: Actualizar Perfil -->
-                    <button type="button" id="btnArcoRectify" class="flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/70 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200/80 dark:border-gray-700/80 text-left transition group cursor-pointer">
-                        <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </div>
-                        <div>
-                            <strong class="text-xs font-semibold text-gray-900 dark:text-white block">Rectificación</strong>
-                            <span class="text-[10px] text-gray-500 dark:text-gray-400">Modificar datos y moneda</span>
-                        </div>
-                    </button>
-                </div>
-
-                <!-- 3. Oposición: Toggle de Procesamiento Agregado -->
-                <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200/60 dark:border-gray-700/60 flex items-center justify-between">
-                    <div class="pr-3">
-                        <strong class="text-xs font-semibold text-gray-900 dark:text-white block">Derecho de Oposición</strong>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-snug">Limitar procesamiento analítico estadístico agregado.</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                        <input type="checkbox" id="toggleArcoOpposition" class="sr-only peer" checked />
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
                 </div>
             </div>
 

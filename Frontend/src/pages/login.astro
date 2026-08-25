@@ -688,6 +688,9 @@ if (session) {
 			try { data = await res.json(); } catch (_) {}
 
 			if (res.ok && data.token) {
+				localStorage.clear();
+				sessionStorage.clear();
+				localStorage.setItem('financeai_history_cleared', 'true');
 				localStorage.setItem('financeai_token', data.token);
 				localStorage.setItem('financeai_user', JSON.stringify(data));
 				showToast("¡Bienvenido!", "Accediendo a tu panel financiero...", "👋");
@@ -745,6 +748,9 @@ if (session) {
 					});
 					if (loginRes.ok) {
 						const loginData = await loginRes.json();
+						localStorage.clear();
+						sessionStorage.clear();
+						localStorage.setItem('financeai_history_cleared', 'true');
 						localStorage.setItem('financeai_token', loginData.token);
 						localStorage.setItem('financeai_user', JSON.stringify(loginData));
 						window.location.replace('/dashboard');
