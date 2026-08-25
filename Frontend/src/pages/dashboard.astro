@@ -967,20 +967,21 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
     let transacciones = [];
 
     function renderTransacciones() {
-        const list = document.getElementById('txList');
-        if (!list) return;
+        const selectedCategories = transacciones.map(t => t.descripcion);
 
         list.innerHTML = transacciones.map((tx, idx) => `
             <div class="grid grid-cols-12 gap-1.5 sm:gap-2 items-center bg-gray-50 dark:bg-gray-800/80 p-2 rounded-2xl border border-gray-200 dark:border-gray-700 animate-fade-in" data-id="${tx.id}">
                 <div class="col-span-12 sm:col-span-5">
                     <select class="tx-category w-full px-2.5 py-2 text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
-                        ${OFFICIAL_CATEGORIES.map(cat => `
-                            <option value="${cat}" ${tx.descripcion === cat ? 'selected' : ''}>${cat}</option>
-                        `).join('')}
+                        ${OFFICIAL_CATEGORIES.map(cat => {
+                            const isCurrent = tx.descripcion === cat;
+                            const isTaken = selectedCategories.includes(cat) && !isCurrent;
+                            return `<option value="${cat}" ${isCurrent ? 'selected' : ''} ${isTaken ? 'disabled class="text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-800"' : ''}>${cat}${isTaken ? ' (Ya seleccionada)' : ''}</option>`;
+                        }).join('')}
                     </select>
                 </div>
                 <div class="col-span-5 sm:col-span-3">
-                    <input type="number" min="1" value="${tx.monto}" placeholder="Monto"
+                    <input type="number" min="1" value="${tx.monto !== undefined && tx.monto !== '' ? tx.monto : ''}" placeholder="Monto"
                         class="tx-amount w-full px-2.5 py-2 text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
                 </div>
                 <div class="col-span-5 sm:col-span-3">
@@ -997,6 +998,16 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
 
         document.getElementById('txCount').textContent = `${transacciones.length} agregada(s)`;
 
+        // Controlar estado del botón de agregar si se alcanzaron las 12 categorías
+        const btnAddTx = document.getElementById('btnAddTx');
+        if (btnAddTx) {
+            if (transacciones.length >= OFFICIAL_CATEGORIES.length) {
+                btnAddTx.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                btnAddTx.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
         // Eventos
         document.querySelectorAll('.btn-remove-tx').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1010,6 +1021,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         document.querySelectorAll('.tx-category').forEach((sel, idx) => {
             sel.addEventListener('change', () => {
                 transacciones[idx].descripcion = sel.value;
+                renderTransacciones();
             });
         });
 
@@ -1032,8 +1044,18 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
     }
 
     document.getElementById('btnAddTx')?.addEventListener('click', () => {
+        const selectedCategories = transacciones.map(t => t.descripcion);
+        const availableCategory = OFFICIAL_CATEGORIES.find(cat => !selectedCategories.includes(cat));
+
+        if (!availableCategory) {
+            if (window.showToast) {
+                window.showToast('Límite Alcanzado', 'Ya has agregado todas las 12 categorías disponibles.', 'ℹ️');
+            }
+            return;
+        }
+
         const nextId = transacciones.length > 0 ? Math.max(...transacciones.map(t => t.id)) + 1 : 1;
-        transacciones.push({ id: nextId, descripcion: 'Alimentación', monto: 150, fecha: currentMinDate });
+        transacciones.push({ id: nextId, descripcion: availableCategory, monto: '', fecha: currentMinDate });
         renderTransacciones();
         syncDashboardLiveBalance();
     });
