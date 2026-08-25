@@ -339,9 +339,14 @@ const OFFICIAL_RATES_TABLE = [
         }
         return null;
     }
-    // Moneda base predeterminada en perfil
-    const profileBaseCurrency = (localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
-    let currentViewingCurrency = profileBaseCurrency;
+
+    function getAccountBaseCurrency() {
+        return (localStorage.getItem('financeai_account_base_currency') || 'MXN').toUpperCase();
+    }
+    function getViewingCurrency() {
+        return (localStorage.getItem('financeai_preferred_currency') || getAccountBaseCurrency()).toUpperCase();
+    }
+    let currentViewingCurrency = getViewingCurrency();
 
     // Matriz Oficial de Equivalencias en USD
     const OFFICIAL_USD_VALUES = {
@@ -376,7 +381,7 @@ const OFFICIAL_RATES_TABLE = [
      */
     function convertAmount(amount, fromCur, toCur) {
         if (!amount || isNaN(amount)) return 0;
-        const from = (fromCur || profileBaseCurrency || 'USD').toUpperCase();
+        const from = (fromCur || getAccountBaseCurrency()).toUpperCase();
         const to = (toCur || 'USD').toUpperCase();
         if (from === to) return Number(amount);
 
@@ -418,10 +423,9 @@ const OFFICIAL_RATES_TABLE = [
         deseos: '#F59E0B'       // Ámbar
     };
 
-    async function loadData() {
+    async function loadTransactionsFromStorage() {
         const token = localStorage.getItem('financeai_token');
         let fetchedTx = null;
-
         if (token) {
             try {
                 const res = await fetch(`${API_URL}/api/v1/transactions`, {
@@ -435,6 +439,7 @@ const OFFICIAL_RATES_TABLE = [
             }
         }
 
+        const accountBaseCur = getAccountBaseCurrency();
         if (fetchedTx !== null && Array.isArray(fetchedTx)) {
             rawTransactions = fetchedTx.map(t => {
                 const rawType = String(t.type || '').toUpperCase();
@@ -443,7 +448,7 @@ const OFFICIAL_RATES_TABLE = [
                     id: t.id,
                     description: t.description || t.descripcion || 'Transacción',
                     amount: parseFloat(t.amount || t.monto || t.valor || 0),
-                    originalCurrency: t.originalCurrency || t.moneda || profileBaseCurrency,
+                    originalCurrency: (t.originalCurrency || t.moneda || accountBaseCur).toUpperCase(),
                     category: t.category || t.categoria || t.descripcion || (isIncome ? 'Ingresos' : 'Otros'),
                     type: isIncome ? 'INCOME' : 'EXPENSE',
                     date: (t.date || t.fecha || todayISO).toString().slice(0, 10)
@@ -459,7 +464,7 @@ const OFFICIAL_RATES_TABLE = [
                         id: t.id,
                         description: t.description || t.descripcion || 'Transacción',
                         amount: parseFloat(t.amount || t.monto || t.valor || 0),
-                        originalCurrency: t.originalCurrency || t.moneda || profileBaseCurrency,
+                        originalCurrency: (t.originalCurrency || t.moneda || accountBaseCur).toUpperCase(),
                         category: t.category || t.categoria || t.descripcion || 'Otros',
                         type: t.type || (t.category === 'Ingresos' || t.categoria === 'Ingresos' ? 'INCOME' : 'EXPENSE'),
                         date: (t.date || t.fecha || todayISO).toString().slice(0, 10)
@@ -483,8 +488,7 @@ const OFFICIAL_RATES_TABLE = [
     function initRatesTableToggle() {
         const btn = document.getElementById('btnToggleRatesTable');
         const container = document.getElementById('ratesTableContainer');
-        const chevron = document.getElementById('iconChevronRates');
-
+        const chevron = document.getElementById('ratesChevron');
         if (btn && container) {
             btn.onclick = () => {
                 const isHidden = container.classList.contains('hidden');
@@ -525,14 +529,30 @@ const OFFICIAL_RATES_TABLE = [
             btn.onclick = () => {
                 const selected = btn.getAttribute('data-currency');
                 if (selected) {
-                    currentViewingCurrency = selected;
+                    currentViewingCurrency = selected.toUpperCase();
+                    localStorage.setItem('financeai_preferred_currency', currentViewingCurrency);
+                    document.querySelectorAll('.nav-currency-select').forEach(sel => {
+                        sel.value = currentViewingCurrency;
+                    });
                     updateCurrencyButtonsUI();
                     applyFilters();
+                    window.dispatchEvent(new CustomEvent('financeai_currency_changed', { detail: { currency: currentViewingCurrency } }));
                     window.showToast?.('Moneda Actualizada', `Visualizando historial en ${currentViewingCurrency} con conversión oficial en vivo.`, '💱');
                 }
             };
         });
     }
+
+    window.addEventListener('financeai_currency_changed', (e) => {
+        if (e.detail?.currency) {
+            const newCur = e.detail.currency.toUpperCase();
+            if (currentViewingCurrency !== newCur) {
+                currentViewingCurrency = newCur;
+                updateCurrencyButtonsUI();
+                applyFilters();
+            }
+        }
+    });
 
     // Selector de Mes
     let customSelectedMonth = null;

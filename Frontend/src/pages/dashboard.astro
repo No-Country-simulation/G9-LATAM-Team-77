@@ -445,16 +445,12 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                     nameHeader.textContent = fullName;
                 }
 
-                // Sincronizar moneda oficial elegida por el usuario en BD
+                // Sincronizar moneda oficial de la cuenta elegida por el usuario en BD
                 const userCur = (user.codigoMoneda || user.monedaCodigo || user.moneda || '').toUpperCase();
                 if (userCur) {
-                    localStorage.setItem('financeai_preferred_currency', userCur);
-                    if (activeCurrency !== userCur) {
-                        activeCurrency = userCur;
-                        if (activeCurrencyDisplay) activeCurrencyDisplay.textContent = activeCurrency;
-                        document.querySelectorAll('.currencySymbol').forEach(el => el.textContent = activeCurrency);
-                        syncDashboardLiveBalance();
-                        window.dispatchEvent(new CustomEvent('financeai_currency_changed', { detail: { currency: userCur } }));
+                    localStorage.setItem('financeai_account_base_currency', userCur);
+                    if (!localStorage.getItem('financeai_preferred_currency')) {
+                        localStorage.setItem('financeai_preferred_currency', userCur);
                     }
                 }
             }
@@ -469,7 +465,9 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                     const pId = parseInt(document.getElementById('modalPaisId').value);
                     const mId = parseInt(document.getElementById('modalMonedaId').value);
                     const currencyCodes = { 1: 'CRC', 2: 'MXN', 3: 'USD', 4: 'EUR', 5: 'COP', 6: 'ARS', 7: 'CLP', 8: 'PEN', 9: 'HNL', 10: 'BRL' };
-                    localStorage.setItem('financeai_preferred_currency', currencyCodes[mId] || 'USD');
+                    const selectedCur = currencyCodes[mId] || 'USD';
+                    localStorage.setItem('financeai_account_base_currency', selectedCur);
+                    localStorage.setItem('financeai_preferred_currency', selectedCur);
 
                     const updateRes = await fetch(`${API_URL}/api/v1/users/profile`, {
                         method: 'PUT',
@@ -492,7 +490,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
     }
 
     // Moneda activa
-    let activeCurrency = (localStorage.getItem('financeai_preferred_currency') || 'USD').toUpperCase();
+    let activeCurrency = (localStorage.getItem('financeai_preferred_currency') || localStorage.getItem('financeai_account_base_currency') || 'USD').toUpperCase();
     const activeCurrencyDisplay = document.getElementById('activeCurrencyDisplay');
     if (activeCurrencyDisplay) activeCurrencyDisplay.textContent = activeCurrency;
     document.querySelectorAll('.currencySymbol').forEach(el => el.textContent = activeCurrency);
@@ -530,6 +528,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
             ? transacciones.reduce((acc, t) => acc + (parseFloat(t.monto) || 0), 0)
             : 0;
 
+        const accountBaseCur = (localStorage.getItem('financeai_account_base_currency') || activeCurrency || 'MXN').toUpperCase();
         const ingresoUSD = convertAmount(currentIngreso, activeCurrency, 'USD');
         const expUSD = convertAmount(currentExpTotal, activeCurrency, 'USD');
 
@@ -547,7 +546,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         if (Array.isArray(existingHistory) && existingHistory.length > 0) {
             existingHistory.forEach(t => {
                 const a = parseFloat(t.amount || t.monto || t.valor || 0) || 0;
-                const originCur = (t.originalCurrency || t.moneda || activeCurrency).toUpperCase();
+                const originCur = (t.originalCurrency || t.moneda || accountBaseCur).toUpperCase();
                 const amtInUSD = convertAmount(a, originCur, 'USD');
                 const typ = (t.type || '').toUpperCase();
                 const cat = (t.category || t.categoria || '').toUpperCase();

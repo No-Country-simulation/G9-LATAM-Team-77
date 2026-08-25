@@ -693,6 +693,9 @@ if (session) {
 				localStorage.setItem('financeai_history_cleared', 'true');
 				localStorage.setItem('financeai_token', data.token);
 				localStorage.setItem('financeai_user', JSON.stringify(data));
+				const cur = (data.codigoMoneda || data.moneda || 'MXN').toUpperCase();
+				localStorage.setItem('financeai_account_base_currency', cur);
+				localStorage.setItem('financeai_preferred_currency', cur);
 				showToast("¡Bienvenido!", "Accediendo a tu panel financiero...", "👋");
 				setTimeout(() => { window.location.replace('/dashboard'); }, 300);
 			} else {
@@ -751,9 +754,11 @@ if (session) {
 						localStorage.clear();
 						sessionStorage.clear();
 						const currencyCodes = { 1: 'CRC', 2: 'MXN', 3: 'USD', 4: 'EUR', 5: 'COP', 6: 'ARS', 7: 'CLP', 8: 'PEN', 9: 'HNL', 10: 'BRL' };
-						if (pendingRegistrationData && pendingRegistrationData.monedaId) {
-							localStorage.setItem('financeai_preferred_currency', currencyCodes[pendingRegistrationData.monedaId] || 'MXN');
-						}
+						const curCode = (pendingRegistrationData && pendingRegistrationData.monedaId) 
+							? (currencyCodes[pendingRegistrationData.monedaId] || 'MXN')
+							: 'MXN';
+						localStorage.setItem('financeai_account_base_currency', curCode);
+						localStorage.setItem('financeai_preferred_currency', curCode);
 						localStorage.setItem('financeai_history_cleared', 'true');
 						localStorage.setItem('financeai_token', loginData.token);
 						localStorage.setItem('financeai_user', JSON.stringify(loginData));
