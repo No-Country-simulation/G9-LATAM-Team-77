@@ -746,15 +746,14 @@ const googleEmail = session?.user?.email || '';
 
         if (!fetchedFromBackend) {
             const savedLocal = localStorage.getItem('financeai_all_transactions');
-            const isHistoryExplicitlyCleared = localStorage.getItem('financeai_history_cleared') === 'true';
             if (savedLocal) {
                 try {
                     transacciones = JSON.parse(savedLocal);
                 } catch (_) {
-                    transacciones = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                    transacciones = [];
                 }
             } else {
-                transacciones = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                transacciones = [];
             }
         }
 
@@ -892,21 +891,6 @@ const googleEmail = session?.user?.email || '';
         const converted = inUSD / toVal;
         return Math.round(converted * 100) / 100;
     }
-
-    const INITIAL_SAMPLE_TRANSACTIONS = [
-        { id: 101, description: 'Sueldo Quincenal Base', amount: 4500, originalCurrency: 'USD', category: 'Ingresos', type: 'INCOME', date: '2026-08-01' },
-        { id: 102, description: 'Renta Depto', amount: 1200, originalCurrency: 'USD', category: 'Vivienda', type: 'EXPENSE', date: '2026-08-03' },
-        { id: 103, description: 'Supermercado Mensual', amount: 650, originalCurrency: 'USD', category: 'Alimentación', type: 'EXPENSE', date: '2026-08-06' },
-        { id: 104, description: 'Gasolina y Transporte', amount: 420, originalCurrency: 'USD', category: 'Transporte', type: 'EXPENSE', date: '2026-08-10' },
-        { id: 105, description: 'Servicios de Luz y Agua', amount: 180, originalCurrency: 'USD', category: 'Servicios', type: 'EXPENSE', date: '2026-08-13' },
-        { id: 106, description: 'Ingreso Extra Consultoría', amount: 800, originalCurrency: 'USD', category: 'Ingresos', type: 'INCOME', date: '2026-08-15' },
-        { id: 107, description: 'Cursos y Libros', amount: 500, originalCurrency: 'USD', category: 'Educación', type: 'EXPENSE', date: '2026-08-18' },
-        { id: 108, description: 'Cena y Salidas', amount: 260, originalCurrency: 'USD', category: 'Entretenimiento', type: 'EXPENSE', date: '2026-08-20' },
-        { id: 109, description: 'Farmacia y Vitaminas', amount: 140, originalCurrency: 'USD', category: 'Salud y bienestar', type: 'EXPENSE', date: '2026-07-24' },
-        { id: 110, description: 'Ropa y Accesorios', amount: 310, originalCurrency: 'USD', category: 'Compras', type: 'EXPENSE', date: '2026-07-28' },
-        { id: 111, description: 'Ingreso Nómina Julio', amount: 4200, originalCurrency: 'USD', category: 'Ingresos', type: 'INCOME', date: '2026-07-01' },
-        { id: 112, description: 'Mantenimiento Vehicular', amount: 750, originalCurrency: 'USD', category: 'Transporte', type: 'EXPENSE', date: '2026-07-15' }
-    ];
 
     function renderNavSaldoDisplay() {
         const saldoTexts = document.querySelectorAll('.nav-saldo-text');

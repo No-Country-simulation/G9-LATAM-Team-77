@@ -1,5 +1,8 @@
-# Variables de Entorno
+# Variables de Entorno y Claves
 .env
+.env.*
+*.key
+*.pem
 
 # Backend (Java / Spring Boot)
 Backend/financeia-backend/target/

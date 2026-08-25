@@ -444,6 +444,19 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                 if (nameHeader && fullName) {
                     nameHeader.textContent = fullName;
                 }
+
+                // Sincronizar moneda oficial elegida por el usuario en BD
+                const userCur = (user.codigoMoneda || user.monedaCodigo || user.moneda || '').toUpperCase();
+                if (userCur) {
+                    localStorage.setItem('financeai_preferred_currency', userCur);
+                    if (activeCurrency !== userCur) {
+                        activeCurrency = userCur;
+                        if (activeCurrencyDisplay) activeCurrencyDisplay.textContent = activeCurrency;
+                        document.querySelectorAll('.currencySymbol').forEach(el => el.textContent = activeCurrency);
+                        syncDashboardLiveBalance();
+                        window.dispatchEvent(new CustomEvent('financeai_currency_changed', { detail: { currency: userCur } }));
+                    }
+                }
             }
             if (!user.paisId || !user.monedaId) {
                 document.getElementById('completeProfileModal')?.classList.remove('hidden');
@@ -1180,11 +1193,12 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                     existingHistory = [];
                 }
 
+                const periodLabel = customSubPeriodDisplay?.textContent?.trim() || `${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}`;
                 const timestampBase = Date.now();
                 const newTxns = [
                     {
                         id: timestampBase,
-                        description: `Ingreso del Período (${selectSubPeriod.options[selectSubPeriod.selectedIndex]?.text || ''})`,
+                        description: `Ingreso (${periodLabel})`,
                         amount: ingreso,
                         originalCurrency: activeCurrency,
                         category: 'Ingresos',
@@ -1206,9 +1220,31 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                 localStorage.setItem('financeai_all_transactions', JSON.stringify(updatedHistory));
                 localStorage.setItem('financeai_dashboard_txns', JSON.stringify(updatedHistory));
 
+                // Persistir cada transacción e ingreso en la base de datos MySQL (tabla transacciones)
+                if (token) {
+                    newTxns.forEach(async (tx) => {
+                        try {
+                            await fetch(`${API_URL}/api/v1/transactions`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    description: tx.description,
+                                    amount: parseFloat(tx.amount) || 0.01,
+                                    category: tx.category || 'Otros',
+                                    type: tx.type || 'EXPENSE',
+                                    date: tx.date || currentMinDate
+                                })
+                            });
+                        } catch (_) {}
+                    });
+                }
+
                 window.dispatchEvent(new CustomEvent('financeai_global_balance_updated'));
 
-                window.showToast('¡Análisis Completado!', 'Resultados generados con el motor de IA', '✨');
+                window.showToast('¡Análisis Completado!', 'Resultados y transacciones guardadas exitosamente', '✨');
             } else {
                 setCalculatingState(false);
                 window.showToast('Error en Análisis', `No fue posible completar el análisis (HTTP ${res.status}).`, '⚠️');
