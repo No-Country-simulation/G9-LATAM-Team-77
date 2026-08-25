@@ -436,15 +436,19 @@ const OFFICIAL_RATES_TABLE = [
         }
 
         if (fetchedTx !== null && Array.isArray(fetchedTx)) {
-            rawTransactions = fetchedTx.map(t => ({
-                id: t.id,
-                description: t.description || t.descripcion || 'Transacción',
-                amount: parseFloat(t.amount || t.monto || t.valor || 0),
-                originalCurrency: t.originalCurrency || t.moneda || profileBaseCurrency,
-                category: t.category || t.categoria || t.descripcion || 'Otros',
-                type: t.type || (t.category === 'Ingresos' || t.categoria === 'Ingresos' || parseFloat(t.amount || t.monto) > 0 ? 'INCOME' : 'EXPENSE'),
-                date: (t.date || t.fecha || todayISO).toString().slice(0, 10)
-            }));
+            rawTransactions = fetchedTx.map(t => {
+                const rawType = String(t.type || '').toUpperCase();
+                const isIncome = rawType === 'INGRESO' || rawType === 'INCOME' || t.category === 'Ingresos' || t.categoria === 'Ingresos';
+                return {
+                    id: t.id,
+                    description: t.description || t.descripcion || 'Transacción',
+                    amount: parseFloat(t.amount || t.monto || t.valor || 0),
+                    originalCurrency: t.originalCurrency || t.moneda || profileBaseCurrency,
+                    category: t.category || t.categoria || t.descripcion || (isIncome ? 'Ingresos' : 'Otros'),
+                    type: isIncome ? 'INCOME' : 'EXPENSE',
+                    date: (t.date || t.fecha || todayISO).toString().slice(0, 10)
+                };
+            });
             localStorage.setItem('financeai_all_transactions', JSON.stringify(rawTransactions));
         } else {
             const savedLocal = localStorage.getItem('financeai_all_transactions');

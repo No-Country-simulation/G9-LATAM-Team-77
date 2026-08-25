@@ -1231,10 +1231,10 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
                                     'Authorization': `Bearer ${token}`
                                 },
                                 body: JSON.stringify({
-                                    description: tx.description,
-                                    amount: parseFloat(tx.amount) || 0.01,
+                                    description: tx.description || 'Transacción',
+                                    amount: Math.max(0.01, parseFloat(tx.amount) || 0.01),
                                     category: tx.category || 'Otros',
-                                    type: tx.type || 'EXPENSE',
+                                    type: (tx.type === 'INCOME' || tx.type === 'INGRESO') ? 'INGRESO' : 'GASTO',
                                     date: tx.date || currentMinDate
                                 })
                             });

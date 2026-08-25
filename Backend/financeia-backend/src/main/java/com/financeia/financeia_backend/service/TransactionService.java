@@ -28,9 +28,14 @@ public class TransactionService {
         transaction.setAmount(request.amount());
         transaction.setCategory(request.category());
 
-        transaction.setType( //Funciona solo si los valores del enum coinciden con lo que le llega al Json
-                TransactionType.valueOf(request.type().toUpperCase())
-        );
+        String rawType = request.type() != null ? request.type().trim().toUpperCase() : "GASTO";
+        TransactionType type;
+        if (rawType.equals("INCOME") || rawType.equals("INGRESO")) {
+            type = TransactionType.INGRESO;
+        } else {
+            type = TransactionType.GASTO;
+        }
+        transaction.setType(type);
 
         transaction.setDate(request.date());
         transaction.setUser(user);
