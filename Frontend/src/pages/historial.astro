@@ -423,7 +423,7 @@ const OFFICIAL_RATES_TABLE = [
         deseos: '#F59E0B'       // Ámbar
     };
 
-    async function loadTransactionsFromStorage() {
+    async function loadData() {
         const token = localStorage.getItem('financeai_token');
         let fetchedTx = null;
         if (token) {
