@@ -547,14 +547,14 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
         if (Array.isArray(existingHistory) && existingHistory.length > 0) {
             existingHistory.forEach(t => {
                 const a = parseFloat(t.amount || t.monto || t.valor || 0) || 0;
-                const originCur = t.originalCurrency || t.moneda || 'USD';
+                const originCur = (t.originalCurrency || t.moneda || activeCurrency).toUpperCase();
                 const amtInUSD = convertAmount(a, originCur, 'USD');
                 const typ = (t.type || '').toUpperCase();
                 const cat = (t.category || t.categoria || '').toUpperCase();
                 if (typ === 'INCOME' || typ === 'INGRESO' || cat === 'INGRESOS') {
                     histIncUSD += amtInUSD;
                 } else {
-                    expUSD += amtInUSD;
+                    histExpUSD += amtInUSD;
                 }
             });
             const netTotalUSD = histIncUSD - histExpUSD;
