@@ -229,7 +229,7 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
 
                         <!-- 2. Ahorro Est. -->
                         <div class="p-2.5 sm:p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl sm:rounded-2xl border border-emerald-100 dark:border-emerald-900/40">
-                            <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Ahorro Est.</span>
+                            <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Ahorro</span>
                             <div id="statAhorroEst" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">$0</div>
                         </div>
 
@@ -429,7 +429,15 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
     if (currentToken) {
         fetch(`${API_URL}/api/v1/users/profile`, {
             headers: { 'Authorization': `Bearer ${currentToken}` }
-        }).then(res => res.json()).then(user => {
+        }).then(res => {
+            if (!res.ok) {
+                if (res.status === 401) {
+                    localStorage.removeItem('financeai_token');
+                }
+                return null;
+            }
+            return res.json();
+        }).then(user => {
             if (user) {
                 const fullName = user.nombre ? `${user.nombre} ${user.apellido || ''}`.trim() : (user.name || '');
                 const nameHeader = document.getElementById('dashboardUserNameHeader');
@@ -967,6 +975,9 @@ const initialUserName = session?.user?.name ? `, ${session.user.name}` : '';
     let transacciones = [];
 
     function renderTransacciones() {
+        const list = document.getElementById('txList');
+        if (!list) return;
+
         const selectedCategories = transacciones.map(t => t.descripcion);
 
         list.innerHTML = transacciones.map((tx, idx) => `

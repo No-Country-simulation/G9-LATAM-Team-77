@@ -851,7 +851,7 @@ const googleEmail = session?.user?.email || '';
 
     // ─── Saldo General Total Ahorrado (Consistente con Balance Neto Historial) ───
     let isNavSaldoCensored = true;
-    let globalBaseNetUSD = 5090;
+    let globalBaseNetUSD = 0;
 
     const OFFICIAL_USD_VALUES = {
         USD: 1.00,
@@ -1072,15 +1072,14 @@ const googleEmail = session?.user?.email || '';
 
         if (!fetchedFromBackend) {
             const savedLocal = localStorage.getItem('financeai_all_transactions');
-            const isHistoryExplicitlyCleared = localStorage.getItem('financeai_history_cleared') === 'true';
             if (savedLocal) {
                 try {
                     transactions = JSON.parse(savedLocal);
                 } catch (_) {
-                    transactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                    transactions = [];
                 }
             } else {
-                transactions = isHistoryExplicitlyCleared ? [] : INITIAL_SAMPLE_TRANSACTIONS;
+                transactions = [];
             }
         }
 
