@@ -2,7 +2,7 @@ import Google from '@auth/core/providers/google';
 import Credentials from '@auth/core/providers/credentials';
 import { defineConfig } from 'auth-astro';
 
-const apiUrl = process.env.INTERNAL_BACKEND_URL || 'http://backend:8080';
+const apiUrl = process.env.INTERNAL_BACKEND_URL || (process.env.NODE_ENV === 'production' ? 'http://backend:8080' : 'https://financeai-app.duckdns.org');
 
 export default defineConfig({
   providers: [

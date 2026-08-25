@@ -3,4 +3,4 @@
 export const API_URL = '';
 
 // En endpoints SSR del servidor (Node.js dentro de Docker), conectar directo al backend.
-export const SERVER_API_URL = process.env.INTERNAL_BACKEND_URL || 'http://backend:8080';
+export const SERVER_API_URL = process.env.INTERNAL_BACKEND_URL || (process.env.NODE_ENV === 'production' ? 'http://backend:8080' : 'https://financeai-app.duckdns.org');

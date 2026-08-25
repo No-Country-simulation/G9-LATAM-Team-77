@@ -62,8 +62,9 @@ export default defineConfig({
       allowedHosts: true,
       proxy: {
         '/api/v1': {
-          target: 'http://127.0.0.1:8080',
-          changeOrigin: true
+          target: process.env.BACKEND_API_URL || 'https://financeai-app.duckdns.org',
+          changeOrigin: true,
+          secure: false
         }
       }
     },
